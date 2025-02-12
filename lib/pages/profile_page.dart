@@ -108,12 +108,12 @@ class _ProfilePageState extends State<ProfilePage> {
           Navigator.push(
             context,
             MaterialPageRoute(
-                builder: (context) => const PrivacyPolicyScreen()),
+                builder: (context) => const PrivacyPolicy()),
           );
         } else if (title == "About Us") {
           Navigator.push(
             context,
-            MaterialPageRoute(builder: (context) => const AboutUsScreen()),
+            MaterialPageRoute(builder: (context) => const AboutUs()),
           );
         }
       },

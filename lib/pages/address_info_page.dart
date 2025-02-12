@@ -104,9 +104,15 @@ class _AddressInfoPageState extends State<AddressInfoPage> {
               SizedBox(
                 width: 120, // Reduced button width
                 child: LoginButton(
-                  text: "Sign Up",
+                  text: "Next",
                   onPressed: () {
                     // Sign-up logic here
+                    // Navigator.push(
+                    //   context,
+                    //   MaterialPageRoute(
+                    //     builder: (context) => MedicalInfoPage(),
+                    //   ),
+                    // );
                   },
                 ),
               ),

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:project_1/pages/enter_otp_page.dart';
 import '../widgets/custom_container.dart';
 import '../widgets/login_button.dart';
 
@@ -54,6 +55,12 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
               text: 'Continue',
               onPressed: () {
                 // Continue button press (send OTP)
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => EnterOtpPage(),
+                  ),
+                );
               },
             ),
           ],

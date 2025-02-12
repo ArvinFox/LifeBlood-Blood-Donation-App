@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:project_1/pages/address_info_page.dart';
 import '../widgets/custom_container.dart'; // Reusing the custom container layout
 import '../widgets/login_button.dart'; // Reusing the login button
 
@@ -137,7 +138,12 @@ class _PersonalInfoPageState extends State<PersonalInfoPage> {
               child: LoginButton(
                 text: "Next",
                 onPressed: () {
-                  Navigator.pushNamed(context, "/addressInfo");
+                  Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => AddressInfoPage(),
+                  ),
+                );
                 },
               ),
             ),

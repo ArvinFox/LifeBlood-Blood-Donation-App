@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:project_1/pages/reset_pswd_page.dart';
 import '../widgets/custom_container.dart';
 import '../widgets/login_button.dart';
 
@@ -52,7 +53,13 @@ class _EnterOtpPageState extends State<EnterOtpPage> {
             LoginButton(
               text: 'Continue',
               onPressed: () {
-                // Send OTP when clicking continue
+                // redirect to the reset password page
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => ResetPasswordPage(),
+                  ),
+                );
               },
             ),
           ],

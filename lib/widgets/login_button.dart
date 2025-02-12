@@ -17,7 +17,7 @@ class LoginButton extends StatelessWidget {
       height: 50,
       child: OutlinedButton(
         style: OutlinedButton.styleFrom(
-          side: const BorderSide(color: Colors.red, width: 2), // Red outline
+          side: const BorderSide(color: Color(0xFFE50F2A), width: 2), // Red outline
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(15),
           ),
@@ -28,7 +28,7 @@ class LoginButton extends StatelessWidget {
           style: const TextStyle(
             fontSize: 18,
             fontWeight: FontWeight.bold,
-            color: Colors.red,
+            color: Color(0xFFE50F2A),
           ),
         ),
       ),
