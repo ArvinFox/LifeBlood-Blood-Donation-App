@@ -1,7 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:lifeblood_blood_donation_app/components/event_container.dart';
-import 'package:lifeblood_blood_donation_app/components/bottom_navigation.dart';
 
 class EventsScreen extends StatefulWidget {
   const EventsScreen({super.key});
@@ -116,7 +115,6 @@ class _EventsPageState extends State<EventsScreen> {
           ),
         ),
       ),
-      bottomNavigationBar: CurveNavBar(),
     );
   }
 }

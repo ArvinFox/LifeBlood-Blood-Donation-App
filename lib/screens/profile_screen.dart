@@ -1,7 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:lifeblood_blood_donation_app/components/profile_option.dart';
-import 'package:lifeblood_blood_donation_app/components/bottom_navigation.dart';
 import 'package:lifeblood_blood_donation_app/screens/donation_history_screen.dart';
 import 'package:lifeblood_blood_donation_app/screens/rewards_screen.dart';
 
@@ -159,7 +158,6 @@ class _ProfilePageState extends State<ProfileScreen> {
           ),
         ),
       ),
-      bottomNavigationBar: CurveNavBar(),
     );
   }
 }

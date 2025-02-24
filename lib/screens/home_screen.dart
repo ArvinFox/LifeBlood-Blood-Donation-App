@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:lifeblood_blood_donation_app/components/bottom_navigation.dart';
 import 'package:lifeblood_blood_donation_app/components/carousel_container.dart';
 import 'package:lifeblood_blood_donation_app/components/donation_request_card.dart';
 import 'package:lifeblood_blood_donation_app/components/drawer/side_drawer.dart';
 import 'package:lifeblood_blood_donation_app/components/small_button.dart';
+// import 'package:lifeblood_blood_donation_app/models/donation_request_details.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -23,6 +23,7 @@ class _HomePageState extends State<HomeScreen> {
           color: Colors.white,
           size: 30,
         ),
+        automaticallyImplyLeading: false,
         backgroundColor: Color(0xFFE50F2A),
         title: Padding(
           padding: const EdgeInsets.all(10),
@@ -70,29 +71,36 @@ class _HomePageState extends State<HomeScreen> {
               ),
               //donation request cards
               DonationRequestCard(
-                bloodType: "A+",
-                urgencyLevel: "High",
-                hospitalLocation: "Base Hospital ",
-                city: "Homawgama",
-              ),
-              SizedBox(
-                height: 20,
+                bloodType: 'A+',
+                urgencyLevel: 'High',
+                hospitalLocation: 'Homagama',
+                city: 'Homagama',
               ),
               DonationRequestCard(
-                bloodType: "O+",
-                urgencyLevel: "High",
-                hospitalLocation: "Base Hospital ",
-                city: "Homagama",
+                bloodType: 'A+',
+                urgencyLevel: 'High',
+                hospitalLocation: 'Homagama',
+                city: 'Homagama',
               ),
-              SizedBox(
-                height: 20,
-              ),
-              DonationRequestCard(
-                bloodType: "O+",
-                urgencyLevel: "High",
-                hospitalLocation: "Base Hospital ",
-                city: "Homagama",
-              ),
+              // GridView.builder(
+              //   physics: NeverScrollableScrollPhysics(),
+              //   shrinkWrap: true,
+              //   gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+              //     crossAxisCount: 1,
+              //   ),
+              //   itemCount: 3,
+              //   itemBuilder: (context, index) {
+              //     return SizedBox(
+              //       height: 40,
+              //       child: DonationRequestCard(
+              //         bloodType: requestDetails[index].requestBloodType,
+              //         urgencyLevel: requestDetails[index].urgencyLevel,
+              //         hospitalLocation: requestDetails[index].hospitalLocation,
+              //         city: requestDetails[index].city,
+              //       ),
+              //     );
+              //   },
+              // ),
               SizedBox(
                 height: 20,
               ),
@@ -102,20 +110,23 @@ class _HomePageState extends State<HomeScreen> {
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: [
                   SmallButton(
-                    buttonTitle: "See More",
+                    buttonLabel: "See More",
                     buttonHeight: 40,
                     buttonWidth: 120,
+                    buttonColor: Colors.white,
+                    borderColor: Colors.black,
+                    labelColor: Colors.black,
+                    onTap: () {},
                   ),
                 ],
               ),
               SizedBox(
-                height: 90,
+                height: 20,
               ),
             ],
           ),
         ),
       ),
-      bottomNavigationBar: CurveNavBar(),
     );
   }
 }

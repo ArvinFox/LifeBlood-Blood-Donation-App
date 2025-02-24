@@ -4,15 +4,16 @@ import 'package:lifeblood_blood_donation_app/screens/find_donor_screen.dart';
 import 'package:lifeblood_blood_donation_app/screens/home_screen.dart';
 import 'package:lifeblood_blood_donation_app/screens/profile_screen.dart';
 
-class CurveNavBar extends StatefulWidget {
-  const CurveNavBar({super.key});
+class MainLayoutScreen extends StatefulWidget {
+  const MainLayoutScreen({super.key});
 
   @override
-  State<CurveNavBar> createState() => _CurveNavBarState();
+  State<MainLayoutScreen> createState() => _MainLayoutScreenState();
 }
 
-class _CurveNavBarState extends State<CurveNavBar> {
+class _MainLayoutScreenState extends State<MainLayoutScreen> {
   int _currentIndex = 0;
+
   final items = [
     const Icon(Icons.home, size: 30),
     const Icon(Icons.search, size: 30),
@@ -27,18 +28,10 @@ class _CurveNavBarState extends State<CurveNavBar> {
     ProfileScreen(),
   ];
 
-  late PageController _pageController;
-
-  @override
-  void initState() {
-    super.initState();
-    _pageController = PageController(initialPage: _currentIndex);
-  }
-
-  @override
-  void dispose() {
-    _pageController.dispose();
-    super.dispose();
+  void _onItemTapped(int index) {
+    setState(() {
+      _currentIndex = index;
+    });
   }
 
   @override
@@ -59,11 +52,7 @@ class _CurveNavBarState extends State<CurveNavBar> {
               color: Color(0xFFE50F2A),
               items: items,
               index: _currentIndex,
-              onTap: (index) {
-                setState(() {
-                  _currentIndex = index;
-                });
-              },
+              onTap: _onItemTapped,
             ),
           ),
         ),

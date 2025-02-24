@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:lifeblood_blood_donation_app/screens/about_us_screen.dart';
 import 'package:lifeblood_blood_donation_app/screens/feedback_screen.dart';
+import 'package:lifeblood_blood_donation_app/screens/find_donor_screen.dart';
 import 'package:lifeblood_blood_donation_app/screens/home_screen.dart';
 import 'package:lifeblood_blood_donation_app/screens/login_screen.dart';
 import 'package:lifeblood_blood_donation_app/screens/privacy_policy_screen.dart';
@@ -309,7 +310,7 @@ void navigatePage(BuildContext context, DrawerSelection selection) {
           case DrawerSelection.home:
             return HomeScreen();
           case DrawerSelection.search:
-            return HomeScreen(); //find donors page
+            return FindDonorScreen(); //find donors page
           case DrawerSelection.settings:
             return HomeScreen(); //settings page
           case DrawerSelection.notifications:

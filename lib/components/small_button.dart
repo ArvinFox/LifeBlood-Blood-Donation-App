@@ -1,16 +1,23 @@
 import 'package:flutter/material.dart';
-import 'package:lifeblood_blood_donation_app/screens/events_screen.dart';
 
 class SmallButton extends StatelessWidget {
-  final String buttonTitle;
+  final String buttonLabel;
   final double buttonWidth;
   final double buttonHeight;
+  final Color buttonColor;
+  final Color borderColor;
+  final Color labelColor;
+  final VoidCallback onTap;
 
   const SmallButton({
     super.key,
-    required this.buttonTitle,
+    required this.buttonLabel,
     required this.buttonWidth,
     required this.buttonHeight,
+    required this.buttonColor,
+    required this.borderColor,
+    required this.labelColor,
+    required this.onTap,
   });
 
   @override
@@ -18,27 +25,24 @@ class SmallButton extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.all(10),
       child: InkWell(
-        onTap: () {
-          Navigator.push(
-              context, MaterialPageRoute(builder: (context) => EventsScreen()));
-        },
+        onTap: onTap,
         child: Container(
           padding: const EdgeInsets.all(10),
           height: buttonHeight,
           width: buttonWidth,
           decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(8),
+            color: buttonColor,
+            borderRadius: BorderRadius.circular(15),
             border: Border.all(
-              color: Colors.black,
+              color: borderColor,
               width: 1,
             ),
           ),
           child: Center(
             child: Text(
-              buttonTitle,
+              buttonLabel,
               style: TextStyle(
-                color: Colors.black,
+                color: labelColor,
                 fontWeight: FontWeight.bold,
               ),
             ),
