@@ -1,29 +1,17 @@
 import 'package:flutter/material.dart';
-import 'package:project_1/pages/login_signup.dart';
-// import 'pages/address_info_page.dart';
-// import 'pages/personal_info_page.dart';
-// import 'pages/about_us_page.dart';
-// import 'pages/login_page.dart';
-// import 'pages/forgot_pswd_page.dart';
-// import 'pages/enter_otp_page.dart';
-// import 'pages/reset_pswd_page.dart';
-// import 'pages/privacy_policy_page.dart';
-// import 'pages/profile_page.dart';
-// import 'package:project_1/pages/login_signup.dart';
-// import 'package:project_1/pages/home_page.dart';
+import 'package:lifeblood_blood_donation_app/app.dart';
+import 'package:lifeblood_blood_donation_app/screens/login_signup_screen.dart';
+import 'package:lifeblood_blood_donation_app/screens/privacy_policy_screen.dart';
 
 void main() {
-  runApp(LifeBloodApp());
+  runApp(MyApp());
 }
 
-class LifeBloodApp extends StatelessWidget {
-  const LifeBloodApp({super.key});
+class MyApp extends StatelessWidget {
+  const MyApp({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      home: LoginScreen(), //Change this to see the page
-    );
+    return LifeBlood();
   }
 }
