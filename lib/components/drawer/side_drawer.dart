@@ -4,6 +4,7 @@ import 'package:lifeblood_blood_donation_app/screens/feedback_screen.dart';
 import 'package:lifeblood_blood_donation_app/screens/find_donor_screen.dart';
 import 'package:lifeblood_blood_donation_app/screens/home_screen.dart';
 import 'package:lifeblood_blood_donation_app/screens/login_screen.dart';
+import 'package:lifeblood_blood_donation_app/screens/notification_screen.dart';
 import 'package:lifeblood_blood_donation_app/screens/privacy_policy_screen.dart';
 import 'package:lifeblood_blood_donation_app/components/drawer/drawer_header.dart';
 
@@ -310,11 +311,11 @@ void navigatePage(BuildContext context, DrawerSelection selection) {
           case DrawerSelection.home:
             return HomeScreen();
           case DrawerSelection.search:
-            return FindDonorScreen(); //find donors page
+            return FindDonorScreen(navigation: NavigationPage.sideDrawer,); //find donors page
           case DrawerSelection.settings:
             return HomeScreen(); //settings page
           case DrawerSelection.notifications:
-            return HomeScreen(); //notification page
+            return NotificationScreen(navigation: NotificationPageNavigation.sideDrawer,); //notification page
           case DrawerSelection.feedbacks:
             return FeedbackScreen();
           case DrawerSelection.privacyPolicy:

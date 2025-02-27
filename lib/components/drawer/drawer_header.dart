@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:lifeblood_blood_donation_app/screens/profile_screen.dart';
 
 class HeaderDrawer extends StatefulWidget {
   const HeaderDrawer({super.key});
@@ -19,14 +18,12 @@ class _HeaderDrawerState extends State<HeaderDrawer> {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Container(
-            margin: EdgeInsets.only(bottom: 10),
-            height: 70,
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              image: DecorationImage(
-                image: AssetImage("assets/images/profile.jpg"),
-              ),
+          Padding(
+            padding: const EdgeInsets.all(10),
+            child: CircleAvatar(
+              radius: 40,
+              backgroundColor: Colors.grey.shade300,
+              backgroundImage: AssetImage("assets/images/profile.jpg"),
             ),
           ),
           Text(
@@ -38,12 +35,7 @@ class _HeaderDrawerState extends State<HeaderDrawer> {
           ),
           TextButton(
             onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                    builder: (context) =>
-                        ProfileScreen()), // Navigate to Profile Screen
-              );
+              Navigator.pushReplacementNamed(context, '/profile');
             },
             child: const Text(
               "View Profile",

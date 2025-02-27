@@ -5,7 +5,12 @@ import 'package:lifeblood_blood_donation_app/components/text_field.dart';
 import '../../components/custom_container.dart';
 
 class ForgotPasswordScreen extends StatefulWidget {
-  const ForgotPasswordScreen({super.key});
+  final String screenTitle;
+
+  const ForgotPasswordScreen({
+    super.key,
+    required this.screenTitle,
+  });
 
   @override
   State<ForgotPasswordScreen> createState() => _ForgotPasswordPageState();
@@ -20,7 +25,7 @@ class _ForgotPasswordPageState extends State<ForgotPasswordScreen> {
   void getOtp(context) {
     if (_formKey.currentState != null && _formKey.currentState!.validate()) {
       //navigate to the enter OTP page
-      Navigator.pushReplacementNamed(context, '/enter-otp');
+      Navigator.pushReplacementNamed(context, '/enter-otp',arguments: widget.screenTitle,);
     } else {
       //display an error message
       ScaffoldMessenger.of(context).showSnackBar(
@@ -46,8 +51,11 @@ class _ForgotPasswordPageState extends State<ForgotPasswordScreen> {
           children: [
             SizedBox(height: 20),
             Text(
-              'Forgot Password?',
+             widget.screenTitle == 'changePassword'
+                ? 'Need to Change Password ?'
+                : 'Forgot Password?',
               style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold),
+              textAlign: TextAlign.center,
             ),
             SizedBox(height: 10),
             Image.asset(
@@ -69,12 +77,12 @@ class _ForgotPasswordPageState extends State<ForgotPasswordScreen> {
                 controller: _contactNumberController,
                 keyboardType: TextInputType.number,
                 inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-                validator: (value){
-                  if(value == null || value.isEmpty){
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
                     return 'please enter your contact number';
-                  }else if(value.length != 10){
+                  } else if (value.length != 10) {
                     return 'Contact number length should 10';
-                  }else{
+                  } else {
                     return null;
                   }
                 },
@@ -86,10 +94,16 @@ class _ForgotPasswordPageState extends State<ForgotPasswordScreen> {
               alignment: Alignment.centerRight,
               child: GestureDetector(
                 onTap: () {
-                  Navigator.popAndPushNamed(context, '/login');
+                  widget.screenTitle == 'changePassword'
+                ? Navigator.popAndPushNamed(context, '/profile')
+                : Navigator.popAndPushNamed(context, '/login');
+                  
                 },
                 child: Text(
-                  'Back to Login',
+                  widget.screenTitle == 'changePassword'
+                ? 'Back to Profile'
+                : 'Back to Login',
+                  
                   style: TextStyle(color: Colors.red),
                 ),
               ),
@@ -110,18 +124,6 @@ class _ForgotPasswordPageState extends State<ForgotPasswordScreen> {
             SizedBox(
               height: 20,
             ),
-            // LoginButton(
-            //   text: 'Continue',
-            //   onPressed: () {
-            //     // Continue button press (send OTP)
-            //     Navigator.push(
-            //       context,
-            //       MaterialPageRoute(
-            //         builder: (context) => EnterOtpScreen(),
-            //       ),
-            //     );
-            //   },
-            // ),
           ],
         ),
       ),

@@ -11,6 +11,7 @@ class CustomInputBox extends StatelessWidget {
   final FormFieldValidator<String>? validator;
   final int? multiLines;
   final int? minLines;
+  final bool needToEdit;
 
   const CustomInputBox({
     super.key,
@@ -23,6 +24,7 @@ class CustomInputBox extends StatelessWidget {
     this.validator, 
     this.multiLines,
     this.minLines,
+    this.needToEdit = false,
   });
 
   @override
@@ -46,8 +48,7 @@ class CustomInputBox extends StatelessWidget {
           obscureText: hasAstricks, //for hide password in password fields
           keyboardType: keyboardType,
           inputFormatters: inputFormatters,
-          // maxLines: multiLines,
-          // minLines: minLines,
+          readOnly: needToEdit,
           validator: (value) {
             if (validator != null) {
               return validator!(value);

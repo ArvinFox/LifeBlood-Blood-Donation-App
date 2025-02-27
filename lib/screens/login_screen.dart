@@ -106,7 +106,11 @@ class LoginScreen extends StatelessWidget {
             alignment: Alignment.centerRight,
             child: GestureDetector(
               onTap: () {
-                Navigator.pushReplacementNamed(context, '/forgot-password');
+                Navigator.pushNamed(
+                  context,
+                  '/forgot-password',
+                  arguments: 'forgotPassword',
+                );
               },
               child: Text(
                 'Forgot Password?',
@@ -127,18 +131,6 @@ class LoginScreen extends StatelessWidget {
             btnBorderColor: Color(0xFFE50F2A),
             labelColor: Color(0xFFE50F2A),
           ),
-          // LoginButton(
-          //   text: 'Login',
-          //   onPressed: () {
-          //     Navigator.pushAndRemoveUntil(
-          //       context,
-          //       MaterialPageRoute(
-          //         builder: (context) => HomeScreen(),
-          //       ),
-          //       (route) => false,
-          //     );
-          //   },
-          // ),
           const SizedBox(height: 18),
 
           // "Don't have an account?" with "Sign Up"

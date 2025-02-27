@@ -1,17 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:lifeblood_blood_donation_app/models/donation_request_details.dart';
 
 class DonationRequestCard extends StatelessWidget {
-  final String bloodType;
-  final String urgencyLevel;
-  final String hospitalLocation;
-  final String city;
+  final DonationRequestDetails donationRequest;
 
   const DonationRequestCard({
     super.key,
-    required this.bloodType,
-    required this.urgencyLevel,
-    required this.hospitalLocation,
-    required this.city,
+    required this.donationRequest, 
   });
 
   @override
@@ -32,7 +27,7 @@ class DonationRequestCard extends StatelessWidget {
               backgroundColor: Color(0xFFE50F2A),
               radius: 30,
               child: Text(
-                bloodType,
+                donationRequest.requestBloodType,
                 style: TextStyle(
                   color: Colors.white,
                   fontSize: 20,
@@ -55,7 +50,7 @@ class DonationRequestCard extends StatelessWidget {
                       ),
                     ),
                     Text(
-                      urgencyLevel,
+                      donationRequest.urgencyLevel,
                       style: TextStyle(
                         fontSize: 18,
                       ),
@@ -72,7 +67,7 @@ class DonationRequestCard extends StatelessWidget {
                       ),
                     ),
                     Text(
-                      hospitalLocation,
+                      donationRequest.hospitalLocation,
                       style: TextStyle(
                         fontSize: 18,
                       ),
@@ -80,7 +75,7 @@ class DonationRequestCard extends StatelessWidget {
                   ],
                 ),
                 Text(
-                  city,
+                  donationRequest.city,
                   style: TextStyle(
                     fontSize: 18,
                   ),

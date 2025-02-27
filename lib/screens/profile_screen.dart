@@ -1,11 +1,14 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:lifeblood_blood_donation_app/components/profile_option.dart';
-import 'package:lifeblood_blood_donation_app/screens/donation_history_screen.dart';
-import 'package:lifeblood_blood_donation_app/screens/rewards_screen.dart';
 
 class ProfileScreen extends StatefulWidget {
-  const ProfileScreen({super.key});
+  final ProfilePageNavigation navigation;
+
+  const ProfileScreen({
+    super.key,
+    required this.navigation,
+  });
 
   @override
   State<ProfileScreen> createState() => _ProfilePageState();
@@ -17,19 +20,29 @@ class _ProfilePageState extends State<ProfileScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.white,
       appBar: AppBar(
           backgroundColor: Color(0xFFE50F2A),
           title: Text(
             "Profile",
             style: TextStyle(
-                color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold),
+              color: Colors.white,
+              fontSize: 25,
+              fontWeight: FontWeight.w500,
+            ),
           ),
-          leading: CupertinoNavigationBarBackButton(
-            color: Colors.white,
-            onPressed: () {
-              Navigator.pop(context);
-            },
-          ),
+          automaticallyImplyLeading:
+              widget.navigation == ProfilePageNavigation.sideDrawer
+                  ? true
+                  : false,
+          leading: widget.navigation == ProfilePageNavigation.sideDrawer
+              ? CupertinoNavigationBarBackButton(
+                  color: Colors.white,
+                  onPressed: () {
+                    Navigator.popAndPushNamed(context, "/home");
+                  },
+                )
+              : null,
           leadingWidth: 40), // Reduce space in between leading and text
       body: SingleChildScrollView(
         child: Padding(
@@ -42,7 +55,7 @@ class _ProfilePageState extends State<ProfileScreen> {
               CircleAvatar(
                 radius: 60,
                 backgroundColor: Colors.grey.shade300,
-                // backgroundImage: AssetImage(assetName),
+                backgroundImage: AssetImage("assets/images/profile.jpg"),
               ),
 
               SizedBox(height: 16),
@@ -129,29 +142,37 @@ class _ProfilePageState extends State<ProfileScreen> {
               ProfileOption(
                 icon: Icons.edit,
                 text: "Edit Information",
-                onTap: () {},
+                onTap: () {
+                  Navigator.popAndPushNamed(
+                    context,
+                    "/signup-personal-info",
+                    arguments: 'profilePage',
+                  );
+                },
               ),
               ProfileOption(
                 icon: Icons.vpn_key,
                 text: "Change Password",
-                onTap: () {},
+                onTap: () {
+                  Navigator.popAndPushNamed(
+                    context,
+                    "/forgot-password",
+                    arguments: 'changePassword',
+                  );
+                },
               ),
               ProfileOption(
                 icon: Icons.access_time,
                 text: "Donation History",
                 onTap: () {
-                  Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) => DonationHistoryScreen()));
+                  Navigator.popAndPushNamed(context, "/donation-history");
                 },
               ),
               ProfileOption(
                 icon: Icons.card_giftcard,
                 text: " View Rewards",
                 onTap: () {
-                  Navigator.push(context,
-                      MaterialPageRoute(builder: (context) => RewardsScreen()));
+                  Navigator.popAndPushNamed(context, "/view-rewards");
                 },
               ),
             ],
@@ -160,4 +181,9 @@ class _ProfilePageState extends State<ProfileScreen> {
       ),
     );
   }
+}
+
+enum ProfilePageNavigation {
+  bottomNavigation,
+  sideDrawer,
 }

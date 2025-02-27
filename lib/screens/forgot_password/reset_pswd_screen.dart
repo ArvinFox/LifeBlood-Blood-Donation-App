@@ -4,7 +4,12 @@ import 'package:lifeblood_blood_donation_app/components/text_field.dart';
 import '../../components/custom_container.dart';
 
 class ResetPasswordScreen extends StatefulWidget {
-  const ResetPasswordScreen({super.key});
+  final String screenTitle;
+
+  const ResetPasswordScreen({
+    super.key,
+    required this.screenTitle,
+  });
 
   @override
   State<ResetPasswordScreen> createState() => _ResetPasswordPageState();
@@ -60,8 +65,11 @@ class _ResetPasswordPageState extends State<ResetPasswordScreen> {
           children: [
             SizedBox(height: 20),
             Text(
-              'Forgot Password',
+              widget.screenTitle == 'changePassword'
+                  ? 'Need to Change Password ?'
+                  : 'Forgot Password?',
               style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold),
+              textAlign: TextAlign.center,
             ),
             Image.asset('assets/images/reset_pswd.png', height: 230),
             SizedBox(height: 15),
@@ -97,7 +105,7 @@ class _ResetPasswordPageState extends State<ResetPasswordScreen> {
                     validator: (value) {
                       if (value == null || value.isEmpty) {
                         return 'Please re-enter your password here';
-                      } else if (value.length < 5 ) {
+                      } else if (value.length < 5) {
                         return 'Your password should have more than 5 characters.';
                       } else {
                         return null;
@@ -118,19 +126,6 @@ class _ResetPasswordPageState extends State<ResetPasswordScreen> {
               btnBorderColor: Color(0xFFE50F2A),
               labelColor: Color(0xFFE50F2A),
             ),
-            // LoginButton(
-            //   text: 'Reset Password',
-            //   onPressed: () {
-            //     // Reset password button press
-            //     Navigator.pushAndRemoveUntil(
-            //       context,
-            //       MaterialPageRoute(
-            //         builder: (context) => LoginScreen(),
-            //       ),
-            //       (route) => false,
-            //     );
-            //   },
-            // ),
             SizedBox(height: 20),
           ],
         ),

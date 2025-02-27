@@ -5,7 +5,12 @@ import 'package:lifeblood_blood_donation_app/components/text_field.dart';
 import '../../components/custom_container.dart';
 
 class EnterOtpScreen extends StatefulWidget {
-  const EnterOtpScreen({super.key});
+  final String screenTitle;
+
+  const EnterOtpScreen({
+    super.key,
+    required this.screenTitle,
+  });
 
   @override
   State<EnterOtpScreen> createState() => _EnterOtpPageState();
@@ -18,7 +23,7 @@ class _EnterOtpPageState extends State<EnterOtpScreen> {
   void verifyOtp(context) {
     if (_formKey.currentState != null && _formKey.currentState!.validate()) {
       //navigate to the password reset page
-      Navigator.pushReplacementNamed(context, '/new-password');
+      Navigator.pushReplacementNamed(context, '/new-password',arguments: widget.screenTitle,);
     } else {
       //display an error message
       ScaffoldMessenger.of(context).showSnackBar(
@@ -44,8 +49,11 @@ class _EnterOtpPageState extends State<EnterOtpScreen> {
           children: [
             SizedBox(height: 20),
             Text(
-              'Forgot Password?',
+              widget.screenTitle == 'changePassword'
+                ? 'Need to Change Password ?'
+                : 'Forgot Password?',
               style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold),
+              textAlign: TextAlign.center,
             ),
             SizedBox(height: 20),
             Image.asset('assets/images/otp.png', height: 230),
@@ -100,18 +108,6 @@ class _EnterOtpPageState extends State<EnterOtpScreen> {
               btnBorderColor: Color(0xFFE50F2A),
               labelColor: Color(0xFFE50F2A),
             ),
-            // LoginButton(
-            //   text: 'Continue',
-            //   onPressed: () {
-            //     // redirect to the reset password page
-            //     Navigator.push(
-            //       context,
-            //       MaterialPageRoute(
-            //         builder: (context) => ResetPasswordScreen(),
-            //       ),
-            //     );
-            //   },
-            // ),
             SizedBox(height: 30),
           ],
         ),

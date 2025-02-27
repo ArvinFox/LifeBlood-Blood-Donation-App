@@ -9,16 +9,46 @@ import 'package:lifeblood_blood_donation_app/screens/signup/signup_address_info_
 import 'package:lifeblood_blood_donation_app/screens/signup/signup_medical_info_screen.dart';
 import 'package:lifeblood_blood_donation_app/screens/signup/signup_personal_info_screen.dart';
 
-class AuthRoutes{
+class AuthRoutes {
   static Map<String, WidgetBuilder> routes = {
-    '/welcome' : (context) => GetStartedPage(),
-    '/select-role' : (context) => RoleSelectionPage(),
-    '/login' : (context) => LoginScreen(),
-    '/signup-personal-info' : (context) => SignupPersonalInfoScreen(),
-    '/signup-address-info' : (context) => SignupAddressInfoScreen(),
-    '/signup-medical-info' : (context) => SignupMedicalInfoScreen(),
-    '/forgot-password' : (context) => ForgotPasswordScreen(),
-    '/enter-otp' : (context) => EnterOtpScreen(),
-    '/new-password' : (context) => ResetPasswordScreen(),
+    '/welcome': (context) => GetStartedPage(),
+    '/select-role': (context) => RoleSelectionPage(),
+    '/login': (context) => LoginScreen(),
+    '/signup-personal-info': (context) {
+      final condition = ModalRoute.of(context)?.settings.arguments as String?;
+      return SignupPersonalInfoScreen(
+        screenTitle: condition ?? 'SignupPage',
+      );
+    },
+    '/signup-address-info': (context) {
+      final condition = ModalRoute.of(context)?.settings.arguments as String?;
+      return SignupAddressInfoScreen(
+        screenTitle: condition ?? 'SignupPage',
+      );
+    },
+    '/signup-medical-info': (context) {
+      final condition = ModalRoute.of(context)?.settings.arguments as String?;
+      return SignupMedicalInfoScreen(
+        screenTitle: condition ?? 'SignupPage',
+      );
+    },
+    '/forgot-password': (context) {
+      final condition = ModalRoute.of(context)?.settings.arguments as String?;
+      return ForgotPasswordScreen(
+        screenTitle: condition ?? 'forgotPassword',
+      );
+    },
+    '/enter-otp': (context) {
+      final condition = ModalRoute.of(context)?.settings.arguments as String?;
+      return EnterOtpScreen(
+        screenTitle: condition ?? 'forgotPassword',
+      );
+    },
+    '/new-password': (context) {
+      final condition = ModalRoute.of(context)?.settings.arguments as String?;
+      return ResetPasswordScreen(
+        screenTitle: condition ?? 'forgotPassword',
+      );
+    },
   };
 }

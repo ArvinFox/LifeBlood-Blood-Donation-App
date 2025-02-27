@@ -12,29 +12,29 @@ class DonationRequestDetails {
   });
 }
 
-List<DonationRequestDetails> requestDetails = [
-  DonationRequestDetails(
-    requestBloodType: 'A+',
-    urgencyLevel: "High",
-    hospitalLocation: "Base Hospital ",
-    city: "Homagama",
-  ),
-  DonationRequestDetails(
-    requestBloodType: 'B+',
-    urgencyLevel: "High",
-    hospitalLocation: "Base Hospital ",
-    city: "Homawgama",
-  ),
-  DonationRequestDetails(
-    requestBloodType: 'AB+',
-    urgencyLevel: "High",
-    hospitalLocation: "Base Hospital ",
-    city: "Homawgama",
-  ),
-  DonationRequestDetails(
-    requestBloodType: 'O+',
-    urgencyLevel: "High",
-    hospitalLocation: "Base Hospital ",
-    city: "Homawgama",
-  ),
-];
+// List<DonationRequestDetails> requestDetails = [
+//   DonationRequestDetails(
+//     requestBloodType: 'A+',
+//     urgencyLevel: "High",
+//     hospitalLocation: "Base Hospital ",
+//     city: "Homagama",
+//   ),
+//   DonationRequestDetails(
+//     requestBloodType: 'B+',
+//     urgencyLevel: "High",
+//     hospitalLocation: "Base Hospital ",
+//     city: "Homagama",
+//   ),
+//   DonationRequestDetails(
+//     requestBloodType: 'AB+',
+//     urgencyLevel: "High",
+//     hospitalLocation: "Base Hospital ",
+//     city: "Homagama",
+//   ),
+//   DonationRequestDetails(
+//     requestBloodType: 'O+',
+//     urgencyLevel: "High",
+//     hospitalLocation: "Base Hospital ",
+//     city: "Homagama",
+//   ),
+// ];

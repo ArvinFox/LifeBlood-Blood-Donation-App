@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:lifeblood_blood_donation_app/components/feedback_container.dart';
+import 'package:lifeblood_blood_donation_app/models/feedback.dart';
 
 class FeedbackScreen extends StatefulWidget {
   const FeedbackScreen({super.key});
@@ -10,19 +11,17 @@ class FeedbackScreen extends StatefulWidget {
 }
 
 class _FeedbackPageState extends State<FeedbackScreen> {
-  final List<Map<String, dynamic>> feedbackList = [
-    {
-      "content":
-          "This app has the potential to save lives. It's amazing how quickly I could connect with a donor.",
-      "user": "Jane Smith",
-      "rating": 5,
-    },
-    {
-      "content":
-          "The app is very user-friendly and easy to navigate. I found a donor quickly!",
-      "user": "John Dave",
-      "rating": 5,
-    },
+  final List<UserFeedback> feedbackList = [
+    UserFeedback(
+      userName: 'Jane Smith',
+      content: "This app has the potential to save lives. It's amazing how quickly I could connect with a donor.",
+      rating: 5,
+    ),
+    UserFeedback(
+      userName: 'John Dave',
+      content: "The app is very user-friendly and easy to navigate. I found a donor quickly!",
+      rating: 5,
+    ),
   ];
 
   void _showFeedbackDialog() {
@@ -113,6 +112,7 @@ class _FeedbackPageState extends State<FeedbackScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.white,
       appBar: AppBar(
         backgroundColor: const Color(0xFFE50F2A),
         title: const Text(
@@ -160,12 +160,7 @@ class _FeedbackPageState extends State<FeedbackScreen> {
             child: ListView.builder(
               itemCount: feedbackList.length,
               itemBuilder: (context, index) {
-                final feedback = feedbackList[index];
-                return FeedbackContainer(
-                  content: feedback["content"],
-                  user: feedback["user"],
-                  rating: feedback["rating"],
-                );
+                return FeedbackContainer(feedback: feedbackList[index],);
               },
             ),
           ),

@@ -4,7 +4,12 @@ import '../../components/custom_container.dart';
 import '../../components/login_button.dart';
 
 class SignupAddressInfoScreen extends StatefulWidget {
-  const SignupAddressInfoScreen({super.key});
+  final String screenTitle;
+
+  const SignupAddressInfoScreen({
+    super.key,
+    required this.screenTitle,
+  });
 
   @override
   State<SignupAddressInfoScreen> createState() => _AddressInfoPageState();
@@ -23,7 +28,8 @@ class _AddressInfoPageState extends State<SignupAddressInfoScreen> {
   void signupUserMedicalInfo(context) {
     if (_formKey.currentState != null && _formKey.currentState!.validate()) {
       //navigate to the next page
-      Navigator.pushReplacementNamed(context, '/signup-medical-info');
+      Navigator.pushReplacementNamed(context, '/signup-medical-info',
+          arguments: widget.screenTitle);
     } else {
       //display an error message
       ScaffoldMessenger.of(context).showSnackBar(
@@ -48,7 +54,10 @@ class _AddressInfoPageState extends State<SignupAddressInfoScreen> {
         children: [
           SizedBox(height: 25),
           Center(
-            child: Text("Address Information",
+            child: Text(
+                widget.screenTitle == 'profilePage'
+                    ? 'Edit Address Information'
+                    : 'Address Information',
                 style: TextStyle(
                     fontSize: 18,
                     color: Color(0xFFE50F2A),
@@ -146,8 +155,11 @@ class _AddressInfoPageState extends State<SignupAddressInfoScreen> {
                 child: LoginButton(
                   text: "Back",
                   onPressed: () {
-                    Navigator.pushReplacementNamed(
-                        context, '/signup-personal-info');
+                    widget.screenTitle == 'profilePage'
+                        ? Navigator.popAndPushNamed(
+                            context, '/signup-personal-info',
+                            arguments: widget.screenTitle)
+                        : Navigator.popAndPushNamed(context, '/signup-personal-info');
                   },
                 ),
               ),

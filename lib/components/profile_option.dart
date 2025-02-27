@@ -22,7 +22,7 @@ class ProfileOption extends StatelessWidget {
         borderRadius: BorderRadius.circular(15),
         boxShadow: [
           BoxShadow(
-            color: Colors.black12,
+            color: Colors.black26,
             blurRadius: 6,
             offset: Offset(0, 4),
           ),

@@ -5,7 +5,12 @@ import 'package:lifeblood_blood_donation_app/components/login_button.dart';
 import 'package:lifeblood_blood_donation_app/models/blood_type.dart';
 
 class SignupMedicalInfoScreen extends StatefulWidget {
-  const SignupMedicalInfoScreen({super.key});
+  final String screenTitle;
+
+  const SignupMedicalInfoScreen({
+    super.key,
+    required this.screenTitle,
+  });
 
   @override
   State<SignupMedicalInfoScreen> createState() =>
@@ -20,7 +25,10 @@ class _SignupMedicalInfoScreenState extends State<SignupMedicalInfoScreen> {
 
   void signupUserRedirectHome(context) {
     if (_formKey.currentState != null && _formKey.currentState!.validate()) {
-      Navigator.pushReplacementNamed(context, '/login');
+      //Navigator.pushReplacementNamed(context, '/login');
+      widget.screenTitle == 'profilePage'
+          ? Navigator.popAndPushNamed(context, '/profile')
+          : Navigator.popAndPushNamed(context, '/login');
     } else {
       //display an error message
       ScaffoldMessenger.of(context).showSnackBar(
@@ -45,7 +53,10 @@ class _SignupMedicalInfoScreenState extends State<SignupMedicalInfoScreen> {
         children: [
           SizedBox(height: 25),
           Center(
-            child: Text("Medical Information",
+            child: Text(
+                widget.screenTitle == 'profilePage'
+                    ? 'Edit Medical Information'
+                    : 'Medical Information',
                 style: TextStyle(
                     fontSize: 18,
                     color: Color(0xFFE50F2A),
@@ -171,15 +182,21 @@ class _SignupMedicalInfoScreenState extends State<SignupMedicalInfoScreen> {
                 child: LoginButton(
                   text: "Back",
                   onPressed: () {
-                    Navigator.pushReplacementNamed(
-                        context, '/signup-address-info');
+                    widget.screenTitle == 'profilePage'
+                        ? Navigator.popAndPushNamed(
+                            context, '/signup-address-info',
+                            arguments: widget.screenTitle)
+                        : Navigator.popAndPushNamed(
+                            context, '/signup-address-info');
                   },
                 ),
               ),
               SizedBox(
                 width: 120,
                 child: LoginButton(
-                  text: "Sign Up",
+                  text: widget.screenTitle == 'profilePage'
+                      ? 'Save'
+                      : 'Sign Up',
                   onPressed: () {
                     signupUserRedirectHome(context);
                   },

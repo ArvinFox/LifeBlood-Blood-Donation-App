@@ -7,7 +7,12 @@ import 'package:lifeblood_blood_donation_app/components/text_field.dart';
 import 'package:lifeblood_blood_donation_app/models/blood_type.dart';
 
 class FindDonorScreen extends StatefulWidget {
-  const FindDonorScreen({super.key});
+  final NavigationPage navigation;
+
+  const FindDonorScreen({
+    super.key,
+    required this.navigation,
+  });
 
   @override
   State<FindDonorScreen> createState() => _FindDonorScreenState();
@@ -52,14 +57,22 @@ class _FindDonorScreenState extends State<FindDonorScreen> {
         iconTheme: IconThemeData(color: Colors.white),
         title: Text(
           "Find Donors",
-          style: TextStyle(color: Colors.white),
+          style: TextStyle(
+            color: Colors.white,
+            fontSize: 25,
+            fontWeight: FontWeight.w500,
+          ),
         ),
-        leading: CupertinoNavigationBarBackButton(
-          color: Colors.white,
-          onPressed: () {
-            Navigator.maybePop(context);
-          },
-        ),
+        automaticallyImplyLeading:
+            widget.navigation == NavigationPage.sideDrawer ? true : false,
+        leading: widget.navigation == NavigationPage.sideDrawer
+            ? CupertinoNavigationBarBackButton(
+                color: Colors.white,
+                onPressed: () {
+                  Navigator.pop(context);
+                },
+              )
+            : null,
         leadingWidth: 40,
       ),
       body: SingleChildScrollView(
@@ -159,4 +172,10 @@ class _FindDonorScreenState extends State<FindDonorScreen> {
       ),
     );
   }
+}
+
+enum NavigationPage {
+  bottomNavigation,
+  sideDrawer,
+  roleSelection,
 }

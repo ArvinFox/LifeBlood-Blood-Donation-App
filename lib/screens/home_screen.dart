@@ -3,7 +3,7 @@ import 'package:lifeblood_blood_donation_app/components/carousel_container.dart'
 import 'package:lifeblood_blood_donation_app/components/donation_request_card.dart';
 import 'package:lifeblood_blood_donation_app/components/drawer/side_drawer.dart';
 import 'package:lifeblood_blood_donation_app/components/small_button.dart';
-// import 'package:lifeblood_blood_donation_app/models/donation_request_details.dart';
+import 'package:lifeblood_blood_donation_app/models/donation_request_details.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -13,6 +13,33 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomeScreen> {
+  final List<DonationRequestDetails> _donationRequests = [
+    DonationRequestDetails(
+      requestBloodType: 'A+',
+      urgencyLevel: "High",
+      hospitalLocation: "Base Hospital ",
+      city: "Homagama",
+    ),
+    DonationRequestDetails(
+      requestBloodType: 'B+',
+      urgencyLevel: "High",
+      hospitalLocation: "Base Hospital ",
+      city: "Homagama",
+    ),
+    DonationRequestDetails(
+      requestBloodType: 'AB+',
+      urgencyLevel: "High",
+      hospitalLocation: "Base Hospital ",
+      city: "Homagama",
+    ),
+    DonationRequestDetails(
+      requestBloodType: 'A-',
+      urgencyLevel: "High",
+      hospitalLocation: "Base Hospital ",
+      city: "Homagama",
+    )
+  ];
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -69,38 +96,17 @@ class _HomePageState extends State<HomeScreen> {
               SizedBox(
                 height: 20,
               ),
-              //donation request cards
-              DonationRequestCard(
-                bloodType: 'A+',
-                urgencyLevel: 'High',
-                hospitalLocation: 'Homagama',
-                city: 'Homagama',
+              //donation request cards (take only 3 cards from the list)
+              ListView.builder(
+                shrinkWrap: true,
+                physics: NeverScrollableScrollPhysics(),
+                itemCount: 3,
+                itemBuilder: (context, index) {
+                  return DonationRequestCard(
+                    donationRequest: _donationRequests[index],
+                  );
+                },
               ),
-              DonationRequestCard(
-                bloodType: 'A+',
-                urgencyLevel: 'High',
-                hospitalLocation: 'Homagama',
-                city: 'Homagama',
-              ),
-              // GridView.builder(
-              //   physics: NeverScrollableScrollPhysics(),
-              //   shrinkWrap: true,
-              //   gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-              //     crossAxisCount: 1,
-              //   ),
-              //   itemCount: 3,
-              //   itemBuilder: (context, index) {
-              //     return SizedBox(
-              //       height: 40,
-              //       child: DonationRequestCard(
-              //         bloodType: requestDetails[index].requestBloodType,
-              //         urgencyLevel: requestDetails[index].urgencyLevel,
-              //         hospitalLocation: requestDetails[index].hospitalLocation,
-              //         city: requestDetails[index].city,
-              //       ),
-              //     );
-              //   },
-              // ),
               SizedBox(
                 height: 20,
               ),
@@ -116,7 +122,9 @@ class _HomePageState extends State<HomeScreen> {
                     buttonColor: Colors.white,
                     borderColor: Colors.black,
                     labelColor: Colors.black,
-                    onTap: () {},
+                    onTap: () {
+                      Navigator.pushNamed(context, '/donation-request');
+                    },
                   ),
                 ],
               ),

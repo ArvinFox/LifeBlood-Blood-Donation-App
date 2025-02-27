@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:lifeblood_blood_donation_app/components/event_container.dart';
+//import 'package:social_sharing_plus/social_sharing_plus.dart';
 
 class EventsScreen extends StatefulWidget {
   const EventsScreen({super.key});
@@ -10,6 +11,7 @@ class EventsScreen extends StatefulWidget {
 }
 
 class _EventsPageState extends State<EventsScreen> {
+  final String contentToShare = "Join us for the blood donation event and save lives! Event details: Be a Hero: Save Lives Through Blood Donation at Base Hospital, Homagama.";
   void showJoinDialog(BuildContext context) {
     showDialog(
       context: context,
@@ -54,7 +56,9 @@ class _EventsPageState extends State<EventsScreen> {
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
               ElevatedButton(
-                onPressed: () => Navigator.pop(context),
+                onPressed: () {
+                  //SocialSharingPlus.shareToSocialMedia(SocialPlatform.whatsapp, contentToShare);
+                },
                 style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
                 child: Text("Share", style: TextStyle(color: Colors.white)),
               ),

@@ -1,15 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:lifeblood_blood_donation_app/models/feedback.dart';
+
 
 class FeedbackContainer extends StatelessWidget {
-  final String content;
-  final String user;
-  final int rating;
+  final UserFeedback feedback;
 
   const FeedbackContainer({
     super.key,
-    required this.content,
-    required this.user,
-    required this.rating,
+    required this.feedback,
   });
 
   @override
@@ -22,7 +20,7 @@ class FeedbackContainer extends StatelessWidget {
         borderRadius: BorderRadius.circular(12),
         boxShadow: [
           BoxShadow(
-            color: Colors.grey.withOpacity(0.6),
+            color: Colors.grey.withOpacity(0.8),
             blurRadius: 6,
             offset: const Offset(0, 4),
           ),
@@ -32,7 +30,7 @@ class FeedbackContainer extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           Text(
-            content,
+            feedback.content,
             style: const TextStyle(
               fontSize: 14,
               fontWeight: FontWeight.w500,
@@ -42,7 +40,7 @@ class FeedbackContainer extends StatelessWidget {
           ),
           const SizedBox(height: 8),
           Text(
-            "- $user -",
+            "- ${feedback.userName} -",
             style: const TextStyle(fontSize: 12, fontStyle: FontStyle.italic),
           ),
           const SizedBox(height: 8),
@@ -52,6 +50,7 @@ class FeedbackContainer extends StatelessWidget {
               5,
               (index) => Icon(
                 Icons.star,
+                color: Colors.amber,
                 size: 20,
               ),
             ),

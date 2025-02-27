@@ -5,7 +5,12 @@ import '../../components/custom_container.dart';
 import '../../components/login_button.dart';
 
 class SignupPersonalInfoScreen extends StatefulWidget {
-  const SignupPersonalInfoScreen({super.key});
+  final String screenTitle;
+
+  const SignupPersonalInfoScreen({
+    super.key,
+    required this.screenTitle,
+  });
 
   @override
   State<SignupPersonalInfoScreen> createState() => _PersonalInfoPageState();
@@ -42,7 +47,11 @@ class _PersonalInfoPageState extends State<SignupPersonalInfoScreen> {
     if (_formKey.currentState != null && _formKey.currentState!.validate()) {
       if (_passwordController.text == _confirmPasswordController.text) {
         //navigate to the next page
-        Navigator.pushReplacementNamed(context, '/signup-address-info');
+        Navigator.pushReplacementNamed(
+          context,
+          '/signup-address-info',
+          arguments: widget.screenTitle,
+        );
       } else {
         //display an error message
         ScaffoldMessenger.of(context).showSnackBar(
@@ -82,12 +91,16 @@ class _PersonalInfoPageState extends State<SignupPersonalInfoScreen> {
           children: [
             SizedBox(height: 20),
             Center(
-              child: Text("Sign Up Here",
+              child: Text(
+                  widget.screenTitle == 'profilePage' ? '' : 'Sign Up Here',
                   style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
             ),
             SizedBox(height: 20),
             Center(
-              child: Text("Personal Information",
+              child: Text(
+                  widget.screenTitle == 'profilePage'
+                      ? 'Edit Personal Information'
+                      : 'Personal Information',
                   style: TextStyle(
                       fontSize: 18,
                       color: const Color(0xFFE50F2A),
@@ -232,7 +245,9 @@ class _PersonalInfoPageState extends State<SignupPersonalInfoScreen> {
                   child: LoginButton(
                     text: "Back",
                     onPressed: () {
-                      Navigator.pop(context);
+                      widget.screenTitle == 'profilePage'
+                          ? Navigator.popAndPushNamed(context, '/profile')
+                          : Navigator.popAndPushNamed(context, '/login');
                     },
                   ),
                 ),
