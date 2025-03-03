@@ -6,7 +6,12 @@ import 'package:lifeblood_blood_donation_app/screens/notification_screen.dart';
 import 'package:lifeblood_blood_donation_app/screens/profile_screen.dart';
 
 class MainLayoutScreen extends StatefulWidget {
-  const MainLayoutScreen({super.key});
+  final int selectIndex;
+
+  const MainLayoutScreen({
+    super.key,
+    required this.selectIndex,
+  });
 
   @override
   State<MainLayoutScreen> createState() => _MainLayoutScreenState();
@@ -24,10 +29,16 @@ class _MainLayoutScreenState extends State<MainLayoutScreen> {
 
   final List<Widget> pages = [
     HomeScreen(),
-    FindDonorScreen(navigation: NavigationPage.bottomNavigation,),
-    NotificationScreen(navigation: NotificationPageNavigation.bottomNavigation,),
-    ProfileScreen(navigation: ProfilePageNavigation.bottomNavigation,),
+    FindDonorScreen(navigation: NavigationPage.bottomNavigation),
+    NotificationScreen(navigation: NotificationPageNavigation.bottomNavigation),
+    ProfileScreen(navigation: ProfilePageNavigation.bottomNavigation),
   ];
+
+  @override
+  void initState() {
+    super.initState();
+    _currentIndex = widget.selectIndex;
+  }
 
   void _onItemTapped(int index) {
     setState(() {

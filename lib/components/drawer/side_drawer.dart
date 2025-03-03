@@ -4,6 +4,7 @@ import 'package:lifeblood_blood_donation_app/screens/feedback_screen.dart';
 import 'package:lifeblood_blood_donation_app/screens/find_donor_screen.dart';
 import 'package:lifeblood_blood_donation_app/screens/home_screen.dart';
 import 'package:lifeblood_blood_donation_app/screens/login_screen.dart';
+import 'package:lifeblood_blood_donation_app/screens/main_layout_screen.dart';
 import 'package:lifeblood_blood_donation_app/screens/notification_screen.dart';
 import 'package:lifeblood_blood_donation_app/screens/privacy_policy_screen.dart';
 import 'package:lifeblood_blood_donation_app/components/drawer/drawer_header.dart';
@@ -92,7 +93,7 @@ class _NavDrawerState extends State<NavDrawer> {
               style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20)),
           content: const Text(
             "Are you sure you want to delete your account? This will permanently erase your account.",
-            style: TextStyle(color: Colors.grey),
+            style: TextStyle(color: Colors.black),
             textAlign: TextAlign.center,
           ),
           actions: [
@@ -106,6 +107,7 @@ class _NavDrawerState extends State<NavDrawer> {
                   onPressed: () {
                     // Perform delete account action
                     Navigator.pop(context);
+                    Navigator.pushReplacementNamed(context, '/login');
                   },
                   child: const Text(
                     "Delete",
@@ -152,8 +154,8 @@ class _NavDrawerState extends State<NavDrawer> {
                     backgroundColor: Colors.red,
                   ),
                   onPressed: () {
-                    Navigator.push(context,
-                        MaterialPageRoute(builder: (context) => LoginScreen()));
+                    Navigator.pop(context);
+                    Navigator.pushReplacementNamed(context, '/login');
                   },
                   child: const Text(
                     "Yes",
@@ -236,6 +238,7 @@ class _NavDrawerState extends State<NavDrawer> {
               //to navigate home find donors page
               navigatePage(context, DrawerSelection.search);
             } else if (id == 3) {
+              Navigator.pop(context);
               showSettingsDialog(context);
             } else if (id == 4) {
               //to navigate home page
@@ -246,13 +249,15 @@ class _NavDrawerState extends State<NavDrawer> {
             } else if (id == 6) {
               //to navigate home page
               navigatePage(context, DrawerSelection.privacyPolicy);
-            } else if (id == 7) {
+            } //else if (id == 7) {
               //to navigate home page
-              navigatePage(context, DrawerSelection.help);
-            } else if (id == 8) {
+              //navigatePage(context, DrawerSelection.help);
+            //} 
+            else if (id == 8) {
               //to navigate home page
               navigatePage(context, DrawerSelection.aboutUs);
             } else if (id == 9) {
+              Navigator.pop(context);
               showLogoutDialog(context);
             }
           });
@@ -287,6 +292,45 @@ class _NavDrawerState extends State<NavDrawer> {
       ),
     );
   }
+
+  void navigatePage(BuildContext context, DrawerSelection selection) {
+    Navigator.pop(context);
+    if (selection == DrawerSelection.logout) {
+      showLogoutDialog(context);
+    } else {
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) {
+            switch (selection) {
+              case DrawerSelection.home:
+                return MainLayoutScreen(selectIndex: 0);
+              case DrawerSelection.search:
+                return FindDonorScreen(
+                  navigation: NavigationPage.sideDrawer,
+                ); //find donors page
+              case DrawerSelection.settings:
+                return HomeScreen(); //settings page
+              case DrawerSelection.notifications:
+                return NotificationScreen(
+                  navigation: NotificationPageNavigation.sideDrawer,
+                ); //notification page
+              case DrawerSelection.feedbacks:
+                return FeedbackScreen();
+              case DrawerSelection.privacyPolicy:
+                return PrivacyPolicy();
+              case DrawerSelection.help:
+                return HomeScreen(); //help page
+              case DrawerSelection.aboutUs:
+                return AboutUsScreen();
+              case DrawerSelection.logout:
+                return LoginScreen();
+            }
+          },
+        ),
+      );
+    }
+  }
 }
 
 enum DrawerSelection {
@@ -299,35 +343,4 @@ enum DrawerSelection {
   help,
   aboutUs,
   logout,
-}
-
-void navigatePage(BuildContext context, DrawerSelection selection) {
-  Navigator.pop(context);
-  Navigator.push(
-    context,
-    MaterialPageRoute(
-      builder: (context) {
-        switch (selection) {
-          case DrawerSelection.home:
-            return HomeScreen();
-          case DrawerSelection.search:
-            return FindDonorScreen(navigation: NavigationPage.sideDrawer,); //find donors page
-          case DrawerSelection.settings:
-            return HomeScreen(); //settings page
-          case DrawerSelection.notifications:
-            return NotificationScreen(navigation: NotificationPageNavigation.sideDrawer,); //notification page
-          case DrawerSelection.feedbacks:
-            return FeedbackScreen();
-          case DrawerSelection.privacyPolicy:
-            return PrivacyPolicy();
-          case DrawerSelection.help:
-            return HomeScreen(); //help page
-          case DrawerSelection.aboutUs:
-            return AboutUsScreen();
-          case DrawerSelection.logout:
-            return LoginScreen();
-        }
-      },
-    ),
-  );
 }

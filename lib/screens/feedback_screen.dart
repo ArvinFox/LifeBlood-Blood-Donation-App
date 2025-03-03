@@ -14,15 +14,19 @@ class _FeedbackPageState extends State<FeedbackScreen> {
   final List<UserFeedback> feedbackList = [
     UserFeedback(
       userName: 'Jane Smith',
-      content: "This app has the potential to save lives. It's amazing how quickly I could connect with a donor.",
+      content:
+          "This app has the potential to save lives. It's amazing how quickly I could connect with a donor.",
       rating: 5,
     ),
     UserFeedback(
       userName: 'John Dave',
-      content: "The app is very user-friendly and easy to navigate. I found a donor quickly!",
+      content:
+          "The app is very user-friendly and easy to navigate. I found a donor quickly!",
       rating: 5,
     ),
   ];
+
+  int ratingCount = 0;
 
   void _showFeedbackDialog() {
     final TextEditingController commentController = TextEditingController();
@@ -33,75 +37,93 @@ class _FeedbackPageState extends State<FeedbackScreen> {
         return Dialog(
           child: Padding(
             padding: const EdgeInsets.all(16.0),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            child: StatefulBuilder(
+              builder: (BuildContext context, StateSetter setState) {
+                return Column(
+                  mainAxisSize: MainAxisSize.min,
                   children: [
-                    const SizedBox(width: 40), // Spacer to balance the title
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        const SizedBox(
+                            width: 40), // Spacer to balance the title
+                        const Text(
+                          "Give Us a Feedback!",
+                          style: TextStyle(
+                            fontSize: 20,
+                            fontWeight: FontWeight.bold,
+                            color: Color(0xFFE50F2A),
+                          ),
+                        ),
+                        IconButton(
+                          icon: const Icon(Icons.close, color: Colors.black54),
+                          onPressed: () {
+                            ratingCount = 0;
+                            commentController.clear();
+                            Navigator.pop(context);
+                          },
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 8),
                     const Text(
-                      "Give Us a Feedback!",
-                      style: TextStyle(
-                        fontSize: 20,
-                        fontWeight: FontWeight.bold,
-                        color: Color(0xFFE50F2A),
+                      "Your feedback is important for us. We take your feedback very seriously.",
+                      textAlign: TextAlign.center,
+                      style: TextStyle(fontSize: 14, color: Colors.black87),
+                    ),
+                    const SizedBox(height: 16),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: List.generate(
+                        5,
+                        (index) => IconButton(
+                          onPressed: () {
+                            setState(() {
+                              ratingCount = index + 1;
+                            });
+                          },
+                          icon: Icon(
+                            Icons.star,
+                            size: 32,
+                            color: index < ratingCount
+                                ? Colors.amber
+                                : Colors.grey,
+                          ),
+                        ),
                       ),
                     ),
-                    IconButton(
-                      icon: const Icon(Icons.close, color: Colors.black54),
+                    TextField(
+                      controller: commentController,
+                      decoration: InputDecoration(
+                        hintText: "Add a comment",
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                      ),
+                      maxLines: 3,
+                    ),
+                    const SizedBox(height: 20),
+                    ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: const Color(0xFFE50F2A),
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 24, vertical: 12),
+                      ),
                       onPressed: () {
-                        Navigator.pop(context);
+                        setState(() {
+                          ratingCount = 0;
+                          commentController.clear();
+                          Navigator.pop(context);
+                        });
                       },
+                      child: const Text(
+                        "Submit Feedback",
+                        style: TextStyle(color: Colors.white, fontSize: 16),
+                      ),
                     ),
                   ],
-                ),
-                const SizedBox(height: 8),
-                const Text(
-                  "Your feedback is important for us. We take your feedback very seriously.",
-                  textAlign: TextAlign.center,
-                  style: TextStyle(fontSize: 14, color: Colors.black87),
-                ),
-                const SizedBox(height: 16),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: List.generate(
-                    5,
-                    (index) => IconButton(
-                      onPressed: () {
-                        // Handle the Rating functionality
-                      },
-                      icon: const Icon(
-                        Icons.star,
-                        size: 32,
-                      ),
-                    ),
-                  ),
-                ),
-                TextField(
-                  controller: commentController,
-                  decoration: InputDecoration(
-                    hintText: "Add a comment",
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                  ),
-                  maxLines: 3,
-                ),
-                const SizedBox(height: 20),
-                ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFFE50F2A),
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 24, vertical: 12),
-                  ),
-                  onPressed: () {},
-                  child: const Text(
-                    "Submit Feedback",
-                    style: TextStyle(color: Colors.white, fontSize: 16),
-                  ),
-                ),
-              ],
+                );
+              },
             ),
           ),
         );
@@ -160,7 +182,9 @@ class _FeedbackPageState extends State<FeedbackScreen> {
             child: ListView.builder(
               itemCount: feedbackList.length,
               itemBuilder: (context, index) {
-                return FeedbackContainer(feedback: feedbackList[index],);
+                return FeedbackContainer(
+                  feedback: feedbackList[index],
+                );
               },
             ),
           ),

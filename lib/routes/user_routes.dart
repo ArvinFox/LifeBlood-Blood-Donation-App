@@ -13,14 +13,13 @@ import 'package:lifeblood_blood_donation_app/screens/rewards_screen.dart';
 
 class UserRoutes {
   static Map<String, WidgetBuilder> routes = {
-    '/home': (context) => MainLayoutScreen(),
+    '/home': (context) => MainLayoutScreen(selectIndex: 0,),
     '/find-donor': (context) => FindDonorScreen(navigation: NavigationPage.sideDrawer,),
     '/notifications': (context) => NotificationScreen(navigation: NotificationPageNavigation.sideDrawer,),
     '/profile': (context) => ProfileScreen(navigation: ProfilePageNavigation.sideDrawer,),
     '/feedback': (context) => FeedbackScreen(),
     '/privacy-policy': (context) => PrivacyPolicy(),
     '/about-us': (context) => AboutUsScreen(),
-    '/donation-events': (context) => EventsScreen(),
     '/donation-request': (context) => BloodRequestScreen(),
     '/events': (context) => EventsScreen(),
     '/donation-history': (context) => DonationHistoryScreen(),
