@@ -1,6 +1,5 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:lifeblood_blood_donation_app/components/profile_option.dart';
 
 class ProfileScreen extends StatefulWidget {
   final ProfilePageNavigation navigation;
@@ -139,48 +138,56 @@ class _ProfilePageState extends State<ProfileScreen> {
               SizedBox(height: 10),
 
               // Profile Options
-              ProfileOption(
-                icon: Icons.edit,
-                text: "Edit Information",
-                onTap: () {
-                  Navigator.popAndPushNamed(
-                    context,
-                    "/signup-personal-info",
-                    arguments: 'profilePage',
-                  );
-                },
-              ),
-              ProfileOption(
-                icon: Icons.vpn_key,
-                text: "Change Password",
-                onTap: () {
-                  Navigator.popAndPushNamed(
-                    context,
-                    "/forgot-password",
-                    arguments: 'changePassword',
-                  );
-                },
-              ),
-              ProfileOption(
-                icon: Icons.access_time,
-                text: "Donation History",
-                onTap: () {
-                  Navigator.popAndPushNamed(context, "/donation-history");
-                },
-              ),
-              ProfileOption(
-                icon: Icons.card_giftcard,
-                text: " View Rewards",
-                onTap: () {
-                  Navigator.popAndPushNamed(context, "/view-rewards");
-                },
-              ),
+              _buildProfileOption(Icons.edit, 'Edit Information', () {
+                Navigator.popAndPushNamed(
+                  context,
+                  "/signup-personal-info",
+                  arguments: 'profilePage',
+                );
+              }),
+              _buildProfileOption(Icons.vpn_key, 'Change Password', () {
+                Navigator.popAndPushNamed(
+                  context,
+                  "/forgot-password",
+                  arguments: 'changePassword',
+                );
+              }),
+              _buildProfileOption(Icons.access_time, 'Donation History', () {
+                Navigator.popAndPushNamed(context, "/donation-history");
+              }),
+              _buildProfileOption(Icons.card_giftcard, 'View Rewards', () {
+                Navigator.popAndPushNamed(context, "/view-rewards");
+              }),
             ],
           ),
         ),
       ),
     );
   }
+}
+
+Widget _buildProfileOption(IconData icon, String text, VoidCallback onTap) {
+  return Container(
+    margin: EdgeInsets.symmetric(vertical: 6, horizontal: 12),
+    padding: EdgeInsets.all(6),
+    decoration: BoxDecoration(
+      color: Colors.white,
+      borderRadius: BorderRadius.circular(15),
+      boxShadow: [
+        BoxShadow(
+          color: Colors.black26,
+          blurRadius: 6,
+          offset: Offset(0, 4),
+        ),
+      ],
+    ),
+    child: ListTile(
+      leading: Icon(icon, color: Color(0xFFE50F2A)),
+      title: Text(text,
+          style: TextStyle(fontSize: 16, fontWeight: FontWeight.w400)),
+      onTap: onTap,
+    ),
+  );
 }
 
 enum ProfilePageNavigation {

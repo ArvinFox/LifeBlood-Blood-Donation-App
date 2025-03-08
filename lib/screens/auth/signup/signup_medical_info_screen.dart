@@ -21,6 +21,7 @@ class _SignupMedicalInfoScreenState extends State<SignupMedicalInfoScreen> {
   final TextEditingController _healthConditionController =
       TextEditingController();
   String selectBloodType = '';
+  bool isSelected = false;
   final _formKey = GlobalKey<FormState>();
 
   void signupUserRedirectHome(context) {
@@ -169,6 +170,16 @@ class _SignupMedicalInfoScreenState extends State<SignupMedicalInfoScreen> {
                 ),
                 SizedBox(
                   height: 15,
+                ),
+                Row(
+                  children: [
+                    Checkbox(value: isSelected, onChanged: (bool? value){
+                      setState(() {
+                        isSelected = value!;
+                      });
+                    }),
+                    Text('I agree to the terms and conditions'),
+                  ],
                 ),
               ],
             ),

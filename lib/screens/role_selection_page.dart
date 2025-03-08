@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:lifeblood_blood_donation_app/components/option_card.dart';
 
 class RoleSelectionPage extends StatelessWidget {
   const RoleSelectionPage({super.key});
@@ -10,7 +9,7 @@ class RoleSelectionPage extends StatelessWidget {
       body: Container(
         decoration: BoxDecoration(
           gradient: LinearGradient(
-            colors: [Colors.white, Color(0xFFFFD2D3),],
+            colors: [Colors.white, Color(0xFFFFD2D3)],
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
           ),
@@ -24,19 +23,13 @@ class RoleSelectionPage extends StatelessWidget {
                 onTap: () {
                   Navigator.pushNamed(context, "/login");
                 },
-                child: OptionCard(
-                  option: 'Become a Donor',
-                  imgUrl: 'assets/images/become_donor.jpg',
-                ),
+                child: _buildSelectOption('Become a Donor', 'assets/images/become_donor.jpg'),
               ),
               GestureDetector(
                 onTap: () {
                   Navigator.pushNamed(context, "/find-donor");
                 },
-                child: OptionCard(
-                  option: 'Find a Donor',
-                  imgUrl: 'assets/images/find_donor.jpeg',
-                ),
+                child:  _buildSelectOption('Find a Donor', 'assets/images/find_donor.jpeg'),
               ),
             ],
           ),
@@ -44,4 +37,32 @@ class RoleSelectionPage extends StatelessWidget {
       ),
     );
   }
+}
+
+Widget _buildSelectOption(String option, String imgUrl) {
+  return Stack(
+    children: [
+      ClipRRect(
+        borderRadius: BorderRadius.circular(40),
+        child: Image.asset(
+          imgUrl.toString(),
+          width: double.infinity,
+          height: 250,
+          fit: BoxFit.cover,
+        ),
+      ),
+      Positioned(
+        bottom: 10,
+        right: 10,
+        child: Text(
+          option,
+          style: TextStyle(
+            color: Colors.black,
+            fontSize: 24,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+      ),
+    ],
+  );
 }

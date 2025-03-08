@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
-import 'package:lifeblood_blood_donation_app/screens/forgot_password/enter_otp_screen.dart';
-import 'package:lifeblood_blood_donation_app/screens/forgot_password/forgot_pswd_screen.dart';
-import 'package:lifeblood_blood_donation_app/screens/get_started_page.dart';
-import 'package:lifeblood_blood_donation_app/screens/login_screen.dart';
-import 'package:lifeblood_blood_donation_app/screens/forgot_password/reset_pswd_screen.dart';
+import 'package:lifeblood_blood_donation_app/screens/auth/forgot_password/enter_otp_screen.dart';
+import 'package:lifeblood_blood_donation_app/screens/auth/forgot_password/forgot_pswd_screen.dart';
+import 'package:lifeblood_blood_donation_app/screens/static/get_started_page.dart';
+import 'package:lifeblood_blood_donation_app/screens/auth/login_screen.dart';
+import 'package:lifeblood_blood_donation_app/screens/auth/forgot_password/reset_pswd_screen.dart';
 import 'package:lifeblood_blood_donation_app/screens/role_selection_page.dart';
-import 'package:lifeblood_blood_donation_app/screens/signup/signup_address_info_screen.dart';
-import 'package:lifeblood_blood_donation_app/screens/signup/signup_medical_info_screen.dart';
-import 'package:lifeblood_blood_donation_app/screens/signup/signup_personal_info_screen.dart';
+import 'package:lifeblood_blood_donation_app/screens/auth/signup/signup_address_info_screen.dart';
+import 'package:lifeblood_blood_donation_app/screens/auth/signup/signup_medical_info_screen.dart';
+import 'package:lifeblood_blood_donation_app/screens/auth/signup/signup_personal_info_screen.dart';
 
 class AuthRoutes {
   static Map<String, WidgetBuilder> routes = {

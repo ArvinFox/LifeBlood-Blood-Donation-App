@@ -1,7 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:lifeblood_blood_donation_app/components/reward_card.dart';
-import 'package:lifeblood_blood_donation_app/models/rewards.dart';
+import 'package:lifeblood_blood_donation_app/models/reward_model.dart';
 
 class RewardsScreen extends StatefulWidget {
   const RewardsScreen({super.key});
@@ -13,14 +12,22 @@ class RewardsScreen extends StatefulWidget {
 class _RewardsPageState extends State<RewardsScreen> {
   final List<Rewards> rewards = [
     Rewards(
-      title: 'Free Health Checkup Package',
-      date: '20 Aug 2024',
-      rewardImgUrl: 'assets/images/health_package.jpg',
+      rewardId: 1,
+      rewardTitle: 'Free Health Checkup Package',
+      createdAt: DateTime(2025, 3, 7),
+      rewardPosterUrl: 'assets/images/health_package.jpg',
+      rewardDescription: 'Free Health Checkup Package',
+      startDate: DateTime(2025, 3, 7),
+      endDate: DateTime(2025, 6, 7),
     ),
     Rewards(
-      title: 'Free Health Checkup Package',
-      date: '20 Nov 2024',
-      rewardImgUrl: 'assets/images/health_package.jpg',
+      rewardId: 2,
+      rewardTitle: 'Free Health Checkup Package',
+      createdAt: DateTime(2025, 3, 7),
+      rewardPosterUrl: 'assets/images/health_package.jpg',
+      rewardDescription: 'Free Health Checkup Package',
+      startDate: DateTime(2025, 3, 7),
+      endDate: DateTime(2025, 6, 7),
     ),
   ];
 
@@ -69,11 +76,69 @@ class _RewardsPageState extends State<RewardsScreen> {
                   physics: NeverScrollableScrollPhysics(),
                   itemCount: rewards.length,
                   itemBuilder: (context, index) {
-                    return RewardCard(reward: rewards[index]);
+                    return _buildRewardCard(reward: rewards[index]);
                   },
                 ),
               ],
             ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildRewardCard({required Rewards reward}) {
+    return Container(
+      height: 250,
+      margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(12),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.grey.withOpacity(0.8),
+            blurRadius: 6,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            reward.rewardTitle,
+            style: TextStyle(
+              fontSize: 16,
+              fontWeight: FontWeight.bold,
+              color: Colors.black,
+            ),
+          ),
+          const SizedBox(height: 10),
+          Image.asset(
+            reward.rewardPosterUrl,
+            width: double.infinity,
+            height: 150,
+            fit: BoxFit.cover,
+          ),
+          const SizedBox(height: 10),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.end,
+            children: [
+              Icon(
+                Icons.access_time,
+                size: 16,
+                color: Colors.grey,
+              ),
+              SizedBox(width: 5),
+              Text(
+                DateTime.now().toString(),
+                style: TextStyle(
+                  fontSize: 14,
+                  color: Colors.grey,
+                ),
+              ),
+            ],
           ),
         ],
       ),

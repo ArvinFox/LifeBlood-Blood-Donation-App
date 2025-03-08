@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:lifeblood_blood_donation_app/models/donation_request_details.dart';
+import 'package:lifeblood_blood_donation_app/models/donation_request_model.dart';
 
 class DonationRequestCard extends StatelessWidget {
   final DonationRequestDetails donationRequest;
@@ -67,7 +67,7 @@ class DonationRequestCard extends StatelessWidget {
                       ),
                     ),
                     Text(
-                      donationRequest.hospitalLocation,
+                      donationRequest.location,
                       style: TextStyle(
                         fontSize: 18,
                       ),

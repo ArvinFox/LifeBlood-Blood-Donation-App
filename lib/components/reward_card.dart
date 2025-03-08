@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:lifeblood_blood_donation_app/models/rewards.dart';
+import 'package:lifeblood_blood_donation_app/models/reward_model.dart';
 
 class RewardCard extends StatelessWidget {
   final Rewards reward;
@@ -30,7 +30,7 @@ class RewardCard extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            reward.title, 
+            reward.rewardTitle, 
             style: TextStyle(
               fontSize: 16,
               fontWeight: FontWeight.bold,
@@ -39,7 +39,7 @@ class RewardCard extends StatelessWidget {
           ),
           const SizedBox(height: 10),
           Image.asset(
-            reward.rewardImgUrl, 
+            reward.rewardPosterUrl, 
             width: double.infinity,
             height: 150,
             fit: BoxFit.cover,
@@ -55,7 +55,7 @@ class RewardCard extends StatelessWidget {
               ),
               SizedBox(width: 5), // Small spacing between icon and text
               Text(
-                reward.date,  
+                DateTime.now().toString(),  
                 style: TextStyle(
                   fontSize: 14,
                   color: Colors.grey,

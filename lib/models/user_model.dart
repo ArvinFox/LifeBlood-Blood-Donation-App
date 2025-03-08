@@ -1,8 +1,10 @@
 import 'dart:io';
 
 class User {
-  final String userName;
-  final String dob;
+  final int userId;
+  final String firstName;
+  final String lastName;
+  final DateTime dob;
   final String gender;
   final String nic;
   final String? drivingLicenseNo;
@@ -18,9 +20,13 @@ class User {
   final File medicalReport;
   final String? healthConditions;
   final bool isActive;
+  final DateTime registrationDate;
 
   User({
-    required this.userName,
+    required this.userId,
+    required this.firstName,
+    required this.lastName,
+    required this.registrationDate, 
     required this.dob,
     required this.gender,
     required this.nic,

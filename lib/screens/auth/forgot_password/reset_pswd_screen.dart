@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:lifeblood_blood_donation_app/components/custom_button.dart';
 import 'package:lifeblood_blood_donation_app/components/text_field.dart';
-import '../../components/custom_container.dart';
+import '../../../components/custom_container.dart';
 
 class ResetPasswordScreen extends StatefulWidget {
   final String screenTitle;

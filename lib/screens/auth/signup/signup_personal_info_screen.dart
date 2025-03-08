@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:lifeblood_blood_donation_app/components/text_field.dart';
-import '../../components/custom_container.dart';
-import '../../components/login_button.dart';
+import '../../../components/custom_container.dart';
+import '../../../components/login_button.dart';
 
 class SignupPersonalInfoScreen extends StatefulWidget {
   final String screenTitle;
@@ -17,7 +17,8 @@ class SignupPersonalInfoScreen extends StatefulWidget {
 }
 
 class _PersonalInfoPageState extends State<SignupPersonalInfoScreen> {
-  final TextEditingController _nameController = TextEditingController();
+  final TextEditingController _fnameController = TextEditingController();
+  final TextEditingController _lnameController = TextEditingController();
   final TextEditingController _dobController = TextEditingController();
   final TextEditingController _nicController = TextEditingController();
   final TextEditingController _licenseController = TextEditingController();
@@ -113,12 +114,24 @@ class _PersonalInfoPageState extends State<SignupPersonalInfoScreen> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   CustomInputBox(
-                    textName: 'Name',
-                    hintText: 'Enter your name',
-                    controller: _nameController,
+                    textName: 'First Name',
+                    hintText: 'Enter your first name',
+                    controller: _fnameController,
                     validator: (value) {
                       if (value == null || value.isEmpty) {
-                        return 'Please enter your name here';
+                        return 'Please enter your first name here';
+                      } else {
+                        return null;
+                      }
+                    },
+                  ),
+                  CustomInputBox(
+                    textName: 'Last Name',
+                    hintText: 'Enter your last name',
+                    controller: _lnameController,
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return 'Please enter your last name here';
                       } else {
                         return null;
                       }

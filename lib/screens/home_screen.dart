@@ -3,7 +3,7 @@ import 'package:lifeblood_blood_donation_app/components/carousel_container.dart'
 import 'package:lifeblood_blood_donation_app/components/donation_request_card.dart';
 import 'package:lifeblood_blood_donation_app/components/drawer/side_drawer.dart';
 import 'package:lifeblood_blood_donation_app/components/small_button.dart';
-import 'package:lifeblood_blood_donation_app/models/donation_request_details.dart';
+import 'package:lifeblood_blood_donation_app/models/donation_request_model.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -15,28 +15,40 @@ class HomeScreen extends StatefulWidget {
 class _HomePageState extends State<HomeScreen> {
   final List<DonationRequestDetails> _donationRequests = [
     DonationRequestDetails(
+      requestId: 1,
       requestBloodType: 'A+',
       urgencyLevel: "High",
-      hospitalLocation: "Base Hospital ",
-      city: "Homagama",
+      location: "Base Hospital ",
+      city: "Homagama", 
+      name: 'ABC', 
+      contactNumber: '0771234567', 
     ),
     DonationRequestDetails(
-      requestBloodType: 'B+',
+      requestId: 1,
+      requestBloodType: 'O+',
       urgencyLevel: "High",
-      hospitalLocation: "Base Hospital ",
-      city: "Homagama",
+      location: "Base Hospital ",
+      city: "Homagama", 
+      name: 'ABC', 
+      contactNumber: '0771234567', 
     ),
     DonationRequestDetails(
+      requestId: 1,
       requestBloodType: 'AB+',
       urgencyLevel: "High",
-      hospitalLocation: "Base Hospital ",
-      city: "Homagama",
+      location: "Base Hospital ",
+      city: "Homagama", 
+      name: 'ABC', 
+      contactNumber: '0771234567', 
     ),
     DonationRequestDetails(
-      requestBloodType: 'A-',
+      requestId: 1,
+      requestBloodType: 'B+',
       urgencyLevel: "High",
-      hospitalLocation: "Base Hospital ",
-      city: "Homagama",
+      location: "Base Hospital ",
+      city: "Homagama", 
+      name: 'ABC', 
+      contactNumber: '0771234567', 
     )
   ];
 
@@ -44,7 +56,6 @@ class _HomePageState extends State<HomeScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       extendBody: true,
-      //AppBar
       appBar: AppBar(
         iconTheme: IconThemeData(
           color: Colors.white,
