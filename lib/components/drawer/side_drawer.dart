@@ -8,6 +8,7 @@ import 'package:lifeblood_blood_donation_app/screens/main_layout_screen.dart';
 import 'package:lifeblood_blood_donation_app/screens/notification_screen.dart';
 import 'package:lifeblood_blood_donation_app/screens/static/privacy_policy_screen.dart';
 import 'package:lifeblood_blood_donation_app/components/drawer/drawer_header.dart';
+import 'package:lifeblood_blood_donation_app/services/auth_service.dart';
 
 class NavDrawer extends StatefulWidget {
   const NavDrawer({super.key});
@@ -82,6 +83,29 @@ class _NavDrawerState extends State<NavDrawer> {
     );
   }
 
+//user account delete functionality
+  void deleteUser(BuildContext context) async {
+    final auth = AuthService();
+
+    try {
+      await auth.deleteUser();
+      Navigator.pop(context);
+      Navigator.pushReplacementNamed(context, '/select-role');
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            "Account deletion failed. Please try again.",
+            style: TextStyle(
+              color: Colors.white,
+            ),
+          ),
+          backgroundColor: Colors.black.withOpacity(0.3),
+        ),
+      );
+    }
+  }
+
   // Delete Account Dialog Box
   void showDeleteAccountDialog(BuildContext context) {
     showDialog(
@@ -105,9 +129,7 @@ class _NavDrawerState extends State<NavDrawer> {
                     backgroundColor: Colors.red,
                   ),
                   onPressed: () {
-                    // Perform delete account action
-                    Navigator.pop(context);
-                    Navigator.pushReplacementNamed(context, '/login');
+                    deleteUser(context);
                   },
                   child: const Text(
                     "Delete",
@@ -136,6 +158,30 @@ class _NavDrawerState extends State<NavDrawer> {
     );
   }
 
+  //Logout functionality
+  void logoutUser(BuildContext context) async {
+    final auth = AuthService();
+
+    try {
+      await auth.signOut();
+      print("logout....");
+      Navigator.pop(context);
+      Navigator.pushReplacementNamed(context, '/select-role');
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            "Logout failed. Please try again.",
+            style: TextStyle(
+              color: Colors.white,
+            ),
+          ),
+          backgroundColor: Colors.black.withOpacity(0.3),
+        ),
+      );
+    }
+  }
+
   // Logout Dialog Box
   void showLogoutDialog(BuildContext context) {
     showDialog(
@@ -153,9 +199,8 @@ class _NavDrawerState extends State<NavDrawer> {
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.red,
                   ),
-                  onPressed: () {
-                    Navigator.pop(context);
-                    Navigator.pushReplacementNamed(context, '/login');
+                  onPressed: () async {
+                    logoutUser(context);
                   },
                   child: const Text(
                     "Yes",
@@ -232,27 +277,27 @@ class _NavDrawerState extends State<NavDrawer> {
         onTap: () {
           setState(() {
             if (id == 1) {
-              //to navigate home page
+              // to navigate home page
               navigatePage(context, DrawerSelection.home);
             } else if (id == 2) {
-              //to navigate home find donors page
+              // to navigate find donors page
               navigatePage(context, DrawerSelection.search);
             } else if (id == 3) {
               Navigator.pop(context);
               showSettingsDialog(context);
             } else if (id == 4) {
-              //to navigate home page
+              // to navigate notification page
               navigatePage(context, DrawerSelection.notifications);
             } else if (id == 5) {
-              //to navigate home page
+              // to navigate feedback page
               navigatePage(context, DrawerSelection.feedbacks);
             } else if (id == 6) {
-              //to navigate home page
+              // to navigate privacy policy page
               navigatePage(context, DrawerSelection.privacyPolicy);
             } //else if (id == 7) {
-              //to navigate home page
-              //navigatePage(context, DrawerSelection.help);
-            //} 
+            //to navigate home page
+            //navigatePage(context, DrawerSelection.help);
+            //}
             else if (id == 8) {
               //to navigate home page
               navigatePage(context, DrawerSelection.aboutUs);
@@ -306,15 +351,12 @@ class _NavDrawerState extends State<NavDrawer> {
               case DrawerSelection.home:
                 return MainLayoutScreen(selectIndex: 0);
               case DrawerSelection.search:
-                return FindDonorScreen(
-                  navigation: NavigationPage.sideDrawer,
-                ); //find donors page
+                return FindDonorScreen(navigation: NavigationPage.sideDrawer);
               case DrawerSelection.settings:
-                return HomeScreen(); //settings page
+                return HomeScreen();
               case DrawerSelection.notifications:
                 return NotificationScreen(
-                  navigation: NotificationPageNavigation.sideDrawer,
-                ); //notification page
+                    navigation: NotificationPageNavigation.sideDrawer);
               case DrawerSelection.feedbacks:
                 return FeedbackScreen();
               case DrawerSelection.privacyPolicy:

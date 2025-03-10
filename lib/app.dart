@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:lifeblood_blood_donation_app/routes/app_routes.dart';
-import 'package:lifeblood_blood_donation_app/screens/feedback_screen.dart';
-import 'package:lifeblood_blood_donation_app/screens/home_screen.dart';
-import 'package:lifeblood_blood_donation_app/screens/static/get_started_page.dart';
+import 'package:lifeblood_blood_donation_app/services/authGate.dart';
 
 class LifeBlood extends StatelessWidget {
   const LifeBlood({super.key});
@@ -12,7 +10,7 @@ class LifeBlood extends StatelessWidget {
     return MaterialApp(
       title: "LifeBlood",
       debugShowCheckedModeBanner: false,
-      home: GetStartedPage(),
+      home: AuthGate(),
       routes: AppRoutes.routes,
     );
   }

@@ -1,26 +1,47 @@
 import 'package:flutter/material.dart';
 import 'package:lifeblood_blood_donation_app/components/custom_button.dart';
 import 'package:lifeblood_blood_donation_app/components/text_field.dart';
+import 'package:lifeblood_blood_donation_app/services/auth_service.dart';
 import '../../components/custom_container.dart';
 
-class LoginScreen extends StatelessWidget {
-  LoginScreen({super.key});
+class LoginScreen extends StatefulWidget {
+  const LoginScreen({super.key});
 
+  @override
+  State<LoginScreen> createState() => _LoginScreenState();
+}
+
+class _LoginScreenState extends State<LoginScreen> {
+  final _emailController = TextEditingController();
+  final _passwordController = TextEditingController();
   final _formKey = GlobalKey<FormState>();
 
-  void loginUser(context) {
-    if (_formKey.currentState != null && _formKey.currentState!.validate()) {
-      String email = _emailController.text;
-      String password = _passwordController.text;
+  @override
+  void dispose() {
+    _emailController.dispose();
+    _passwordController.dispose();
+    super.dispose();
+  }
 
-      if (email == "test@gmail.com" && password == "12345") {
-        //navigate to the home page
-        Navigator.pushReplacementNamed(context, '/home');
-        print("login sucess...");
-      }
-    } else {
-      print("login failed..");
-      //display an error message
+  //validate email
+  String? validateEmail(String? value) {
+    if (value == null || value.isEmpty) {
+      return 'Please enter your email here';
+    }
+    const emailRegex = r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$';
+    if (!RegExp(emailRegex).hasMatch(value)) {
+      return 'Please enter a valid email address';
+    }
+    return null;
+  }
+
+  void loginUser() async {
+    final auth = AuthService();
+
+    try {
+      await auth.signInWithEmailAndPassword(_emailController.text.trim(), _passwordController.text.trim());
+      Navigator.pushNamed(context, '/home');
+    } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(
@@ -33,21 +54,6 @@ class LoginScreen extends StatelessWidget {
         ),
       );
     }
-  }
-
-  final _emailController = TextEditingController();
-  final _passwordController = TextEditingController();
-
-  //validate email
-  String? validateEmail(String? value) {
-    if (value == null || value.isEmpty) {
-      return 'Please enter your email here';
-    }
-    const emailRegex = r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$';
-    if (!RegExp(emailRegex).hasMatch(value)) {
-      return 'Please enter a valid email address';
-    }
-    return null;
   }
 
   @override
@@ -87,15 +93,6 @@ class LoginScreen extends StatelessWidget {
                   hintText: 'Enter your password',
                   controller: _passwordController,
                   hasAstricks: true,
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return 'Please enter your password here';
-                    } else if (value.length < 5) {
-                      return 'Your password should have more than 5 characters.';
-                    } else {
-                      return null;
-                    }
-                  },
                 ),
               ],
             ),
@@ -123,7 +120,7 @@ class LoginScreen extends StatelessWidget {
           // Login button
           CustomButton(
             onPressed: () {
-              loginUser(context);
+              loginUser();
             },
             btnLabel: 'Login',
             cornerRadius: 15,
