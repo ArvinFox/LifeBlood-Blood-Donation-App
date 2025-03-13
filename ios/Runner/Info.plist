@@ -45,5 +45,12 @@
 	<true/>
 	<key>UIApplicationSupportsIndirectInputEvents</key>
 	<true/>
+	<key>NSDocumentsFolderUsageDescription</key>
+	<string>This app needs access to your documents folder to pick files.</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>This app needs access to your photo library to pick files.</string>
+	<key>NSFileAccessUsageDescription</key>
+	<string>This app needs access to your files.</string>
+
 </dict>
 </plist>

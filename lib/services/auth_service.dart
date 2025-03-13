@@ -10,28 +10,14 @@ class AuthService {
   //user signup
   Future<void> addUser(UserModel user) async {
     try {
-      UserCredential userCredential = await auth.createUserWithEmailAndPassword(email: user.email, password: user.password);
-      String userId = userCredential.user?.uid??'';
-      await userCollection.add({
-        'userId': userId,
-        'firstName': user.firstName,
-        'LastName': user.lastName,
-        'dob': user.dob,
-        'gender': user.gender,
-        'nic': user.nic,
-        'licenseNumber': user.drivingLicenseNo,
-        'email': user.email,
-        'contactNumber': user.contactNumber,
-        'addressLine1': user.addressLine1,
-        'addressLine2': user.addressLine2,
-        'addressLine3': user.addressLine3,
-        'city': user.city,
-        'province': user.province,
-        'bloodType': user.bloodType,
-        'healthConditions': user.healthConditions,
-        'isActive': user.isActive,
-        'registrationDate':Timestamp.fromDate(user.registrationDate)
-      });
+      UserCredential userCredential = await auth.createUserWithEmailAndPassword(email: user.personalInfo.email, password: user.personalInfo.password);
+
+      //get the user id from firebase auth
+      String uId = userCredential.user?.uid??'';
+      user.personalInfo.userId = uId;
+
+      await userCollection.doc(uId).set(user.toFirestore());
+
     } on FirebaseAuthException catch (e) {
       throw Exception(e.code);
     } catch (e) {
@@ -56,20 +42,13 @@ class AuthService {
     return await auth.signOut();
   }
 
-  //delete account
+  //delete user
   Future<void> deleteUser() async {
     try {
       User? user = auth.currentUser;
 
       if (user != null) {
-        QuerySnapshot userSnapshot = await userCollection.where('userId', isEqualTo: user.uid).get();
-
-        if(userSnapshot.docs.isNotEmpty){
-          await userSnapshot.docs.first.reference.delete();
-        }else{
-          throw Exception('User not found..');
-        }
-        
+        await userCollection.doc(user.uid).delete();
         await user.delete();
       } else {
         throw Exception('No user is currently logged in..');

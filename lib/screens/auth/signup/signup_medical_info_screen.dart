@@ -2,14 +2,25 @@ import 'package:flutter/material.dart';
 import 'package:lifeblood_blood_donation_app/components/blood_type_card.dart';
 import 'package:lifeblood_blood_donation_app/components/custom_container.dart';
 import 'package:lifeblood_blood_donation_app/components/login_button.dart';
+import 'package:lifeblood_blood_donation_app/components/medical_report_picker.dart';
+import 'package:lifeblood_blood_donation_app/models/address_information.dart';
 import 'package:lifeblood_blood_donation_app/models/blood_type.dart';
+import 'package:lifeblood_blood_donation_app/models/medical_information.dart';
+import 'package:lifeblood_blood_donation_app/models/personal_information.dart';
+import 'package:lifeblood_blood_donation_app/models/user_model.dart';
+import 'package:lifeblood_blood_donation_app/services/auth_service.dart';
+import 'package:lifeblood_blood_donation_app/utils/helpers.dart';
 
 class SignupMedicalInfoScreen extends StatefulWidget {
   final String screenTitle;
+  final PersonalInfo personalInfo;
+  final AddressInfo addressInfo;
 
   const SignupMedicalInfoScreen({
     super.key,
     required this.screenTitle,
+    required this.personalInfo,
+    required this.addressInfo,
   });
 
   @override
@@ -18,31 +29,59 @@ class SignupMedicalInfoScreen extends StatefulWidget {
 }
 
 class _SignupMedicalInfoScreenState extends State<SignupMedicalInfoScreen> {
-  final TextEditingController _healthConditionController =
-      TextEditingController();
+  final TextEditingController _healthConditionController = TextEditingController();
   String selectBloodType = '';
   bool isSelected = false;
+  String? medicalReport;
   final _formKey = GlobalKey<FormState>();
 
-  void signupUserRedirectHome(context) {
+  @override
+  void dispose() {
+    _healthConditionController.dispose();
+    super.dispose();
+  }
+
+  void signupUserRedirect() {
+    final auth = AuthService();
+
+    if (!isSelected) {
+      Helpers.showError(
+          context, 'You must agree to the terms and conditions to continue');
+      return;
+    }
+
     if (_formKey.currentState != null && _formKey.currentState!.validate()) {
-      //Navigator.pushReplacementNamed(context, '/login');
-      widget.screenTitle == 'profilePage'
-          ? Navigator.popAndPushNamed(context, '/profile')
-          : Navigator.popAndPushNamed(context, '/login');
-    } else {
-      //display an error message
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(
-            "Error",
-            style: TextStyle(
-              color: Colors.white,
-            ),
-          ),
-          backgroundColor: Colors.black.withOpacity(0.3),
-        ),
+      if (medicalReport == null) {
+        Helpers.showError(context, 'Please upload valid medical file');
+        return;
+      }
+      MedicalInfo medicalInfo = MedicalInfo(
+        bloodType: selectBloodType,
+        healthConditions: _healthConditionController.text,
+        registrationDate: DateTime.now(),
+        medicalReport: medicalReport,
       );
+
+      UserModel userModel = UserModel(
+        personalInfo: widget.personalInfo,
+        addressInfo: widget.addressInfo,
+        medicalInfo: medicalInfo,
+        isActive: isSelected,
+      );
+
+      try {
+        auth.addUser(userModel);
+
+        if (widget.screenTitle == 'profilePage') {
+          Navigator.popAndPushNamed(context, '/profile');
+        } else {
+          Navigator.popAndPushNamed(context, '/login');
+        }
+      } catch (e) {
+        Helpers.showError(context, "Error");
+      }
+    } else {
+      Helpers.showError(context, "Please fill all the fields correctly");
     }
   }
 
@@ -114,30 +153,12 @@ class _SignupMedicalInfoScreenState extends State<SignupMedicalInfoScreen> {
                 ),
                 SizedBox(height: 15),
                 //file picker for select medical report
-                SizedBox(
-                  width: double.infinity,
-                  height: 50,
-                  child: ElevatedButton(
-                    onPressed: () async {
-                      // final result = await FilePicker.platform.pickFiles();
-                      // if (result == null) {
-                      //   print('No file selected.');
-                      //   return;
-                      // }
-                      // print('File selected: ${result.files.single.name}');
-                    },
-                    style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.white,
-                        shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(10),
-                            side: BorderSide(color: Colors.black38))),
-                    child: Text(
-                      'Select Medical Report',
-                      style: TextStyle(
-                        color: Colors.black,
-                      ),
-                    ),
-                  ),
+                MedicalReportPicker(
+                  onFileUploaded: (file) {
+                    setState(() {
+                      medicalReport = file; 
+                    });
+                  },
                 ),
                 SizedBox(height: 15),
                 Text(
@@ -156,10 +177,8 @@ class _SignupMedicalInfoScreenState extends State<SignupMedicalInfoScreen> {
                   maxLines: 20,
                   minLines: 1,
                   validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return 'Please enter your health conditions';
-                    }
-                    return null;
+                    return Helpers.validateInputFields(
+                        value, 'Please enter your health conditions');
                   },
                   decoration: InputDecoration(
                     hintText: 'Enter your health conditions',
@@ -173,11 +192,13 @@ class _SignupMedicalInfoScreenState extends State<SignupMedicalInfoScreen> {
                 ),
                 Row(
                   children: [
-                    Checkbox(value: isSelected, onChanged: (bool? value){
-                      setState(() {
-                        isSelected = value!;
-                      });
-                    }),
+                    Checkbox(
+                        value: isSelected,
+                        onChanged: (bool? value) {
+                          setState(() {
+                            isSelected = value!;
+                          });
+                        }),
                     Text('I agree to the terms and conditions'),
                   ],
                 ),
@@ -195,21 +216,33 @@ class _SignupMedicalInfoScreenState extends State<SignupMedicalInfoScreen> {
                   onPressed: () {
                     widget.screenTitle == 'profilePage'
                         ? Navigator.popAndPushNamed(
-                            context, '/signup-address-info',
-                            arguments: widget.screenTitle)
+                            context,
+                            '/signup-address-info',
+                            arguments: {
+                              'screenTitle': widget.screenTitle,
+                              'personalInfo': widget.personalInfo,
+                              'addressInfo': widget.addressInfo,
+                            },
+                          )
                         : Navigator.popAndPushNamed(
-                            context, '/signup-address-info');
+                            context,
+                            '/signup-address-info',
+                            arguments: {
+                              'screenTitle': widget.screenTitle,
+                              'personalInfo': widget.personalInfo,
+                              'addressInfo': widget.addressInfo,
+                            },
+                          );
                   },
                 ),
               ),
               SizedBox(
                 width: 120,
                 child: LoginButton(
-                  text: widget.screenTitle == 'profilePage'
-                      ? 'Save'
-                      : 'Sign Up',
+                  text:
+                      widget.screenTitle == 'profilePage' ? 'Save' : 'Sign Up',
                   onPressed: () {
-                    signupUserRedirectHome(context);
+                    signupUserRedirect();
                   },
                 ),
               ),

@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:lifeblood_blood_donation_app/components/text_field.dart';
+import 'package:lifeblood_blood_donation_app/models/personal_information.dart';
+import 'package:lifeblood_blood_donation_app/utils/helpers.dart';
 import '../../../components/custom_container.dart';
 import '../../../components/login_button.dart';
 
@@ -27,59 +29,52 @@ class _PersonalInfoPageState extends State<SignupPersonalInfoScreen> {
   final TextEditingController _passwordController = TextEditingController();
   final TextEditingController _confirmPasswordController =
       TextEditingController();
-
   String selectedGender = "Male";
-
   final _formKey = GlobalKey<FormState>();
 
-  //validate email
-  String? validateEmail(String? value) {
-    if (value == null || value.isEmpty) {
-      return 'Please enter your email here';
-    }
-    const emailRegex = r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$';
-    if (!RegExp(emailRegex).hasMatch(value.trim())) {
-      return 'Please enter a valid email address';
-    }
-    return null;
+  @override
+  void dispose() {
+    _fnameController.dispose();
+    _lnameController.dispose();
+    _nicController.dispose();
+    _licenseController.dispose();
+    _emailController.dispose();
+    _contactController.dispose();
+    _passwordController.dispose();
+    _confirmPasswordController.dispose();
+    super.dispose();
   }
 
-  void signupUser(context) {
-    if (_formKey.currentState != null && _formKey.currentState!.validate()) {
-      if (_passwordController.text == _confirmPasswordController.text) {
-        //navigate to the next page
-        Navigator.pushReplacementNamed(
-          context,
-          '/signup-address-info',
-          arguments: widget.screenTitle,
+  void signupUserPersonalInfo() async {
+    if (_passwordController.text == _confirmPasswordController.text) {
+      try {
+        DateTime? dob = Helpers.setDob(_dobController.text.trim());
+        if (dob == null) {
+          Helpers.showError(context, "Invalid Date of Birth format. Please use YYYY-MM-DD.");
+          return;
+        }
+
+        PersonalInfo personalInfo = PersonalInfo(
+          userId: '',
+          firstName: _fnameController.text.trim(),
+          lastName: _lnameController.text.trim(),
+          dob: dob,
+          gender: selectedGender,
+          nic: _nicController.text.trim(),
+          drivingLicenseNo: _licenseController.text.trim(),
+          email: _emailController.text.trim(),
+          contactNumber: _contactController.text.trim(),
+          password: _passwordController.text.trim(),
         );
-      } else {
-        //display an error message
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(
-              "Passwords are doesn't match",
-              style: TextStyle(
-                color: Colors.white,
-              ),
-            ),
-            backgroundColor: Colors.black.withOpacity(0.3),
-          ),
-        );
+        Navigator.pushNamed(context, '/signup-address-info', arguments: {
+          'screentitle': widget.screenTitle,
+          'personalInfo': personalInfo,
+        });
+      } catch (e) {
+        Helpers.showError(context, "Error");
       }
     } else {
-      //display an error message
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(
-            "Error",
-            style: TextStyle(
-              color: Colors.white,
-            ),
-          ),
-          backgroundColor: Colors.black.withOpacity(0.3),
-        ),
-      );
+      Helpers.showError(context, "Passwords are doesn't match");
     }
   }
 
@@ -118,11 +113,7 @@ class _PersonalInfoPageState extends State<SignupPersonalInfoScreen> {
                     hintText: 'Enter your first name',
                     controller: _fnameController,
                     validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return 'Please enter your first name here';
-                      } else {
-                        return null;
-                      }
+                      return Helpers.validateInputFields(value, 'Please enter your first name here');
                     },
                   ),
                   CustomInputBox(
@@ -130,24 +121,15 @@ class _PersonalInfoPageState extends State<SignupPersonalInfoScreen> {
                     hintText: 'Enter your last name',
                     controller: _lnameController,
                     validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return 'Please enter your last name here';
-                      } else {
-                        return null;
-                      }
+                      return Helpers.validateInputFields(value, 'Please enter your last name here');
                     },
                   ),
-                  CustomInputBox(
-                    textName: 'Date of Birth',
-                    hintText: 'Enter your date of birth',
+                  _buildDatePicker(
+                     labelText: 'Date of Birth',
+                    hintText: 'YYYY-MM-DD',
                     controller: _dobController,
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return 'Please enter your dob here';
-                      } else {
-                        return null;
-                      }
-                    },
+                    context: context,
+                    validator: Helpers.validateDate,
                   ),
                   Text(
                     "Gender",
@@ -158,20 +140,7 @@ class _PersonalInfoPageState extends State<SignupPersonalInfoScreen> {
                     ),
                   ),
                   SizedBox(height: 5),
-                  DropdownButtonFormField(
-                    value: selectedGender,
-                    items: ["Male", "Female"]
-                        .map((item) =>
-                            DropdownMenuItem(value: item, child: Text(item)))
-                        .toList(),
-                    onChanged: (value) {
-                      setState(() => selectedGender = value.toString());
-                    },
-                    decoration: InputDecoration(
-                      border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(15)),
-                    ),
-                  ),
+                  _buildGenderSelector(),
                   SizedBox(
                     height: 10,
                   ),
@@ -180,11 +149,7 @@ class _PersonalInfoPageState extends State<SignupPersonalInfoScreen> {
                     hintText: 'Enter your NIC number',
                     controller: _nicController,
                     validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return 'Please enter your NIC here';
-                      } else {
-                        return null;
-                      }
+                      return Helpers.validateInputFields(value, 'Please enter your NIC here');
                     },
                   ),
                   CustomInputBox(
@@ -196,22 +161,19 @@ class _PersonalInfoPageState extends State<SignupPersonalInfoScreen> {
                     textName: 'Email',
                     hintText: 'Enter your Email',
                     controller: _emailController,
-                    validator: validateEmail,
+                    validator: Helpers.validateEmail,
                   ),
                   CustomInputBox(
                     textName: 'Contact Number',
                     hintText: 'Enter Contact Number',
                     controller: _contactController,
                     keyboardType: TextInputType.number,
-                    inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+                    inputFormatters: [
+                      FilteringTextInputFormatter.digitsOnly,
+                      LengthLimitingTextInputFormatter(10),
+                    ],
                     validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return 'please enter your contact number';
-                      } else if (value.length != 10) {
-                        return 'Contact number length should 10';
-                      } else {
-                        return null;
-                      }
+                      return Helpers.validateInputFields(value, 'Please enter your contact number here');
                     },
                   ),
                   CustomInputBox(
@@ -220,13 +182,7 @@ class _PersonalInfoPageState extends State<SignupPersonalInfoScreen> {
                     controller: _passwordController,
                     hasAstricks: true,
                     validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return 'Please enter your password here';
-                      } else if (value.length < 5) {
-                        return 'Your password should have more than 5 characters.';
-                      } else {
-                        return null;
-                      }
+                      return Helpers.validateInputFields(value, 'Please enter your password here');
                     },
                   ),
                   CustomInputBox(
@@ -235,13 +191,7 @@ class _PersonalInfoPageState extends State<SignupPersonalInfoScreen> {
                     controller: _confirmPasswordController,
                     hasAstricks: true,
                     validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return 'Please enter your password here';
-                      } else if (value.length < 5) {
-                        return 'Your password should have more than 5 characters.';
-                      } else {
-                        return null;
-                      }
+                      return Helpers.validateInputFields(value, 'Please enter your password here');
                     },
                   ),
                 ],
@@ -269,7 +219,7 @@ class _PersonalInfoPageState extends State<SignupPersonalInfoScreen> {
                   child: LoginButton(
                     text: "Next",
                     onPressed: () {
-                      signupUser(context);
+                      signupUserPersonalInfo();
                     },
                   ),
                 ),
@@ -277,6 +227,76 @@ class _PersonalInfoPageState extends State<SignupPersonalInfoScreen> {
             ),
           ],
         ),
+      ),
+    );
+  }
+
+  Widget _buildDatePicker({
+    required String labelText,
+    required String hintText,
+    required TextEditingController controller,
+    required BuildContext context,
+    String? Function(String?)? validator,
+  }) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          labelText,
+          style: TextStyle(
+            fontSize: 16,
+            color: Colors.black,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        SizedBox(
+          height: 15,
+        ),
+        GestureDetector(
+          onTap: () async {
+            DateTime? selectedDate = await showDatePicker(
+              context: context,
+              initialDate: DateTime.now(),
+              firstDate: DateTime(1900),
+              lastDate: DateTime.now(),
+            );
+
+            if (selectedDate != null) {
+              String formattedDate =
+                  '${selectedDate.year}-${selectedDate.month.toString().padLeft(2, '0')}-${selectedDate.day.toString().padLeft(2, '0')}';
+              controller.text = formattedDate;
+            }
+          },
+          child: AbsorbPointer(
+            child: TextFormField(
+              controller: controller,
+              decoration: InputDecoration(
+                hintText: hintText,
+                border:
+                    OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
+              ),
+              validator: validator,
+            ),
+          ),
+        ),
+        SizedBox(
+          height: 15,
+        ),
+      ],
+    );
+  }
+
+  Widget _buildGenderSelector() {
+    return DropdownButtonFormField(
+      value: selectedGender,
+      items: ["Male", "Female"]
+          .map((item) => DropdownMenuItem(value: item, child: Text(item)))
+          .toList(),
+      onChanged: (value) {
+        setState(() => selectedGender = value.toString());
+      },
+      decoration: InputDecoration(
+        border: OutlineInputBorder(borderRadius: BorderRadius.circular(15)),
       ),
     );
   }

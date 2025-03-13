@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:lifeblood_blood_donation_app/components/custom_button.dart';
 import 'package:lifeblood_blood_donation_app/components/text_field.dart';
+import 'package:lifeblood_blood_donation_app/utils/helpers.dart';
 import '../../../components/custom_container.dart';
 
 class ResetPasswordScreen extends StatefulWidget {
@@ -17,8 +18,7 @@ class ResetPasswordScreen extends StatefulWidget {
 
 class _ResetPasswordPageState extends State<ResetPasswordScreen> {
   final TextEditingController _newPasswordController = TextEditingController();
-  final TextEditingController _verifyPasswordController =
-      TextEditingController();
+  final TextEditingController _verifyPasswordController =TextEditingController();
   final _formKey = GlobalKey<FormState>();
 
   void verifyPassword(context) {
@@ -88,13 +88,7 @@ class _ResetPasswordPageState extends State<ResetPasswordScreen> {
                     controller: _newPasswordController,
                     hasAstricks: true,
                     validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return 'Please enter your password here';
-                      } else if (value.length < 5) {
-                        return 'Your password should have more than 5 characters.';
-                      } else {
-                        return null;
-                      }
+                      return Helpers.validateInputFields(value, 'Please enter your password here');
                     },
                   ),
                   CustomInputBox(
@@ -103,14 +97,8 @@ class _ResetPasswordPageState extends State<ResetPasswordScreen> {
                     controller: _verifyPasswordController,
                     hasAstricks: true,
                     validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return 'Please re-enter your password here';
-                      } else if (value.length < 5) {
-                        return 'Your password should have more than 5 characters.';
-                      } else {
-                        return null;
-                      }
-                    },
+                      return Helpers.validateInputFields(value, 'Please re-enter your password here');
+                    }
                   ),
                 ],
               ),

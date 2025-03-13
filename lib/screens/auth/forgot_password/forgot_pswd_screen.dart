@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:lifeblood_blood_donation_app/components/custom_button.dart';
 import 'package:lifeblood_blood_donation_app/components/text_field.dart';
+import 'package:lifeblood_blood_donation_app/utils/helpers.dart';
 import '../../../components/custom_container.dart';
 
 class ForgotPasswordScreen extends StatefulWidget {
@@ -24,21 +25,13 @@ class _ForgotPasswordPageState extends State<ForgotPasswordScreen> {
 
   void getOtp(context) {
     if (_formKey.currentState != null && _formKey.currentState!.validate()) {
-      //navigate to the enter OTP page
-      Navigator.pushReplacementNamed(context, '/enter-otp',arguments: widget.screenTitle,);
-    } else {
-      //display an error message
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(
-            "Incorrect Contact number.",
-            style: TextStyle(
-              color: Colors.white,
-            ),
-          ),
-          backgroundColor: Colors.black.withOpacity(0.3),
-        ),
+      Navigator.pushReplacementNamed(
+        context,
+        '/enter-otp',
+        arguments: widget.screenTitle,
       );
+    } else {
+      Helpers.showError(context, "Incorrect Contact number.");
     }
   }
 
@@ -51,9 +44,9 @@ class _ForgotPasswordPageState extends State<ForgotPasswordScreen> {
           children: [
             SizedBox(height: 20),
             Text(
-             widget.screenTitle == 'changePassword'
-                ? 'Need to Change Password ?'
-                : 'Forgot Password?',
+              widget.screenTitle == 'changePassword'
+                  ? 'Need to Change Password ?'
+                  : 'Forgot Password?',
               style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold),
               textAlign: TextAlign.center,
             ),
@@ -76,15 +69,12 @@ class _ForgotPasswordPageState extends State<ForgotPasswordScreen> {
                 hintText: 'Enter Contact Number',
                 controller: _contactNumberController,
                 keyboardType: TextInputType.number,
-                inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+                inputFormatters: [
+                  FilteringTextInputFormatter.digitsOnly,
+                  LengthLimitingTextInputFormatter(10),
+                ],
                 validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'please enter your contact number';
-                  } else if (value.length != 10) {
-                    return 'Contact number length should 10';
-                  } else {
-                    return null;
-                  }
+                  return Helpers.validateInputFields(value, 'Please enter your contact number here');
                 },
               ),
             ),
@@ -95,15 +85,13 @@ class _ForgotPasswordPageState extends State<ForgotPasswordScreen> {
               child: GestureDetector(
                 onTap: () {
                   widget.screenTitle == 'changePassword'
-                ? Navigator.popAndPushNamed(context, '/profile')
-                : Navigator.popAndPushNamed(context, '/login');
-                  
+                      ? Navigator.popAndPushNamed(context, '/profile')
+                      : Navigator.popAndPushNamed(context, '/login');
                 },
                 child: Text(
                   widget.screenTitle == 'changePassword'
-                ? 'Back to Profile'
-                : 'Back to Login',
-                  
+                      ? 'Back to Profile'
+                      : 'Back to Login',
                   style: TextStyle(color: Colors.red),
                 ),
               ),

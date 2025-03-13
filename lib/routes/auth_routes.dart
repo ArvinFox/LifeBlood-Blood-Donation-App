@@ -15,21 +15,27 @@ class AuthRoutes {
     '/select-role': (context) => RoleSelectionPage(),
     '/login': (context) => LoginScreen(),
     '/signup-personal-info': (context) {
-      final condition = ModalRoute.of(context)?.settings.arguments as String?;
+      final arguments = ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>?;
       return SignupPersonalInfoScreen(
-        screenTitle: condition ?? 'SignupPage',
+        screenTitle: arguments?['screenTitle'] ?? 'SignupPage',
       );
     },
     '/signup-address-info': (context) {
-      final condition = ModalRoute.of(context)?.settings.arguments as String?;
+      final arguments = ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>?;
+      final personalInfo = arguments?['personalInfo']; // Get personal info from previous screen
       return SignupAddressInfoScreen(
-        screenTitle: condition ?? 'SignupPage',
+        screenTitle: arguments?['screenTitle'] ?? 'SignupPage',
+        personalInfo: personalInfo, // Pass personalInfo to the address info screen
       );
     },
     '/signup-medical-info': (context) {
-      final condition = ModalRoute.of(context)?.settings.arguments as String?;
+      final arguments = ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>?;
+      final personalInfo = arguments?['personalInfo'];
+      final addressInfo = arguments?['addressInfo'];
       return SignupMedicalInfoScreen(
-        screenTitle: condition ?? 'SignupPage',
+        screenTitle: arguments?['screenTitle'] ?? 'SignupPage',
+        personalInfo: personalInfo, // Pass personalInfo
+        addressInfo: addressInfo, // Pass addressInfo
       );
     },
     '/forgot-password': (context) {

@@ -1,15 +1,22 @@
 import 'package:flutter/material.dart';
 import 'package:lifeblood_blood_donation_app/components/text_field.dart';
+import 'package:lifeblood_blood_donation_app/models/address_information.dart';
+import 'package:lifeblood_blood_donation_app/models/personal_information.dart';
+import 'package:lifeblood_blood_donation_app/utils/helpers.dart';
 import '../../../components/custom_container.dart';
 import '../../../components/login_button.dart';
 
 class SignupAddressInfoScreen extends StatefulWidget {
   final String screenTitle;
+  final PersonalInfo personalInfo;
 
-  const SignupAddressInfoScreen({
-    super.key,
-    required this.screenTitle,
-  });
+  const SignupAddressInfoScreen(
+    {
+      super.key,
+      required this.screenTitle,
+      required this.personalInfo
+    }
+  );
 
   @override
   State<SignupAddressInfoScreen> createState() => _AddressInfoPageState();
@@ -20,29 +27,37 @@ class _AddressInfoPageState extends State<SignupAddressInfoScreen> {
   final TextEditingController _addressLine2Controller = TextEditingController();
   final TextEditingController _addressLine3Controller = TextEditingController();
   final TextEditingController _cityController = TextEditingController();
-
   String selectedProvince = "Central Province";
-
   final _formKey = GlobalKey<FormState>();
 
-  void signupUserMedicalInfo(context) {
+  @override
+  void dispose() {
+    _addressLine1Controller.dispose();
+    _addressLine2Controller.dispose();
+    _addressLine3Controller.dispose();
+    _cityController.dispose();
+    super.dispose();
+  }
+
+  void signupUserAddressInfo() async {
     if (_formKey.currentState != null && _formKey.currentState!.validate()) {
-      //navigate to the next page
-      Navigator.pushReplacementNamed(context, '/signup-medical-info',
-          arguments: widget.screenTitle);
-    } else {
-      //display an error message
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(
-            "Error",
-            style: TextStyle(
-              color: Colors.white,
-            ),
-          ),
-          backgroundColor: Colors.black.withOpacity(0.3),
-        ),
-      );
+      try {
+        AddressInfo addressInfo = AddressInfo(
+          addressLine1: _addressLine1Controller.text.trim(),
+          addressLine2: _addressLine2Controller.text.trim(),
+          addressLine3: _addressLine3Controller.text.trim(),
+          city: _cityController.text.trim(),
+          province: selectedProvince,
+        );
+
+        Navigator.pushNamed(context, '/signup-medical-info', arguments: {
+          'screenTitle': widget.screenTitle,
+          'personalInfo': widget.personalInfo,
+          'addressInfo': addressInfo
+        });
+      } catch (e) {
+        Helpers.showError(context, "Error");
+      }
     }
   }
 
@@ -74,11 +89,8 @@ class _AddressInfoPageState extends State<SignupAddressInfoScreen> {
                   hintText: 'Enter your address',
                   controller: _addressLine1Controller,
                   validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return 'Please enter your address here';
-                    } else {
-                      return null;
-                    }
+                    return Helpers.validateInputFields(
+                        value, 'Please enter your address here');
                   },
                 ),
                 CustomInputBox(
@@ -86,11 +98,8 @@ class _AddressInfoPageState extends State<SignupAddressInfoScreen> {
                   hintText: 'Enter your address',
                   controller: _addressLine2Controller,
                   validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return 'Please enter your address here';
-                    } else {
-                      return null;
-                    }
+                    return Helpers.validateInputFields(
+                        value, 'Please enter your address here');
                   },
                 ),
                 CustomInputBox(
@@ -103,11 +112,8 @@ class _AddressInfoPageState extends State<SignupAddressInfoScreen> {
                   hintText: 'Enter your city',
                   controller: _cityController,
                   validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return 'Please enter your city here';
-                    } else {
-                      return null;
-                    }
+                    return Helpers.validateInputFields(
+                        value, 'Please enter your city here');
                   },
                 ),
                 Text(
@@ -119,30 +125,7 @@ class _AddressInfoPageState extends State<SignupAddressInfoScreen> {
                   ),
                 ),
                 SizedBox(height: 5),
-                DropdownButtonFormField(
-                  value: selectedProvince,
-                  items: [
-                    "Central Province",
-                    "Eastern Province",
-                    "Northern Province",
-                    "North Central Province",
-                    "North Western Province",
-                    "Sabaragamuwa Province",
-                    "Southern Province",
-                    "Uva Province",
-                    "Western Province"
-                  ]
-                      .map((item) =>
-                          DropdownMenuItem(value: item, child: Text(item)))
-                      .toList(),
-                  onChanged: (value) {
-                    setState(() => selectedProvince = value.toString());
-                  },
-                  decoration: InputDecoration(
-                    border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(10)),
-                  ),
-                ),
+                _buidProvinceSelector()
               ],
             ),
           ),
@@ -158,8 +141,18 @@ class _AddressInfoPageState extends State<SignupAddressInfoScreen> {
                     widget.screenTitle == 'profilePage'
                         ? Navigator.popAndPushNamed(
                             context, '/signup-personal-info',
-                            arguments: widget.screenTitle)
-                        : Navigator.popAndPushNamed(context, '/signup-personal-info');
+                            arguments: {
+                              'screenTitle': widget.screenTitle,
+                              'personalInfo': widget.personalInfo,
+                            }
+                          )
+                        : Navigator.popAndPushNamed(
+                            context, '/signup-personal-info', 
+                            arguments: {
+                              'screenTitle': widget.screenTitle,
+                              'personalInfo': widget.personalInfo,
+                            }
+                          );
                   },
                 ),
               ),
@@ -168,7 +161,7 @@ class _AddressInfoPageState extends State<SignupAddressInfoScreen> {
                 child: LoginButton(
                   text: "Next",
                   onPressed: () {
-                    signupUserMedicalInfo(context);
+                    signupUserAddressInfo();
                   },
                 ),
               ),
@@ -176,6 +169,31 @@ class _AddressInfoPageState extends State<SignupAddressInfoScreen> {
           ),
           SizedBox(height: 20),
         ],
+      ),
+    );
+  }
+
+  Widget _buidProvinceSelector() {
+    return DropdownButtonFormField(
+      value: selectedProvince,
+      items: [
+        "Central Province",
+        "Eastern Province",
+        "Northern Province",
+        "North Central Province",
+        "North Western Province",
+        "Sabaragamuwa Province",
+        "Southern Province",
+        "Uva Province",
+        "Western Province"
+      ]
+          .map((item) => DropdownMenuItem(value: item, child: Text(item)))
+          .toList(),
+      onChanged: (value) {
+        setState(() => selectedProvince = value.toString());
+      },
+      decoration: InputDecoration(
+        border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
       ),
     );
   }

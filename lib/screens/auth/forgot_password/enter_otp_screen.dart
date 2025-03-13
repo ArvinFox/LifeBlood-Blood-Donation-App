@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:lifeblood_blood_donation_app/components/custom_button.dart';
 import 'package:lifeblood_blood_donation_app/components/text_field.dart';
+import 'package:lifeblood_blood_donation_app/utils/helpers.dart';
 import '../../../components/custom_container.dart';
 
 class EnterOtpScreen extends StatefulWidget {
@@ -22,21 +23,9 @@ class _EnterOtpPageState extends State<EnterOtpScreen> {
 
   void verifyOtp(context) {
     if (_formKey.currentState != null && _formKey.currentState!.validate()) {
-      //navigate to the password reset page
       Navigator.pushReplacementNamed(context, '/new-password',arguments: widget.screenTitle,);
     } else {
-      //display an error message
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(
-            "Incorrect OTP",
-            style: TextStyle(
-              color: Colors.white,
-            ),
-          ),
-          backgroundColor: Colors.black.withOpacity(0.3),
-        ),
-      );
+      Helpers.showError(context, "Incorrect OTP");
     }
   }
 
@@ -73,13 +62,7 @@ class _EnterOtpPageState extends State<EnterOtpScreen> {
                 keyboardType: TextInputType.number,
                 inputFormatters: [FilteringTextInputFormatter.digitsOnly],
                 validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Please enter the given OTP';
-                  } else if (value.length != 6) {
-                    return 'Incorrect OTP';
-                  } else {
-                    return null;
-                  }
+                  return Helpers.validateInputFields(value, 'Please enter the given OTP');
                 },
               ),
             ),

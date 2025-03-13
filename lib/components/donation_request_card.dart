@@ -67,7 +67,7 @@ class DonationRequestCard extends StatelessWidget {
                       ),
                     ),
                     Text(
-                      donationRequest.location,
+                      donationRequest.hospitalName,
                       style: TextStyle(
                         fontSize: 18,
                       ),

@@ -1,0 +1,2 @@
+D:/NSBM/Y2-S2/LifeBlood-Blood-Donation-App/android/app/.cxx/Debug/424x2m6x/x86/CMakeFiles/edit_cache.dir
+D:/NSBM/Y2-S2/LifeBlood-Blood-Donation-App/android/app/.cxx/Debug/424x2m6x/x86/CMakeFiles/rebuild_cache.dir
