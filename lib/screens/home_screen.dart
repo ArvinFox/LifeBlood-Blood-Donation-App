@@ -15,7 +15,7 @@ class HomeScreen extends StatefulWidget {
 class _HomePageState extends State<HomeScreen> {
   final List<DonationRequestDetails> _donationRequests = [
     DonationRequestDetails(
-      requestId: 1,
+      requestId: '1',
       requestBloodType: 'A+',
       urgencyLevel: "High",
       hospitalName: "Base Hospital ",
@@ -26,7 +26,7 @@ class _HomePageState extends State<HomeScreen> {
       createdAt: DateTime(2023, 3, 13, 14, 30), 
     ),
     DonationRequestDetails(
-      requestId: 1,
+      requestId: '1',
       requestBloodType: 'O+',
       urgencyLevel: "High",
       hospitalName: "Base Hospital ",
@@ -37,7 +37,7 @@ class _HomePageState extends State<HomeScreen> {
       createdAt: DateTime(2023, 3, 13, 14, 30), 
     ),
     DonationRequestDetails(
-      requestId: 1,
+      requestId: '1',
       requestBloodType: 'AB+',
       urgencyLevel: "High",
       hospitalName: "Base Hospital ",
@@ -48,7 +48,7 @@ class _HomePageState extends State<HomeScreen> {
       createdAt: DateTime(2023, 3, 13, 14, 30), 
     ),
     DonationRequestDetails(
-      requestId: 1,
+      requestId: '1',
       requestBloodType: 'AB+',
       urgencyLevel: "High",
       hospitalName: "Base Hospital ",

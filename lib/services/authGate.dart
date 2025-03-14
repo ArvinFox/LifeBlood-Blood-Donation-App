@@ -2,6 +2,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:lifeblood_blood_donation_app/screens/main_layout_screen.dart';
 import 'package:lifeblood_blood_donation_app/screens/role_selection_page.dart';
+import 'package:lifeblood_blood_donation_app/screens/static/get_started_page.dart';
 
 class AuthGate extends StatelessWidget {
   const AuthGate({super.key});
@@ -22,7 +23,7 @@ class AuthGate extends StatelessWidget {
           }
           //user is not logged in to the app
           else{
-            return RoleSelectionPage();
+            return GetStartedPage();
           }
         },
       ),

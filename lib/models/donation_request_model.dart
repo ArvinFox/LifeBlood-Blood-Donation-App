@@ -1,7 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 class DonationRequestDetails {
-  final int requestId;
+  final String requestId;
   final String patientName;
   final String requestBloodType;
   final String urgencyLevel;
@@ -25,7 +25,7 @@ class DonationRequestDetails {
 
   Map<String, dynamic> toFirestore() {
     return {
-      'requestId': requestId,
+      //'requestId': requestId,
       'patientName': patientName,
       'contactNumber': contactNumber,
       'requestBloodType': requestBloodType,
@@ -41,10 +41,10 @@ class DonationRequestDetails {
     return DonationRequestDetails(
       requestId: data['requestId'] ?? '',
       patientName: data['patientName'] ?? '',
-      contactNumber: data['contactNumber'] ?? '',
       requestBloodType: data['requestBloodType'] ?? '',
       urgencyLevel: data['urgencyLevel'] ?? '',
       hospitalName: data['hospitalName'] ?? '',
+      contactNumber: data['contactNumber'] ?? '',
       city: data['city'] ?? '',
       province: data['province'] ?? '',
       createdAt: data['createdAt'].toDate(),

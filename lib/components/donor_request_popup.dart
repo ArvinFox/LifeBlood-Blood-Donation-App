@@ -2,16 +2,18 @@ import 'package:flutter/material.dart';
 import 'package:lifeblood_blood_donation_app/components/small_button.dart';
 
 class RequestPopupMessage extends StatelessWidget {
-  final TextEditingController patientNameController;
+  final TextEditingController patientName;
   final String bloodType;
-  final TextEditingController locationController;
+  final TextEditingController hospitalName;
+  final TextEditingController city;
   final VoidCallback onClearFields;
 
   const RequestPopupMessage(
       {super.key,
-      required this.patientNameController,
+      required this.patientName,
       required this.bloodType,
-      required this.locationController,
+      required this.hospitalName,
+      required this.city,
       required this.onClearFields});
 
   @override
@@ -51,7 +53,7 @@ class RequestPopupMessage extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'Patient Name: ${patientNameController.text}',
+                  'Patient Name: ${patientName.text}',
                   style: TextStyle(
                     fontSize: 18,
                     color: Colors.black.withOpacity(0.9),
@@ -65,7 +67,14 @@ class RequestPopupMessage extends StatelessWidget {
                   ),
                 ),
                 Text(
-                  'Location: ${locationController.text}',
+                  'Location: ${hospitalName.text}',
+                  style: TextStyle(
+                    fontSize: 18,
+                    color: Colors.black.withOpacity(0.9),
+                  ),
+                ),
+                Text(
+                  'City: ${city.text}',
                   style: TextStyle(
                     fontSize: 18,
                     color: Colors.black.withOpacity(0.9),
