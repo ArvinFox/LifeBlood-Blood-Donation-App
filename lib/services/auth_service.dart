@@ -21,8 +21,7 @@ class AuthService {
     } on FirebaseAuthException catch (e) {
       throw Exception(e.code);
     } catch (e) {
-      throw Exception(
-          "An error occurred while adding the user: $e"); 
+      throw Exception("An error occurred while adding the user: $e"); 
     }
   }
 
@@ -57,6 +56,23 @@ class AuthService {
       throw Exception('Failed to delete user : ${e.message}');
     } catch (e) {
       throw Exception('An error occured : $e');
+    }
+  }
+
+  //update current user password
+  Future<void> updatePassword(String newPassword) async {
+    try{
+      User? user = auth.currentUser;
+
+      if(user != null){
+        await user.updatePassword(newPassword);
+      }else{
+        throw Exception('No user is currently logged in.');
+      }
+    }on FirebaseAuthException catch (e){
+      throw Exception('Failed to update password : ${e.message}');
+    }catch (e){
+      throw Exception('An error occurred while updating the password : $e');
     }
   }
 }

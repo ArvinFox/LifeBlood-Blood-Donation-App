@@ -74,8 +74,10 @@ class _SignupMedicalInfoScreenState extends State<SignupMedicalInfoScreen> {
 
         if (widget.screenTitle == 'profilePage') {
           Navigator.popAndPushNamed(context, '/profile');
+          Helpers.showSucess(context, "Your information has been updated.");
         } else {
           Navigator.popAndPushNamed(context, '/login');
+          Helpers.showSucess(context, "Login using email and password.");
         }
       } catch (e) {
         Helpers.showError(context, "Error");

@@ -1,20 +1,71 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 class ProfileScreen extends StatefulWidget {
   final ProfilePageNavigation navigation;
 
-  const ProfileScreen({
-    super.key,
-    required this.navigation,
-  });
+  const ProfileScreen({super.key, required this.navigation});
 
   @override
   State<ProfileScreen> createState() => _ProfilePageState();
 }
 
 class _ProfilePageState extends State<ProfileScreen> {
-  bool isAvailable = true; // Availability toggle status
+  bool isAvailable = true;
+  String? firstName;
+  String? lastName;
+  String? contactNumber;
+  bool isUserDataFetched = false;
+  final FirebaseAuth auth = FirebaseAuth.instance;
+  final CollectionReference userCollection = FirebaseFirestore.instance.collection('user');
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchUserDetails();
+  }
+
+  Future<void> _fetchUserDetails() async {
+    if(isUserDataFetched) return ;
+
+    try {
+      User? currentUser = auth.currentUser;
+
+      if (currentUser != null) {
+        String uid = currentUser.uid;
+        DocumentSnapshot userDoc =
+            await userCollection.doc(uid).get();
+
+        if (userDoc.exists) {
+          setState(() {
+            firstName = userDoc['personalInfo']['firstName'];
+            lastName = userDoc['personalInfo']['lastName'];
+            contactNumber = userDoc['personalInfo']['contactNumber'];
+            isAvailable = userDoc['isActive'] ;
+          });
+        }
+      }
+    } catch (e) {
+      print("Error fetching user details.: $e");
+    }
+  }
+
+  Future<void> _setAvailabilityStatus(bool value) async {
+    try {
+      User? currentUser = auth.currentUser;
+
+      if (currentUser != null) {
+        String userId = currentUser.uid;
+        await userCollection
+            .doc(userId)
+            .update({'isActive': value});
+      }
+    } catch (e) {
+      print("Error updating availability status: $e");
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -58,10 +109,14 @@ class _ProfilePageState extends State<ProfileScreen> {
               ),
 
               SizedBox(height: 16),
-              Text("@Username",
+              Text(
+                  firstName != null && lastName != null
+                      ? '$firstName $lastName'
+                      : '@Username',
                   style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
               SizedBox(height: 8),
-              Text("07XXXXXXXX", style: TextStyle(fontSize: 16)),
+              Text(contactNumber != null ? "$contactNumber" : 'Contact Number',
+                  style: TextStyle(fontSize: 16)),
               SizedBox(height: 30),
 
               // Donation Info Row
@@ -127,6 +182,7 @@ class _ProfilePageState extends State<ProfileScreen> {
                       setState(() {
                         isAvailable = value;
                       });
+                      _setAvailabilityStatus(value);
                     },
                     activeColor: Color(0xFFE50F2A),
                   ),
@@ -142,15 +198,11 @@ class _ProfilePageState extends State<ProfileScreen> {
                 Navigator.popAndPushNamed(
                   context,
                   "/signup-personal-info",
-                  arguments: 'profilePage',
+                  arguments: {'screenTitle': 'profilePage'},
                 );
               }),
               _buildProfileOption(Icons.vpn_key, 'Change Password', () {
-                Navigator.popAndPushNamed(
-                  context,
-                  "/forgot-password",
-                  arguments: 'changePassword',
-                );
+                Navigator.popAndPushNamed(context, '/update-password');
               }),
               _buildProfileOption(Icons.access_time, 'Donation History', () {
                 Navigator.popAndPushNamed(context, "/donation-history");

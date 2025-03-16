@@ -1,3 +1,5 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:lifeblood_blood_donation_app/components/carousel_container.dart';
 import 'package:lifeblood_blood_donation_app/components/donation_request_card.dart';
@@ -60,6 +62,35 @@ class _HomePageState extends State<HomeScreen> {
     ),
   ];
 
+  String? userName;
+  final FirebaseAuth auth = FirebaseAuth.instance;
+  final FirebaseFirestore firestore = FirebaseFirestore.instance;
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchUsername();
+  }
+
+  Future<void>  _fetchUsername() async{
+    try{
+      User? currentUser = auth.currentUser;
+
+      if(currentUser != null){
+        String uid = currentUser.uid;
+        DocumentSnapshot userDoc = await firestore.collection('user').doc(uid).get();
+
+        if(userDoc.exists){
+          setState(() {
+            userName = userDoc['personalInfo']['firstName'];
+          });
+        }
+      }
+    }catch (e) {
+      print("Error fetching username: $e");
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -74,7 +105,8 @@ class _HomePageState extends State<HomeScreen> {
         title: Padding(
           padding: const EdgeInsets.all(10),
           child: Text(
-            "Hi @Username",
+            userName != null ?
+            'Hi $userName' : 'Hi @Username',
             style: TextStyle(
               fontSize: 18,
               fontWeight: FontWeight.w800,

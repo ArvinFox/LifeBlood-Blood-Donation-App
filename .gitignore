@@ -33,6 +33,7 @@ migrate_working_dir/
 .pub/
 /build/
 android/app/google-services.json
+# lib/constants/app_credentials.dart
 
 # Symbolication related
 app.*.symbols

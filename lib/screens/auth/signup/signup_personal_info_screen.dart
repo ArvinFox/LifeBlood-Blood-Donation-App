@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:lifeblood_blood_donation_app/components/text_field.dart';
 import 'package:lifeblood_blood_donation_app/models/personal_information.dart';
+import 'package:lifeblood_blood_donation_app/utils/formatters.dart';
 import 'package:lifeblood_blood_donation_app/utils/helpers.dart';
 import '../../../components/custom_container.dart';
 import '../../../components/login_button.dart';
@@ -27,27 +28,20 @@ class _PersonalInfoPageState extends State<SignupPersonalInfoScreen> {
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _contactController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
-  final TextEditingController _confirmPasswordController =
-      TextEditingController();
+  final TextEditingController _confirmPasswordController = TextEditingController();
   String selectedGender = "Male";
   final _formKey = GlobalKey<FormState>();
-
-  @override
-  void dispose() {
-    _fnameController.dispose();
-    _lnameController.dispose();
-    _nicController.dispose();
-    _licenseController.dispose();
-    _emailController.dispose();
-    _contactController.dispose();
-    _passwordController.dispose();
-    _confirmPasswordController.dispose();
-    super.dispose();
-  }
 
   void signupUserPersonalInfo() async {
     if (_passwordController.text == _confirmPasswordController.text) {
       try {
+        String formattedContact = Formatters.formatPhoneNumber(_contactController.text.trim());
+
+        if(formattedContact.isEmpty){
+          Helpers.showError(context, "Invalid contact number.");
+          return;
+        }
+
         DateTime? dob = Helpers.setDob(_dobController.text.trim());
         if (dob == null) {
           Helpers.showError(context, "Invalid Date of Birth format. Please use YYYY-MM-DD.");
@@ -63,7 +57,7 @@ class _PersonalInfoPageState extends State<SignupPersonalInfoScreen> {
           nic: _nicController.text.trim(),
           drivingLicenseNo: _licenseController.text.trim(),
           email: _emailController.text.trim(),
-          contactNumber: _contactController.text.trim(),
+          contactNumber: formattedContact,
           password: _passwordController.text.trim(),
         );
         Navigator.pushNamed(context, '/signup-address-info', arguments: {
@@ -76,6 +70,19 @@ class _PersonalInfoPageState extends State<SignupPersonalInfoScreen> {
     } else {
       Helpers.showError(context, "Passwords are doesn't match");
     }
+  }
+
+  @override
+  void dispose() {
+    _fnameController.dispose();
+    _lnameController.dispose();
+    _nicController.dispose();
+    _licenseController.dispose();
+    _emailController.dispose();
+    _contactController.dispose();
+    _passwordController.dispose();
+    _confirmPasswordController.dispose();
+    super.dispose();
   }
 
   @override
@@ -129,7 +136,6 @@ class _PersonalInfoPageState extends State<SignupPersonalInfoScreen> {
                     hintText: 'YYYY-MM-DD',
                     controller: _dobController,
                     context: context,
-                    validator: Helpers.validateDate,
                   ),
                   Text(
                     "Gender",

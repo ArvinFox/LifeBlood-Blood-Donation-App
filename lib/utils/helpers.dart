@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:math';
 import 'package:crypto/crypto.dart';
 import 'package:flutter/material.dart';
 
@@ -18,18 +19,6 @@ class Helpers {
     const emailRegex = r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$';
     if (!RegExp(emailRegex).hasMatch(value.trim())) {
       return 'Please enter a valid email address';
-    }
-    return null;
-  }
-
-  //validate DOB
-  static String? validateDate(String? value) {
-    if (value == null || value.isEmpty) {
-      return 'Please select your Date of Birth';
-    }
-    final dateRegex = RegExp(r'^\d{4}-\d{2}-\d{2}$');
-    if (!dateRegex.hasMatch(value)) {
-      return 'Invalid date format. Please use YYYY-MM-DD.';
     }
     return null;
   }
@@ -63,5 +52,30 @@ class Helpers {
         backgroundColor: Colors.red,
       ),
     );
+  }
+
+  //sucess message
+  static void showSucess(BuildContext context, String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(
+          message,
+          style: TextStyle(fontWeight: FontWeight.bold),
+        ),
+        backgroundColor: Colors.green,
+      ),
+    );
+  }
+
+  static void debugPrintWithBorder(String message) {
+    print("========================================");
+    print(message);
+    print("========================================");
+  }
+  
+  static String generateOtp() {
+    Random random = Random();
+    int otp = 100000 + random.nextInt(900000);
+    return otp.toString();
   }
 }
