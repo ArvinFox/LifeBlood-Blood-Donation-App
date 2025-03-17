@@ -17,26 +17,27 @@ class DonationRequestDetails {
     required this.requestBloodType,
     required this.urgencyLevel,
     required this.hospitalName,
-    required this.contactNumber, 
     required this.city,
     required this.province,
-    required this.createdAt
+    required this.contactNumber,
+    required this.createdAt,
   });
 
   Map<String, dynamic> toFirestore() {
     return {
-      //'requestId': requestId,
+      // 'requestId': requestId,
       'patientName': patientName,
-      'contactNumber': contactNumber,
       'requestBloodType': requestBloodType,
       'urgencyLevel': urgencyLevel,
       'hospitalName': hospitalName,
       'city': city,
       'province': province,
-      'createdAt': Timestamp.fromDate(createdAt), 
+      'contactNumber': contactNumber,
+      'createdAt': Timestamp.fromDate(createdAt),
     };
   }
 
+  // Fetch Data from Firestore
   factory DonationRequestDetails.fromFirestore(Map<String, dynamic> data) {
     return DonationRequestDetails(
       requestId: data['requestId'] ?? '',
@@ -44,11 +45,10 @@ class DonationRequestDetails {
       requestBloodType: data['requestBloodType'] ?? '',
       urgencyLevel: data['urgencyLevel'] ?? '',
       hospitalName: data['hospitalName'] ?? '',
-      contactNumber: data['contactNumber'] ?? '',
       city: data['city'] ?? '',
       province: data['province'] ?? '',
-      createdAt: data['createdAt'].toDate(),
+      contactNumber: data['contactNumber'] ?? '',
+      createdAt: (data['createdAt'] as Timestamp).toDate(),
     );
   }
-
 }

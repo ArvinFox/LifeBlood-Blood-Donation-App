@@ -1,6 +1,8 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:lifeblood_blood_donation_app/components/event_container.dart';
+import 'package:lifeblood_blood_donation_app/models/events_model.dart';
+import 'package:lifeblood_blood_donation_app/services/events_service.dart';
 //import 'package:social_sharing_plus/social_sharing_plus.dart';
 
 class EventsScreen extends StatefulWidget {
@@ -11,8 +13,12 @@ class EventsScreen extends StatefulWidget {
 }
 
 class _EventsPageState extends State<EventsScreen> {
-  final String contentToShare = "Join us for the blood donation event and save lives! Event details: Be a Hero: Save Lives Through Blood Donation at Base Hospital, Homagama.";
-  void showJoinDialog(BuildContext context) {
+  final String contentToShare =
+      "Join us for the blood donation event and save lives! Event details: Be a Hero: Save Lives Through Blood Donation at Base Hospital, Homagama.";
+
+  final EventService _eventService = EventService();
+
+  void showJoinDialog(BuildContext context, DonationEvents event) {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
@@ -22,9 +28,8 @@ class _EventsPageState extends State<EventsScreen> {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Expanded(
-                  // Allows text to take space properly
                   child: Text(
-                    "Be a Hero: Save Lives Through Blood Donation",
+                    event.eventName,
                     style: TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.bold,
@@ -40,14 +45,14 @@ class _EventsPageState extends State<EventsScreen> {
             ),
             SizedBox(height: 10),
             ClipRRect(
-              borderRadius: BorderRadius.circular(
-                  10), // Slight curve on the image corners
-              child: Image.asset("assets/images/events_banner1.jpg"),
+              borderRadius: BorderRadius.circular(10),
+              child: Image.network(event
+                  .eventPosterUrl), // Use network image for the event poster
             ),
           ],
         ),
         content: Text(
-          "You are all invited to participate in blood donation events. Join us and help save lives!",
+          event.description,
           style: TextStyle(fontWeight: FontWeight.bold),
           textAlign: TextAlign.center,
         ),
@@ -94,31 +99,30 @@ class _EventsPageState extends State<EventsScreen> {
         ),
         leadingWidth: 40, // Reduce space in between leading and text
       ),
-      body: SingleChildScrollView(
-        child: Padding(
-          padding: EdgeInsets.all(20),
-          child: Column(
-            children: [
-              // Using the reusable EventContainer
-              EventContainer(
-                imagePath: "assets/images/events_banner1.jpg",
-                onJoin: () => showJoinDialog(context),
+      body: StreamBuilder<List<DonationEvents>>(
+        stream: _eventService.getEvents(),
+        builder: (context, snapshot) {
+          if (!snapshot.hasData) {
+            return Center(child: CircularProgressIndicator());
+          }
+
+          var events = snapshot.data!;
+
+          return SingleChildScrollView(
+            child: Padding(
+              padding: EdgeInsets.all(20),
+              child: Column(
+                children: events.map((event) {
+                  return EventContainer(
+                    imagePath: event.eventPosterUrl, // Use dynamic URL
+                    onJoin: () => showJoinDialog(
+                        context, event), // Pass event data to the dialog
+                  );
+                }).toList(),
               ),
-              EventContainer(
-                imagePath: "assets/images/events_banner2.png",
-                onJoin: () => showJoinDialog(context),
-              ),
-              EventContainer(
-                imagePath: "assets/images/events_banner1.jpg",
-                onJoin: () => showJoinDialog(context),
-              ),
-              EventContainer(
-                imagePath: "assets/images/events_banner2.png",
-                onJoin: () => showJoinDialog(context),
-              ),
-            ],
-          ),
-        ),
+            ),
+          );
+        },
       ),
     );
   }

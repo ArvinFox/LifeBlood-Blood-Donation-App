@@ -1,6 +1,8 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:lifeblood_blood_donation_app/components/blood_request_card.dart';
+import 'package:lifeblood_blood_donation_app/models/donation_request_model.dart';
 
 class BloodRequestScreen extends StatefulWidget {
   const BloodRequestScreen({super.key});
@@ -13,51 +15,49 @@ class _BloodRequestScreenState extends State<BloodRequestScreen> {
   final TextEditingController _provinceController = TextEditingController();
   final TextEditingController _cityController = TextEditingController();
 
-  final List<BloodRequestCard> bloodRequest = [
-    BloodRequestCard(
-      bloodType: "AB+",
-      urgencyLevel: "High",
-      location: "Base Hospital - Homagama",
-      contactInfo: "077XXXXXXX",
-    ),
-    BloodRequestCard(
-      bloodType: "O-",
-      urgencyLevel: "Urgent",
-      location: "General Hospital - Colombo",
-      contactInfo: "077XXXXXXX",
-    ),
-    BloodRequestCard(
-      bloodType: "AB+",
-      urgencyLevel: "High",
-      location: "Base Hospital - Homagama",
-      contactInfo: "077XXXXXXX",
-    ),
-    BloodRequestCard(
-      bloodType: "O-",
-      urgencyLevel: "Urgent",
-      location: "General Hospital - Colombo",
-      contactInfo: "077XXXXXXX",
-    ),
-  ];
+  // List to hold all fetched data
+  List<DonationRequestDetails> bloodRequests = [];
 
-  //to hold the current display blood requests
-  List<BloodRequestCard> displayedCards = [];
+  // List to hold the currently displayed cards
+  List<DonationRequestDetails> displayedRequests = [];
 
-  // no of items that load after click load more
-  int itemsLoad = 2;
+  // Number of items to load after pressing "Load More"
+  int itemsToLoad = 2;
 
   @override
   void initState() {
     super.initState();
-    displayedCards = bloodRequest.take(itemsLoad).toList();
+    _fetchBloodRequests();
   }
 
-  //function to load more blood request cards
+  // Fetch data from Firestore and filter out the latest 3 requests
+  Future<void> _fetchBloodRequests() async {
+    try {
+      var querySnapshot = await FirebaseFirestore.instance
+          .collection('requests')
+          .orderBy('createdAt', descending: true) // Order by the most recent
+          .get();
+
+      List<DonationRequestDetails> fetchedRequests = querySnapshot.docs
+          .map((doc) => DonationRequestDetails.fromFirestore(doc.data()))
+          .toList();
+
+      // Exclude the latest 3 requests
+      setState(() {
+        bloodRequests = fetchedRequests.skip(3).toList();
+        displayedRequests = bloodRequests.take(itemsToLoad).toList();
+      });
+    } catch (e) {
+      print("Error fetching blood requests: $e");
+    }
+  }
+
+  // Function to load more requests
   void loadMoreRequests() {
     setState(() {
-      if (displayedCards.length < bloodRequest.length) {
-        displayedCards.addAll(
-          bloodRequest.skip(displayedCards.length).take(itemsLoad),
+      if (displayedRequests.length < bloodRequests.length) {
+        displayedRequests.addAll(
+          bloodRequests.skip(displayedRequests.length).take(itemsToLoad),
         );
       }
     });
@@ -188,9 +188,11 @@ class _BloodRequestScreenState extends State<BloodRequestScreen> {
               ListView.builder(
                 shrinkWrap: true,
                 physics: NeverScrollableScrollPhysics(),
-                itemCount: displayedCards.length,
+                itemCount: displayedRequests.length,
                 itemBuilder: (context, index) {
-                  return displayedCards[index];
+                  return BloodRequestCard(
+                    bloodRequestDetails: displayedRequests[index],
+                  );
                 },
               ),
               SizedBox(height: 20),

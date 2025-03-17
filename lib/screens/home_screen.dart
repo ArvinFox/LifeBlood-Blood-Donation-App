@@ -15,53 +15,7 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomeScreen> {
-  final List<DonationRequestDetails> _donationRequests = [
-    DonationRequestDetails(
-      requestId: '1',
-      requestBloodType: 'A+',
-      urgencyLevel: "High",
-      hospitalName: "Base Hospital ",
-      city: "Homagama", 
-      patientName: 'ABC', 
-      contactNumber: '0771234567', 
-      province: 'Western Provinnce', 
-      createdAt: DateTime(2023, 3, 13, 14, 30), 
-    ),
-    DonationRequestDetails(
-      requestId: '1',
-      requestBloodType: 'O+',
-      urgencyLevel: "High",
-      hospitalName: "Base Hospital ",
-      city: "Homagama", 
-      patientName: 'ABC', 
-      contactNumber: '0771234567', 
-      province: 'Western Provinnce', 
-      createdAt: DateTime(2023, 3, 13, 14, 30), 
-    ),
-    DonationRequestDetails(
-      requestId: '1',
-      requestBloodType: 'AB+',
-      urgencyLevel: "High",
-      hospitalName: "Base Hospital ",
-      city: "Homagama", 
-      patientName: 'ABC', 
-      contactNumber: '0771234567', 
-      province: 'Western Provinnce', 
-      createdAt: DateTime(2023, 3, 13, 14, 30), 
-    ),
-    DonationRequestDetails(
-      requestId: '1',
-      requestBloodType: 'AB+',
-      urgencyLevel: "High",
-      hospitalName: "Base Hospital ",
-      city: "Homagama", 
-      patientName: 'ABC', 
-      contactNumber: '0771234567', 
-      province: 'Western Provinnce', 
-      createdAt: DateTime(2023, 3, 13, 14, 30), 
-    ),
-  ];
-
+  List<DonationRequestDetails> _donationRequests = [];
   String? userName;
   final FirebaseAuth auth = FirebaseAuth.instance;
   final FirebaseFirestore firestore = FirebaseFirestore.instance;
@@ -70,24 +24,61 @@ class _HomePageState extends State<HomeScreen> {
   void initState() {
     super.initState();
     _fetchUsername();
+    _fetchDonationRequests(); // Fetch donation requests when the screen is loaded
   }
 
-  Future<void>  _fetchUsername() async{
-    try{
+  // Fetch username
+  Future<void> _fetchUsername() async {
+    try {
       User? currentUser = auth.currentUser;
-
-      if(currentUser != null){
+      if (currentUser != null) {
         String uid = currentUser.uid;
-        DocumentSnapshot userDoc = await firestore.collection('user').doc(uid).get();
+        DocumentSnapshot userDoc =
+            await firestore.collection('user').doc(uid).get();
 
-        if(userDoc.exists){
+        if (userDoc.exists) {
           setState(() {
             userName = userDoc['personalInfo']['firstName'];
           });
         }
       }
-    }catch (e) {
+    } catch (e) {
       print("Error fetching username: $e");
+    }
+  }
+
+  // Fetch donation requests from Firestore and order by 'createdAt' field
+  Future<void> _fetchDonationRequests() async {
+    try {
+      QuerySnapshot snapshot = await firestore
+          .collection('requests')
+          .orderBy('createdAt',
+              descending: true) // Order by 'createdAt' (latest first)
+          .limit(3) // Limit to the latest 3 requests
+          .get();
+
+      List<DonationRequestDetails> donationRequests = [];
+      for (var doc in snapshot.docs) {
+        var data = doc.data() as Map<String, dynamic>;
+        // Only extract the required fields
+        donationRequests.add(DonationRequestDetails(
+          requestId: doc.id, // Use Firestore document ID as requestId
+          patientName: data['patientName'] ?? '',
+          requestBloodType: data['requestBloodType'] ?? '',
+          urgencyLevel: data['urgencyLevel'] ?? '',
+          hospitalName: data['hospitalName'] ?? '',
+          city: data['city'] ?? '',
+          province: data['province'] ?? '',
+          contactNumber: data['contactNumber'] ?? '',
+          createdAt: (data['createdAt'] as Timestamp).toDate(),
+        ));
+      }
+
+      setState(() {
+        _donationRequests = donationRequests; // Update state with fetched data
+      });
+    } catch (e) {
+      print("Error fetching donation requests: $e");
     }
   }
 
@@ -105,8 +96,7 @@ class _HomePageState extends State<HomeScreen> {
         title: Padding(
           padding: const EdgeInsets.all(10),
           child: Text(
-            userName != null ?
-            'Hi $userName' : 'Hi @Username',
+            userName != null ? 'Hi $userName' : 'Hi @Username',
             style: TextStyle(
               fontSize: 18,
               fontWeight: FontWeight.w800,
@@ -123,45 +113,32 @@ class _HomePageState extends State<HomeScreen> {
           child: Column(
             children: [
               CarouselContainer(),
-              SizedBox(
-                height: 20,
-              ),
+              SizedBox(height: 20),
               Text(
                 "Lifesaving Alerts: Donate Blood Now!",
-                style: TextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold,
-                ),
+                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
               ),
-              SizedBox(
-                height: 10,
-              ),
+              SizedBox(height: 10),
               Text(
                 "Urgent help needed! Browse the list of blood donation requests and be a hero. Your donation can save lives and bring hope. Every drop counts!",
-                style: TextStyle(
-                  fontSize: 14,
-                  fontWeight: FontWeight.w500,
-                ),
+                style: TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
                 textAlign: TextAlign.center,
               ),
-              SizedBox(
-                height: 20,
-              ),
-              //donation request cards (take only 3 cards from the list)
+              SizedBox(height: 20),
+              // Donation request cards (display fetched requests)
               ListView.builder(
                 shrinkWrap: true,
                 physics: NeverScrollableScrollPhysics(),
-                itemCount: 3,
+                itemCount: _donationRequests.length,
                 itemBuilder: (context, index) {
                   return DonationRequestCard(
-                    donationRequest: _donationRequests[index],
+                    donationRequest:
+                        _donationRequests[index], // Pass the fetched data
                   );
                 },
               ),
-              SizedBox(
-                height: 20,
-              ),
-              //see more donation requests button
+              SizedBox(height: 20),
+              // See more donation requests button
               Row(
                 crossAxisAlignment: CrossAxisAlignment.end,
                 mainAxisAlignment: MainAxisAlignment.end,
@@ -179,9 +156,7 @@ class _HomePageState extends State<HomeScreen> {
                   ),
                 ],
               ),
-              SizedBox(
-                height: 20,
-              ),
+              SizedBox(height: 20),
             ],
           ),
         ),

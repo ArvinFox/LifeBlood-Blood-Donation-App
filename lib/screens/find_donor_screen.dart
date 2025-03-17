@@ -59,18 +59,16 @@ class _FindDonorScreenState extends State<FindDonorScreen> {
   void submitRequest() async {
     try {
       DonationRequestDetails request = DonationRequestDetails(
-        requestId: '',
-        patientName: _patientNameController.text.trim(),
-        requestBloodType: selectBloodType,
-        urgencyLevel: urgencyLevel,
-        hospitalName: _hospitalNameController.text.trim(),
-        contactNumber: _contactController.text.trim(),
-        city: _cityController.text.trim(),
-        province: selectedProvince,
-        createdAt: DateTime.now()
-      );
+          requestId: '',
+          patientName: _patientNameController.text.trim(),
+          requestBloodType: selectBloodType,
+          urgencyLevel: urgencyLevel,
+          hospitalName: _hospitalNameController.text.trim(),
+          contactNumber: _contactController.text.trim(),
+          city: _cityController.text.trim(),
+          province: selectedProvince,
+          createdAt: DateTime.now());
       await requestCollection.doc().set(request.toFirestore());
-
     } catch (e) {
       Helpers.showError(context, e.toString());
     }
@@ -206,7 +204,8 @@ class _FindDonorScreenState extends State<FindDonorScreen> {
                         _contactController.text.isEmpty ||
                         _hospitalNameController.text.isEmpty ||
                         selectBloodType.isEmpty) {
-                      Helpers.showError(context, 'Please fill in all the fields');
+                      Helpers.showError(
+                          context, 'Please fill in all the fields');
                     } else {
                       submitRequest();
                       //display popup message

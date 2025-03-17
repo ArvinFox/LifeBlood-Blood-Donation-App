@@ -1,17 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:lifeblood_blood_donation_app/models/donation_request_model.dart';
 
 class BloodRequestCard extends StatelessWidget {
-  final String bloodType;
-  final String urgencyLevel;
-  final String location;
-  final String contactInfo;
+  final DonationRequestDetails bloodRequestDetails;
 
   const BloodRequestCard({
     super.key,
-    required this.bloodType,
-    required this.urgencyLevel,
-    required this.location,
-    required this.contactInfo,
+    required this.bloodRequestDetails,
   });
 
   // Confirm Dialog Box
@@ -93,13 +88,15 @@ class BloodRequestCard extends StatelessWidget {
                     ),
                     alignment: Alignment.center,
                     child: Text(
-                      bloodType,
-                      style: TextStyle(
-                          color: Color(0xFFE50F2A), fontWeight: FontWeight.bold),
+                      bloodRequestDetails
+                          .requestBloodType, // Blood Type from Firestore
+                      style: const TextStyle(
+                          color: Color(0xFFE50F2A),
+                          fontWeight: FontWeight.bold),
                     ),
                   ),
-                  SizedBox(width: 15), // Space between circle and text
-                
+                  const SizedBox(width: 15),
+
                   // Expanded to prevent overflow
                   Expanded(
                     child: Column(
@@ -107,38 +104,46 @@ class BloodRequestCard extends StatelessWidget {
                       children: [
                         RichText(
                           text: TextSpan(
-                            style: TextStyle(color: Colors.black, fontSize: 13),
+                            style: const TextStyle(
+                                color: Colors.black, fontSize: 13),
                             children: [
-                              TextSpan(
+                              const TextSpan(
                                   text: "Blood Type: ",
-                                  style: TextStyle(fontWeight: FontWeight.bold)),
-                              TextSpan(text: bloodType),
+                                  style:
+                                      TextStyle(fontWeight: FontWeight.bold)),
+                              TextSpan(
+                                  text: bloodRequestDetails.requestBloodType),
                             ],
                           ),
                         ),
                         const SizedBox(height: 2),
                         RichText(
                           text: TextSpan(
-                            style: TextStyle(color: Colors.black, fontSize: 13),
+                            style: const TextStyle(
+                                color: Colors.black, fontSize: 13),
                             children: [
-                              TextSpan(
+                              const TextSpan(
                                   text: "Urgency Level: ",
-                                  style: TextStyle(fontWeight: FontWeight.bold)),
-                              TextSpan(text: urgencyLevel),
+                                  style:
+                                      TextStyle(fontWeight: FontWeight.bold)),
+                              TextSpan(text: bloodRequestDetails.urgencyLevel),
                             ],
                           ),
                         ),
                         const SizedBox(height: 2),
                         RichText(
                           text: TextSpan(
-                            style: TextStyle(color: Colors.black, fontSize: 13),
+                            style: const TextStyle(
+                                color: Colors.black, fontSize: 13),
                             children: [
-                              TextSpan(
+                              const TextSpan(
                                   text: "Location: ",
-                                  style: TextStyle(fontWeight: FontWeight.bold)),
+                                  style:
+                                      TextStyle(fontWeight: FontWeight.bold)),
                               TextSpan(
-                                text: location,
-                                style: TextStyle(overflow: TextOverflow.ellipsis),
+                                text: bloodRequestDetails.hospitalName,
+                                style: const TextStyle(
+                                    overflow: TextOverflow.ellipsis),
                               ),
                             ],
                           ),
@@ -147,12 +152,14 @@ class BloodRequestCard extends StatelessWidget {
                         const SizedBox(height: 2),
                         RichText(
                           text: TextSpan(
-                            style: TextStyle(color: Colors.black, fontSize: 13),
+                            style: const TextStyle(
+                                color: Colors.black, fontSize: 13),
                             children: [
-                              TextSpan(
+                              const TextSpan(
                                   text: "Contact: ",
-                                  style: TextStyle(fontWeight: FontWeight.bold)),
-                              TextSpan(text: contactInfo),
+                                  style:
+                                      TextStyle(fontWeight: FontWeight.bold)),
+                              TextSpan(text: bloodRequestDetails.contactNumber),
                             ],
                           ),
                         ),
@@ -161,20 +168,20 @@ class BloodRequestCard extends StatelessWidget {
                   ),
                 ],
               ),
-              SizedBox(height: 14), // Space before button
-                
+              const SizedBox(height: 14),
+
               // Confirm Button
               ElevatedButton(
                 onPressed: () {
                   showConfirmDialog(context);
                 },
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: Color(0xFFE50F2A),
-                  padding: EdgeInsets.symmetric(horizontal: 40),
+                  backgroundColor: const Color(0xFFE50F2A),
+                  padding: const EdgeInsets.symmetric(horizontal: 40),
                   shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(20)),
                 ),
-                child: Text(
+                child: const Text(
                   "Confirm",
                   style: TextStyle(
                     color: Colors.white,
