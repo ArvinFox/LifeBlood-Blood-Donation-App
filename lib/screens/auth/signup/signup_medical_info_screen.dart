@@ -8,7 +8,7 @@ import 'package:lifeblood_blood_donation_app/models/blood_type.dart';
 import 'package:lifeblood_blood_donation_app/models/medical_information.dart';
 import 'package:lifeblood_blood_donation_app/models/personal_information.dart';
 import 'package:lifeblood_blood_donation_app/models/user_model.dart';
-import 'package:lifeblood_blood_donation_app/services/auth_service.dart';
+import 'package:lifeblood_blood_donation_app/services/user_service.dart';
 import 'package:lifeblood_blood_donation_app/utils/helpers.dart';
 
 class SignupMedicalInfoScreen extends StatefulWidget {
@@ -42,7 +42,7 @@ class _SignupMedicalInfoScreenState extends State<SignupMedicalInfoScreen> {
   }
 
   void signupUserRedirect() {
-    final auth = AuthService();
+    final auth = UserService();
 
     if (!isSelected) {
       Helpers.showError(

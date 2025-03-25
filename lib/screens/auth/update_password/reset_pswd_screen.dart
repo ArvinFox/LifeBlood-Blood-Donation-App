@@ -3,7 +3,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:lifeblood_blood_donation_app/components/custom_button.dart';
 import 'package:lifeblood_blood_donation_app/components/text_field.dart';
-import 'package:lifeblood_blood_donation_app/services/auth_service.dart';
+import 'package:lifeblood_blood_donation_app/services/user_service.dart';
 import 'package:lifeblood_blood_donation_app/utils/helpers.dart';
 import '../../../components/custom_container.dart';
 
@@ -26,7 +26,7 @@ class _ResetPasswordPageState extends State<ResetPasswordScreen> {
   void resetPassword() async {
     final FirebaseFirestore firestore = FirebaseFirestore.instance;
     final FirebaseAuth auth = FirebaseAuth.instance;
-    final authService = AuthService();
+    final authService = UserService();
     Helpers helper = Helpers();
 
     setState(() {

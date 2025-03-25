@@ -43,9 +43,7 @@ class PersonalInfo {
     };
   }
 
-  factory PersonalInfo.fromFirestore(DocumentSnapshot doc) {
-    Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
-
+  factory PersonalInfo.fromFirestore(Map<String, dynamic> data) {
     return PersonalInfo(
       userId: data['userId'],
       firstName: data['firstName'] ?? '',

@@ -8,7 +8,7 @@ import 'package:lifeblood_blood_donation_app/screens/main_layout_screen.dart';
 import 'package:lifeblood_blood_donation_app/screens/notification_screen.dart';
 import 'package:lifeblood_blood_donation_app/screens/static/privacy_policy_screen.dart';
 import 'package:lifeblood_blood_donation_app/components/drawer/drawer_header.dart';
-import 'package:lifeblood_blood_donation_app/services/auth_service.dart';
+import 'package:lifeblood_blood_donation_app/services/user_service.dart';
 
 class NavDrawer extends StatefulWidget {
   const NavDrawer({super.key});
@@ -85,7 +85,7 @@ class _NavDrawerState extends State<NavDrawer> {
 
 //user account delete functionality
   void deleteUser(BuildContext context) async {
-    final auth = AuthService();
+    final auth = UserService();
 
     try {
       await auth.deleteUser();
@@ -160,7 +160,7 @@ class _NavDrawerState extends State<NavDrawer> {
 
   //Logout functionality
   void logoutUser(BuildContext context) async {
-    final auth = AuthService();
+    final auth = UserService();
 
     try {
       await auth.signOut();

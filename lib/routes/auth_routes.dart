@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:lifeblood_blood_donation_app/screens/auth/forgot_password.dart';
 import 'package:lifeblood_blood_donation_app/screens/auth/update_password/enter_otp_screen.dart';
 import 'package:lifeblood_blood_donation_app/screens/auth/update_password/enter_mobile_no.dart';
-import 'package:lifeblood_blood_donation_app/screens/static/get_started_page.dart';
 import 'package:lifeblood_blood_donation_app/screens/auth/login_screen.dart';
 import 'package:lifeblood_blood_donation_app/screens/auth/update_password/reset_pswd_screen.dart';
 import 'package:lifeblood_blood_donation_app/screens/role_selection_page.dart';
@@ -12,7 +11,6 @@ import 'package:lifeblood_blood_donation_app/screens/auth/signup/signup_personal
 
 class AuthRoutes {
   static Map<String, WidgetBuilder> routes = {
-    '/welcome': (context) => GetStartedPage(),
     '/select-role': (context) => RoleSelectionPage(),
     '/login': (context) => LoginScreen(),
     '/forgot-password': (context) => ForgotPasswordScreen(),

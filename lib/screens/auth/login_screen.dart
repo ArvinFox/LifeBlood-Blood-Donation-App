@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:lifeblood_blood_donation_app/components/custom_button.dart';
 import 'package:lifeblood_blood_donation_app/components/text_field.dart';
-import 'package:lifeblood_blood_donation_app/services/auth_service.dart';
+import 'package:lifeblood_blood_donation_app/services/user_service.dart';
 import 'package:lifeblood_blood_donation_app/utils/helpers.dart';
 import '../../components/custom_container.dart';
 
@@ -26,7 +26,7 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 
   void loginUser() async {
-    final auth = AuthService();
+    final auth = UserService();
 
     setState(() {
       isLoading = true;

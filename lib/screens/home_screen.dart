@@ -6,6 +6,8 @@ import 'package:lifeblood_blood_donation_app/components/donation_request_card.da
 import 'package:lifeblood_blood_donation_app/components/drawer/side_drawer.dart';
 import 'package:lifeblood_blood_donation_app/components/small_button.dart';
 import 'package:lifeblood_blood_donation_app/models/donation_request_model.dart';
+import 'package:lifeblood_blood_donation_app/providers/user_provider.dart';
+import 'package:provider/provider.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -16,35 +18,20 @@ class HomeScreen extends StatefulWidget {
 
 class _HomePageState extends State<HomeScreen> {
   List<DonationRequestDetails> _donationRequests = [];
-  String? userName;
   final FirebaseAuth auth = FirebaseAuth.instance;
   final FirebaseFirestore firestore = FirebaseFirestore.instance;
 
   @override
   void initState() {
     super.initState();
-    _fetchUsername();
-    _fetchDonationRequests(); // Fetch donation requests when the screen is loaded
-  }
-
-  // Fetch username
-  Future<void> _fetchUsername() async {
-    try {
-      User? currentUser = auth.currentUser;
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final User? currentUser = auth.currentUser;
       if (currentUser != null) {
-        String uid = currentUser.uid;
-        DocumentSnapshot userDoc =
-            await firestore.collection('user').doc(uid).get();
-
-        if (userDoc.exists) {
-          setState(() {
-            userName = userDoc['personalInfo']['firstName'];
-          });
-        }
+        Provider.of<UserProvider>(context, listen: false).fetchUser(currentUser.uid);
       }
-    } catch (e) {
-      print("Error fetching username: $e");
-    }
+    });
+
+    _fetchDonationRequests(); // Fetch donation requests when the screen is loaded
   }
 
   // Fetch donation requests from Firestore and order by 'createdAt' field
@@ -95,13 +82,22 @@ class _HomePageState extends State<HomeScreen> {
         backgroundColor: Color(0xFFE50F2A),
         title: Padding(
           padding: const EdgeInsets.all(10),
-          child: Text(
-            userName != null ? 'Hi $userName' : 'Hi @Username',
-            style: TextStyle(
-              fontSize: 18,
-              fontWeight: FontWeight.w800,
-              color: Colors.white,
-            ),
+          child: Consumer<UserProvider>(
+            builder: (context, userProvider, child){
+              if (userProvider.isLoading) {
+                return Center(child: CircularProgressIndicator());
+              }
+              final user = userProvider.user;
+
+              return Text(
+                'Hi ${user?.personalInfo.firstName}',
+                style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.w800,
+                  color: Colors.white,
+                ),
+              );
+            },
           ),
         ),
       ),

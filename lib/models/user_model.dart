@@ -26,10 +26,10 @@ class UserModel {
 
   factory UserModel.fromFirestore(Map<String, dynamic> data, String userId) {
     return UserModel(
-      personalInfo: data['personalInfo'],
-      addressInfo: data['addressInfo'],
-      medicalInfo: data['medicalInfo'],
-      isActive: data['isActive'] ?? '',
+      personalInfo: PersonalInfo.fromFirestore(data['personalInfo'] as Map<String, dynamic>),
+      addressInfo: AddressInfo.fromFirestore(data['addressInfo'] as Map<String, dynamic>),
+      medicalInfo: MedicalInfo.fromFirestore(data['medicalInfo'] as Map<String, dynamic>),
+      isActive: data['isActive'] as bool? ?? false,
     );
   }
 }
