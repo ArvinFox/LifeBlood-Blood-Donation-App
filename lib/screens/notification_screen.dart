@@ -1,7 +1,9 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:lifeblood_blood_donation_app/components/confirmation_popup.dart';
 import 'package:lifeblood_blood_donation_app/components/event_popup.dart';
+import 'package:lifeblood_blood_donation_app/models/donation_request_model.dart';
 
 class NotificationScreen extends StatefulWidget {
   final NotificationPageNavigation navigation;
@@ -17,6 +19,32 @@ class NotificationScreen extends StatefulWidget {
 
 class _NotificationScreenState extends State<NotificationScreen> {
   bool _isBorderVisible = true;
+  DonationRequestDetails? latestRequest;
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchLatestDonationRequest();
+  }
+
+  void _fetchLatestDonationRequest() async {
+    try {
+      var snapshot = await FirebaseFirestore.instance
+          .collection('requests')
+          .orderBy('createdAt', descending: true)
+          .limit(1)
+          .get();
+
+      if (snapshot.docs.isNotEmpty) {
+        setState(() {
+          latestRequest =
+              DonationRequestDetails.fromFirestore(snapshot.docs.first.data());
+        });
+      }
+    } catch (e) {
+      print("Error fetching donation request: $e");
+    }
+  }
 
   void _borderVisible() {
     setState(() {
@@ -69,8 +97,15 @@ class _NotificationScreenState extends State<NotificationScreen> {
         child: Column(
           children: [
             _buildNotificationCard(),
-            _buildLifeSavingAlertCard(
-                "A+", "High", "Base Hospital", 'Homagama'),
+            latestRequest != null
+                ? _buildLifeSavingAlertCard(
+                    latestRequest!.requestBloodType,
+                    latestRequest!.urgencyLevel,
+                    latestRequest!.hospitalName,
+                    latestRequest!.city,
+                    latestRequest!.createdAt,
+                  )
+                : Center(child: CircularProgressIndicator()),
           ],
         ),
       ),
@@ -148,8 +183,8 @@ class _NotificationScreenState extends State<NotificationScreen> {
     );
   }
 
-  Widget _buildLifeSavingAlertCard(
-      String bloodType, String urgencyLevel, String hospital, String city) {
+  Widget _buildLifeSavingAlertCard(String bloodType, String urgencyLevel,
+      String hospital, String city, DateTime createdAt) {
     return Padding(
       padding: EdgeInsets.all(10),
       child: Card(
@@ -158,12 +193,6 @@ class _NotificationScreenState extends State<NotificationScreen> {
           height: 250,
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(20),
-            // border: _isBorderVisible
-            //     ? Border.all(
-            //         color: Colors.grey,
-            //         width: 2,
-            //       )
-            //     : null,
           ),
           child: Padding(
             padding: const EdgeInsets.all(15),
@@ -186,7 +215,7 @@ class _NotificationScreenState extends State<NotificationScreen> {
                     ),
                     SizedBox(width: 10),
                     Text(
-                      "12:00 AM",
+                      "${createdAt.hour}:${createdAt.minute.toString().padLeft(2, '0')} ${createdAt.hour < 12 ? 'AM' : 'PM'}",
                       style: TextStyle(
                         fontSize: 12,
                         fontWeight: FontWeight.bold,
@@ -235,7 +264,8 @@ class _NotificationScreenState extends State<NotificationScreen> {
                   children: [
                     GestureDetector(
                       onTap: () {
-                        showConfirmationPopup(context,"A+","High","Base Hospital","Homagama");
+                        showConfirmationPopup(
+                            context, bloodType, urgencyLevel, hospital, city);
                       },
                       child: Text(
                         "Read More.....",

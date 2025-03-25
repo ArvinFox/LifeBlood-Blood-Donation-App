@@ -15,14 +15,12 @@ class _BloodRequestScreenState extends State<BloodRequestScreen> {
   final TextEditingController _provinceController = TextEditingController();
   final TextEditingController _cityController = TextEditingController();
 
-  // List to hold all fetched data
   List<DonationRequestDetails> bloodRequests = [];
-
-  // List to hold the currently displayed cards
   List<DonationRequestDetails> displayedRequests = [];
 
-  // Number of items to load after pressing "Load More"
   int itemsToLoad = 2;
+
+  bool isFiltered = false;
 
   @override
   void initState() {
@@ -30,19 +28,17 @@ class _BloodRequestScreenState extends State<BloodRequestScreen> {
     _fetchBloodRequests();
   }
 
-  // Fetch data from Firestore and filter out the latest 3 requests
   Future<void> _fetchBloodRequests() async {
     try {
       var querySnapshot = await FirebaseFirestore.instance
           .collection('requests')
-          .orderBy('createdAt', descending: true) // Order by the most recent
+          .orderBy('createdAt', descending: true)
           .get();
 
       List<DonationRequestDetails> fetchedRequests = querySnapshot.docs
           .map((doc) => DonationRequestDetails.fromFirestore(doc.data()))
           .toList();
 
-      // Exclude the latest 3 requests
       setState(() {
         bloodRequests = fetchedRequests.skip(3).toList();
         displayedRequests = bloodRequests.take(itemsToLoad).toList();
@@ -52,7 +48,51 @@ class _BloodRequestScreenState extends State<BloodRequestScreen> {
     }
   }
 
-  // Function to load more requests
+  void _filterRequests() {
+    String province = _provinceController.text.trim().toLowerCase();
+    String city = _cityController.text.trim().toLowerCase();
+
+    if (province.isEmpty && city.isEmpty) {
+      // Show Snackbar if both province and city are empty
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: const Text(
+              "Please enter at least one of the fields (Province or City)."),
+          backgroundColor: Colors.blueAccent, // Light blue color
+        ),
+      );
+      return; // Don't proceed with filtering if both fields are empty
+    }
+
+    setState(() {
+      isFiltered = true;
+      displayedRequests = bloodRequests.where((request) {
+        bool matchesProvince = province.isEmpty ||
+            request.province.toLowerCase().contains(province);
+        bool matchesCity =
+            city.isEmpty || request.city.toLowerCase().contains(city);
+        return matchesProvince && matchesCity;
+      }).toList();
+    });
+  }
+
+  void _resetFilters() {
+    setState(() {
+      _provinceController.clear();
+      _cityController.clear();
+      displayedRequests = bloodRequests.take(itemsToLoad).toList();
+      isFiltered = false;
+    });
+
+    // Show Snackbar on Reset Filter if no province or city is entered
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: const Text("Please enter a province or city to filter."),
+        backgroundColor: Colors.blueAccent, // Light blue color
+      ),
+    );
+  }
+
   void loadMoreRequests() {
     setState(() {
       if (displayedRequests.length < bloodRequests.length) {
@@ -80,7 +120,7 @@ class _BloodRequestScreenState extends State<BloodRequestScreen> {
             Navigator.pop(context);
           },
         ),
-        leadingWidth: 40, // Reduce space in between leading and text
+        leadingWidth: 40,
       ),
       body: SingleChildScrollView(
         child: Padding(
@@ -93,31 +133,27 @@ class _BloodRequestScreenState extends State<BloodRequestScreen> {
                 textAlign: TextAlign.center,
               ),
               Container(
-                margin: EdgeInsets.symmetric(vertical: 18),
-                padding: EdgeInsets.all(13),
+                margin: const EdgeInsets.symmetric(vertical: 18),
+                padding: const EdgeInsets.all(13),
                 decoration: BoxDecoration(
                     border: Border.all(color: Colors.black, width: 1.5),
                     color: Colors.white,
                     borderRadius: BorderRadius.circular(15)),
                 child: Column(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children: [
                     Row(
                       children: [
-                        SizedBox(
-                          width: 70,
-                          child: const Text("Province"),
-                        ),
+                        const SizedBox(width: 70, child: Text("Province")),
                         const SizedBox(width: 10),
                         Expanded(
                           child: TextField(
+                            controller: _provinceController,
                             decoration: InputDecoration(
-                              contentPadding: EdgeInsets.symmetric(
+                              contentPadding: const EdgeInsets.symmetric(
                                   horizontal: 10, vertical: 10),
                               border: OutlineInputBorder(
                                   borderRadius: BorderRadius.circular(10)),
                             ),
-                            controller: _provinceController,
                           ),
                         ),
                       ],
@@ -125,17 +161,17 @@ class _BloodRequestScreenState extends State<BloodRequestScreen> {
                     const SizedBox(height: 10),
                     Row(
                       children: [
-                        SizedBox(width: 70, child: const Text("City")),
+                        const SizedBox(width: 70, child: Text("City")),
                         const SizedBox(width: 10),
                         Expanded(
                           child: TextField(
+                            controller: _cityController,
                             decoration: InputDecoration(
-                              contentPadding: EdgeInsets.symmetric(
+                              contentPadding: const EdgeInsets.symmetric(
                                   horizontal: 10, vertical: 10),
                               border: OutlineInputBorder(
                                   borderRadius: BorderRadius.circular(10)),
                             ),
-                            controller: _cityController,
                           ),
                         ),
                       ],
@@ -145,11 +181,11 @@ class _BloodRequestScreenState extends State<BloodRequestScreen> {
                       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                       children: [
                         OutlinedButton(
-                          onPressed: () {},
+                          onPressed: _filterRequests,
                           style: OutlinedButton.styleFrom(
-                            padding: EdgeInsets.symmetric(horizontal: 35),
-                            side:
-                                BorderSide(color: Color(0xFFE50F2A), width: 1),
+                            padding: const EdgeInsets.symmetric(horizontal: 35),
+                            side: const BorderSide(
+                                color: Color(0xFFE50F2A), width: 1),
                             backgroundColor: Colors.white,
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(20),
@@ -162,21 +198,16 @@ class _BloodRequestScreenState extends State<BloodRequestScreen> {
                           ),
                         ),
                         OutlinedButton(
-                          onPressed: () {
-                            setState(() {
-                              _provinceController.clear();
-                              _cityController.clear();
-                            });
-                          },
+                          onPressed: _resetFilters,
                           style: OutlinedButton.styleFrom(
-                            padding: EdgeInsets.symmetric(horizontal: 20),
-                            side:
-                                BorderSide(color: Color(0xFFE50F2A), width: 1),
+                            padding: const EdgeInsets.symmetric(horizontal: 20),
+                            side: const BorderSide(
+                                color: Color(0xFFE50F2A), width: 1),
                             backgroundColor: Colors.white,
                             shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(20)),
                           ),
-                          child: Text("Reset Filter",
+                          child: const Text("Reset Filter",
                               style: TextStyle(
                                   color: Color(0xFFE50F2A), fontSize: 12)),
                         ),
@@ -185,27 +216,43 @@ class _BloodRequestScreenState extends State<BloodRequestScreen> {
                   ],
                 ),
               ),
-              ListView.builder(
-                shrinkWrap: true,
-                physics: NeverScrollableScrollPhysics(),
-                itemCount: displayedRequests.length,
-                itemBuilder: (context, index) {
-                  return BloodRequestCard(
-                    bloodRequestDetails: displayedRequests[index],
-                  );
-                },
-              ),
-              SizedBox(height: 20),
-              ElevatedButton(
-                onPressed: loadMoreRequests,
-                style: ElevatedButton.styleFrom(
-                    backgroundColor: Color(0xFFE50F2A),
-                    padding: EdgeInsets.only(left: 100, right: 100)),
-                child: Text(
-                  "Load More",
-                  style: TextStyle(color: Colors.white),
+              // Show no request found text if no results after filter
+              if (displayedRequests.isEmpty && isFiltered)
+                const Center(
+                  child: Text(
+                    'No blood donation requests found',
+                    style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.red),
+                  ),
                 ),
-              ),
+              // Show blood requests when available
+              if (displayedRequests.isNotEmpty)
+                ListView.builder(
+                  shrinkWrap: true,
+                  physics: const NeverScrollableScrollPhysics(),
+                  itemCount: displayedRequests.length,
+                  itemBuilder: (context, index) {
+                    return BloodRequestCard(
+                      bloodRequestDetails: displayedRequests[index],
+                    );
+                  },
+                ),
+              const SizedBox(height: 20),
+              // Only show load more button if there are requests
+              if (displayedRequests.isNotEmpty && !isFiltered)
+                ElevatedButton(
+                  onPressed: loadMoreRequests,
+                  style: ElevatedButton.styleFrom(
+                      backgroundColor: const Color(0xFFE50F2A),
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 100, vertical: 10)),
+                  child: const Text(
+                    "Load More",
+                    style: TextStyle(color: Colors.white),
+                  ),
+                ),
             ],
           ),
         ),
