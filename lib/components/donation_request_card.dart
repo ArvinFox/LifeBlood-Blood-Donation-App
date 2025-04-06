@@ -6,7 +6,7 @@ class DonationRequestCard extends StatelessWidget {
 
   const DonationRequestCard({
     super.key,
-    required this.donationRequest, 
+    required this.donationRequest,
   });
 
   @override

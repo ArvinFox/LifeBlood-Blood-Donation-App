@@ -3,6 +3,9 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:lifeblood_blood_donation_app/components/blood_request_card.dart';
 import 'package:lifeblood_blood_donation_app/models/donation_request_model.dart';
+import 'package:lifeblood_blood_donation_app/screens/home_screen.dart';
+import 'package:lifeblood_blood_donation_app/providers/current_activity_provider.dart';
+import 'package:provider/provider.dart';
 
 class BloodRequestScreen extends StatefulWidget {
   const BloodRequestScreen({super.key});
@@ -58,10 +61,10 @@ class _BloodRequestScreenState extends State<BloodRequestScreen> {
         SnackBar(
           content: const Text(
               "Please enter at least one of the fields (Province or City)."),
-          backgroundColor: Colors.blueAccent, // Light blue color
+          backgroundColor: Colors.redAccent,
         ),
       );
-      return; // Don't proceed with filtering if both fields are empty
+      return;
     }
 
     setState(() {
@@ -88,7 +91,7 @@ class _BloodRequestScreenState extends State<BloodRequestScreen> {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: const Text("Please enter a province or city to filter."),
-        backgroundColor: Colors.blueAccent, // Light blue color
+        backgroundColor: Colors.blueAccent,
       ),
     );
   }
@@ -101,6 +104,32 @@ class _BloodRequestScreenState extends State<BloodRequestScreen> {
         );
       }
     });
+  }
+
+  void _addToCurrentActivities(DonationRequestDetails request) {
+    final provider =
+        Provider.of<CurrentActivitiesProvider>(context, listen: false);
+
+    // Check if the request is already in current activities
+    if (provider.currentActivities.contains(request)) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: const Text(
+              "This Request is already Added to your Current Activities. Check it out under Current Activities Section."),
+          backgroundColor: Colors.redAccent,
+        ),
+      );
+    } else {
+      provider
+          .addActivity(request); // Add the request to the current activities
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: const Text(
+              "Blood Donation Confirmed and Added to Current Activities!"),
+          backgroundColor: Colors.green,
+        ),
+      );
+    }
   }
 
   @override
@@ -236,6 +265,10 @@ class _BloodRequestScreenState extends State<BloodRequestScreen> {
                   itemBuilder: (context, index) {
                     return BloodRequestCard(
                       bloodRequestDetails: displayedRequests[index],
+                      onConfirm: () {
+                        // When 'Yes' is clicked in the dialog, add to current activities
+                        _addToCurrentActivities(displayedRequests[index]);
+                      },
                     );
                   },
                 ),

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:lifeblood_blood_donation_app/app.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -16,6 +17,6 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return LifeBlood();
+    return LifeBlood(); // Running the app after setup
   }
 }

@@ -3,10 +3,12 @@ import 'package:lifeblood_blood_donation_app/models/donation_request_model.dart'
 
 class BloodRequestCard extends StatelessWidget {
   final DonationRequestDetails bloodRequestDetails;
+  final Function onConfirm; // Add the onConfirm callback
 
   const BloodRequestCard({
     super.key,
     required this.bloodRequestDetails,
+    required this.onConfirm, // Accept the onConfirm callback
   });
 
   // Confirm Dialog Box
@@ -15,9 +17,11 @@ class BloodRequestCard extends StatelessWidget {
       context: context,
       builder: (context) {
         return AlertDialog(
-          title: const Text("Are you sure, that you want to confirm?",
-              textAlign: TextAlign.center,
-              style: TextStyle(fontSize: 20, fontWeight: FontWeight.w500)),
+          title: const Text(
+            "Are you sure, that you want to confirm?",
+            textAlign: TextAlign.center,
+            style: TextStyle(fontSize: 20, fontWeight: FontWeight.w500),
+          ),
           actions: [
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
@@ -27,7 +31,8 @@ class BloodRequestCard extends StatelessWidget {
                     backgroundColor: Colors.red,
                   ),
                   onPressed: () {
-                    Navigator.pop(context);
+                    Navigator.pop(context); // Close the dialog
+                    onConfirm(); // Call the confirm function
                   },
                   child: const Text(
                     "Yes",
@@ -41,7 +46,7 @@ class BloodRequestCard extends StatelessWidget {
                         const BorderSide(color: Color(0xFFE50F2A), width: 1.5),
                   ),
                   onPressed: () {
-                    Navigator.pop(context);
+                    Navigator.pop(context); // Just close the dialog
                   },
                   child: const Text(
                     "No",

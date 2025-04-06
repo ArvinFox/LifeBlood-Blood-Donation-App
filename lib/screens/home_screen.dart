@@ -5,8 +5,10 @@ import 'package:lifeblood_blood_donation_app/components/carousel_container.dart'
 import 'package:lifeblood_blood_donation_app/components/donation_request_card.dart';
 import 'package:lifeblood_blood_donation_app/components/drawer/side_drawer.dart';
 import 'package:lifeblood_blood_donation_app/components/small_button.dart';
+import 'package:lifeblood_blood_donation_app/components/current_activity_card.dart';
 import 'package:lifeblood_blood_donation_app/models/donation_request_model.dart';
 import 'package:lifeblood_blood_donation_app/providers/user_provider.dart';
+import 'package:lifeblood_blood_donation_app/providers/current_activity_provider.dart';
 import 'package:provider/provider.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -27,7 +29,8 @@ class _HomePageState extends State<HomeScreen> {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final User? currentUser = auth.currentUser;
       if (currentUser != null) {
-        Provider.of<UserProvider>(context, listen: false).fetchUser(currentUser.uid);
+        Provider.of<UserProvider>(context, listen: false)
+            .fetchUser(currentUser.uid);
       }
     });
 
@@ -39,17 +42,15 @@ class _HomePageState extends State<HomeScreen> {
     try {
       QuerySnapshot snapshot = await firestore
           .collection('requests')
-          .orderBy('createdAt',
-              descending: true) // Order by 'createdAt' (latest first)
-          .limit(3) // Limit to the latest 3 requests
+          .orderBy('createdAt', descending: true) // Order by latest first
+          .limit(3) // Limit to latest 3 requests
           .get();
 
       List<DonationRequestDetails> donationRequests = [];
       for (var doc in snapshot.docs) {
         var data = doc.data() as Map<String, dynamic>;
-        // Only extract the required fields
         donationRequests.add(DonationRequestDetails(
-          requestId: doc.id, // Use Firestore document ID as requestId
+          requestId: doc.id,
           patientName: data['patientName'] ?? '',
           requestBloodType: data['requestBloodType'] ?? '',
           urgencyLevel: data['urgencyLevel'] ?? '',
@@ -62,11 +63,67 @@ class _HomePageState extends State<HomeScreen> {
       }
 
       setState(() {
-        _donationRequests = donationRequests; // Update state with fetched data
+        _donationRequests = donationRequests;
       });
     } catch (e) {
       print("Error fetching donation requests: $e");
     }
+  }
+
+  // Show confirmation dialog
+  void _showConfirmDialog(
+      BuildContext context, DonationRequestDetails request) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text('Confirm Blood Donation'),
+        content:
+            Text('Are you sure you want to donate blood for this request?'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: Text('Cancel'),
+          ),
+          TextButton(
+            onPressed: () async {
+              Navigator.pop(context);
+              final provider = Provider.of<CurrentActivitiesProvider>(context,
+                  listen: false);
+              final isAlreadyAdded = provider.currentActivities
+                  .any((r) => r.requestId == request.requestId);
+
+              if (isAlreadyAdded) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text(
+                      'This Request is already Added to your Current Activities. Check it out under Current Activities Section.',
+                    ),
+                    backgroundColor: Colors.redAccent,
+                  ),
+                );
+              } else {
+                await provider.addActivity(request);
+
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text(
+                        'Blood Donation Confirmed and Added to Current Activities!'),
+                    backgroundColor: Colors.green,
+                  ),
+                );
+              }
+            },
+            child: Text('Confirm'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  // Add selected request to Current Activities
+  void _addToCurrentActivities(DonationRequestDetails request) {
+    Provider.of<CurrentActivitiesProvider>(context, listen: false)
+        .addActivity(request);
   }
 
   @override
@@ -83,7 +140,7 @@ class _HomePageState extends State<HomeScreen> {
         title: Padding(
           padding: const EdgeInsets.all(10),
           child: Consumer<UserProvider>(
-            builder: (context, userProvider, child){
+            builder: (context, userProvider, child) {
               if (userProvider.isLoading) {
                 return Center(child: CircularProgressIndicator());
               }
@@ -110,6 +167,36 @@ class _HomePageState extends State<HomeScreen> {
             children: [
               CarouselContainer(),
               SizedBox(height: 20),
+
+              // Current Activities Section
+              Align(
+                alignment: Alignment.centerLeft,
+                child: Text(
+                  "Current Activities",
+                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                ),
+              ),
+              SizedBox(height: 10),
+
+              // Display Current Activities
+              Consumer<CurrentActivitiesProvider>(
+                builder: (context, provider, _) {
+                  final currentActivities = provider.currentActivities;
+                  return ListView.builder(
+                    shrinkWrap: true,
+                    physics: NeverScrollableScrollPhysics(),
+                    itemCount: currentActivities.length,
+                    itemBuilder: (context, index) {
+                      return CurrentActivityCard(
+                        donationRequest: currentActivities[index],
+                      );
+                    },
+                  );
+                },
+              ),
+              SizedBox(height: 20),
+
+              // Lifesaving Alerts Section
               Text(
                 "Lifesaving Alerts: Donate Blood Now!",
                 style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
@@ -121,20 +208,26 @@ class _HomePageState extends State<HomeScreen> {
                 textAlign: TextAlign.center,
               ),
               SizedBox(height: 20),
-              // Donation request cards (display fetched requests)
+
+              // Donation Requests
               ListView.builder(
                 shrinkWrap: true,
                 physics: NeverScrollableScrollPhysics(),
                 itemCount: _donationRequests.length,
                 itemBuilder: (context, index) {
-                  return DonationRequestCard(
-                    donationRequest:
-                        _donationRequests[index], // Pass the fetched data
+                  final request = _donationRequests[index];
+                  return GestureDetector(
+                    onTap: () {
+                      _showConfirmDialog(
+                          context, request); // <-- fixed by passing context
+                    },
+                    child: DonationRequestCard(donationRequest: request),
                   );
                 },
               ),
               SizedBox(height: 20),
-              // See more donation requests button
+
+              // "See More" button for donation requests
               Row(
                 crossAxisAlignment: CrossAxisAlignment.end,
                 mainAxisAlignment: MainAxisAlignment.end,
