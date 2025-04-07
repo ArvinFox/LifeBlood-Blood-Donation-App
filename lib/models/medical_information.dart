@@ -2,13 +2,13 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 
 class MedicalInfo{
   final String bloodType;
-  final String? medicalReport;
+  String? medicalReport;
   final String? healthConditions;
   final DateTime registrationDate;
 
   MedicalInfo({
     required this.bloodType,
-    required this.medicalReport,
+    this.medicalReport,
     this.healthConditions,
     required this.registrationDate,
   });

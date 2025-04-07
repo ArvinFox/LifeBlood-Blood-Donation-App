@@ -8,7 +8,7 @@ class UserService {
       FirebaseFirestore.instance.collection('user');
 
   //user signup
-  Future<void> addUser(UserModel user) async {
+  Future<String> addUser(UserModel user) async {
     try {
       UserCredential userCredential = await auth.createUserWithEmailAndPassword(
           email: user.personalInfo.email, password: user.personalInfo.password);
@@ -18,6 +18,7 @@ class UserService {
       user.personalInfo.userId = uId;
 
       await userCollection.doc(uId).set(user.toFirestore());
+      return uId;
     } on FirebaseAuthException catch (e) {
       throw Exception(e.code);
     } catch (e) {

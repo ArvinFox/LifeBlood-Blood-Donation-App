@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:lifeblood_blood_donation_app/components/blood_type_card.dart';
 import 'package:lifeblood_blood_donation_app/components/custom_container.dart';
@@ -10,6 +12,7 @@ import 'package:lifeblood_blood_donation_app/models/personal_information.dart';
 import 'package:lifeblood_blood_donation_app/models/user_model.dart';
 import 'package:lifeblood_blood_donation_app/services/user_service.dart';
 import 'package:lifeblood_blood_donation_app/utils/helpers.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 class SignupMedicalInfoScreen extends StatefulWidget {
   final String screenTitle;
@@ -32,7 +35,7 @@ class _SignupMedicalInfoScreenState extends State<SignupMedicalInfoScreen> {
   final TextEditingController _healthConditionController = TextEditingController();
   String selectBloodType = '';
   bool isSelected = false;
-  String? medicalReport;
+  String? medicalReportBase64;
   final _formKey = GlobalKey<FormState>();
 
   @override
@@ -41,7 +44,13 @@ class _SignupMedicalInfoScreenState extends State<SignupMedicalInfoScreen> {
     super.dispose();
   }
 
-  void signupUserRedirect() {
+  void _handleFileUploaded(String base64Data) {
+    setState(() {
+      medicalReportBase64 = base64Data;
+    });
+  }
+
+  Future<void> signupUserRedirect(BuildContext context) async {
     final auth = UserService();
 
     if (!isSelected) {
@@ -51,7 +60,7 @@ class _SignupMedicalInfoScreenState extends State<SignupMedicalInfoScreen> {
     }
 
     if (_formKey.currentState != null && _formKey.currentState!.validate()) {
-      if (medicalReport == null) {
+      if (medicalReportBase64 == null) {
         Helpers.showError(context, 'Please upload valid medical file');
         return;
       }
@@ -59,7 +68,6 @@ class _SignupMedicalInfoScreenState extends State<SignupMedicalInfoScreen> {
         bloodType: selectBloodType,
         healthConditions: _healthConditionController.text,
         registrationDate: DateTime.now(),
-        medicalReport: medicalReport,
       );
 
       UserModel userModel = UserModel(
@@ -70,17 +78,44 @@ class _SignupMedicalInfoScreenState extends State<SignupMedicalInfoScreen> {
       );
 
       try {
-        auth.addUser(userModel);
+        final userId = await auth.addUser(userModel);
 
-        if (widget.screenTitle == 'profilePage') {
-          Navigator.popAndPushNamed(context, '/profile');
-          Helpers.showSucess(context, "Your information has been updated.");
+        if (userId != null) {
+          final fileName = 'medical_report_$userId.${medicalReportBase64!.substring(0, 10)}.pdf';
+          final filePath = '$userId/$fileName';
+
+          final response = await Supabase.instance.client.storage
+              .from('medical-reports')
+              .uploadBinary(
+                filePath,
+                base64Decode(medicalReportBase64!),
+                fileOptions: const FileOptions(contentType: 'application/pdf'),
+              );
+
+          if (response != null) {
+            final fileUrl = Supabase.instance.client.storage
+                .from('medical-reports')
+                .getPublicUrl(filePath);
+
+            userModel.medicalInfo.medicalReport = fileUrl;
+            Helpers.debugPrintWithBorder('Medical report uploaded to: $fileUrl');
+
+            if (widget.screenTitle == 'profilePage') {
+              Navigator.popAndPushNamed(context, '/profile');
+              Helpers.showSucess(context, "Your information has been updated.");
+            } else {
+              Navigator.popAndPushNamed(context, '/login');
+              Helpers.showSucess(context, "Login using email and password.");
+            }
+          } else {
+            Helpers.showError(context, "Failed to upload medical report.");
+          }
         } else {
-          Navigator.popAndPushNamed(context, '/login');
-          Helpers.showSucess(context, "Login using email and password.");
+          Helpers.showError(context, "Failed to create user account.");
         }
       } catch (e) {
-        Helpers.showError(context, "Error");
+        print('Error during signup: $e');
+        Helpers.showError(context, "Error during signup");
       }
     } else {
       Helpers.showError(context, "Please fill all the fields correctly");
@@ -156,11 +191,7 @@ class _SignupMedicalInfoScreenState extends State<SignupMedicalInfoScreen> {
                 SizedBox(height: 15),
                 //file picker for select medical report
                 MedicalReportPicker(
-                  onFileUploaded: (file) {
-                    setState(() {
-                      medicalReport = file; 
-                    });
-                  },
+                  onFileUploaded: _handleFileUploaded,
                 ),
                 SizedBox(height: 15),
                 Text(
@@ -244,7 +275,7 @@ class _SignupMedicalInfoScreenState extends State<SignupMedicalInfoScreen> {
                   text:
                       widget.screenTitle == 'profilePage' ? 'Save' : 'Sign Up',
                   onPressed: () {
-                    signupUserRedirect();
+                    signupUserRedirect(context);
                   },
                 ),
               ),
