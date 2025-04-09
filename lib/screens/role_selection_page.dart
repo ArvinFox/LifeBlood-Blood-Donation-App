@@ -7,62 +7,124 @@ class RoleSelectionPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       body: Container(
+        width: double.infinity,
         decoration: BoxDecoration(
           gradient: LinearGradient(
-            colors: [Colors.white, Color(0xFFFFD2D3)],
+            colors: [Color(0xFFFFD2D3), Colors.white],
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
           ),
         ),
         child: Padding(
-          padding: const EdgeInsets.all(30),
+          padding: const EdgeInsets.symmetric(horizontal: 24),
           child: Column(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
-              GestureDetector(
-                onTap: () {
-                  Navigator.pushNamed(context, "/login");
-                },
-                child: _buildSelectOption('Become a Donor', 'assets/images/become_donor.jpg'),
+              const SizedBox(height: 70),
+              const Text(
+                "Choose your role",
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontSize: 34,
+                  fontWeight: FontWeight.w900,
+                  color: Color(0xFF222222),
+                ),
               ),
-              GestureDetector(
-                onTap: () {
-                  Navigator.pushNamed(context, "/find-donor");
-                },
-                child:  _buildSelectOption('Find a Donor', 'assets/images/find_donor.jpeg'),
+              const SizedBox(height: 6),
+              const Text(
+                "below",
+                style: TextStyle(
+                  fontSize: 26,
+                  fontWeight: FontWeight.w500,
+                  color: Color(0xFF444444),
+                ),
               ),
+              const SizedBox(height: 18),
+              const Icon(Icons.arrow_downward_rounded, size: 32, color: Colors.grey),
+              const SizedBox(height: 40),
+      
+              // Donor Card
+              _roleCard(
+                context,
+                title: "Become a Donor",
+                imagePath: "assets/images/become_donor.jpg",
+                onTap: () => Navigator.pushNamed(context, "/login"),
+              ),
+      
+              const SizedBox(height: 32),
+              const Text(
+                "or",
+                style: TextStyle(
+                  fontSize: 22,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.grey,
+                ),
+              ),
+              const SizedBox(height: 32),
+      
+              // Find Donor Card
+              _roleCard(
+                context,
+                title: "Find a Donor",
+                imagePath: "assets/images/find_donor.jpeg",
+                onTap: () => Navigator.pushNamed(context, "/find-donor"),
+              ),
+              const SizedBox(height: 40),
             ],
           ),
         ),
       ),
     );
   }
-}
 
-Widget _buildSelectOption(String option, String imgUrl) {
-  return Stack(
-    children: [
-      ClipRRect(
-        borderRadius: BorderRadius.circular(40),
-        child: Image.asset(
-          imgUrl.toString(),
-          width: double.infinity,
-          height: 250,
-          fit: BoxFit.cover,
+  Widget _roleCard(
+    BuildContext context, {
+    required String title,
+    required String imagePath,
+    required VoidCallback onTap,
+  }) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        width: double.infinity,
+        height: 220,
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(28),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.07),
+              blurRadius: 20,
+              offset: const Offset(0, 10),
+            )
+          ],
+        ),
+        child: Row(
+          children: [
+            const SizedBox(width: 20),
+            ClipRRect(
+              borderRadius: BorderRadius.circular(18),
+              child: Image.asset(
+                imagePath,
+                height: 160,
+                width: 160,
+                fit: BoxFit.cover,
+              ),
+            ),
+            const SizedBox(width: 20),
+            Expanded(
+              child: Text(
+                title,
+                style: const TextStyle(
+                  fontSize: 22,
+                  fontWeight: FontWeight.bold,
+                  color: Color(0xFF222222),
+                ),
+              ),
+            ),
+            const SizedBox(width: 20),
+          ],
         ),
       ),
-      Positioned(
-        bottom: 10,
-        right: 10,
-        child: Text(
-          option,
-          style: TextStyle(
-            color: Colors.black,
-            fontSize: 24,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-      ),
-    ],
-  );
+    );
+  }
 }
