@@ -8,7 +8,7 @@ class EventService {
   Stream<List<DonationEvents>> getEvents() {
     return _firestore.collection('events').snapshots().map((snapshot) {
       return snapshot.docs.map((doc) {
-        return DonationEvents.fromFirestore(doc.data() as Map<String, dynamic>);
+        return DonationEvents.fromFirestore(doc.data());
       }).toList();
     });
   }

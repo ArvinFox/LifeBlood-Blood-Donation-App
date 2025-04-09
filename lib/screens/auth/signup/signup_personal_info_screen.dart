@@ -1,18 +1,24 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:lifeblood_blood_donation_app/components/text_field.dart';
+import 'package:lifeblood_blood_donation_app/models/address_information.dart';
 import 'package:lifeblood_blood_donation_app/models/personal_information.dart';
+// import 'package:lifeblood_blood_donation_app/services/user_service.dart';
 import 'package:lifeblood_blood_donation_app/utils/formatters.dart';
 import 'package:lifeblood_blood_donation_app/utils/helpers.dart';
 import '../../../components/custom_container.dart';
 import '../../../components/login_button.dart';
 
+// ignore: must_be_immutable
 class SignupPersonalInfoScreen extends StatefulWidget {
   final String screenTitle;
+  PersonalInfo? initialPersonalInfo;
+  AddressInfo? initialAddressInfo;
 
-  const SignupPersonalInfoScreen({
+  SignupPersonalInfoScreen({
     super.key,
     required this.screenTitle,
+    this.initialPersonalInfo
   });
 
   @override
@@ -29,10 +35,67 @@ class _PersonalInfoPageState extends State<SignupPersonalInfoScreen> {
   final TextEditingController _contactController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
   final TextEditingController _confirmPasswordController = TextEditingController();
+  final FocusNode _dobFocusNode = FocusNode();
   String selectedGender = "Male";
   final _formKey = GlobalKey<FormState>();
+  String passwordStrength = '';
+  String passwordMatch = '';
 
-  void signupUserPersonalInfo() async {
+  @override
+  void initState() {
+    super.initState();
+
+    if (widget.initialPersonalInfo != null) {
+      _fnameController.text = widget.initialPersonalInfo!.firstName;
+      _lnameController.text = widget.initialPersonalInfo!.lastName;
+      _dobController.text = Formatters.formatDate(widget.initialPersonalInfo!.dob);
+      selectedGender = widget.initialPersonalInfo!.gender;
+      _nicController.text = widget.initialPersonalInfo!.nic;
+      _licenseController.text = widget.initialPersonalInfo!.drivingLicenseNo ?? '';
+      _emailController.text = widget.initialPersonalInfo!.email;
+      _contactController.text = widget.initialPersonalInfo!.contactNumber;
+      _passwordController.text = widget.initialPersonalInfo!.password;
+      _confirmPasswordController.text = widget.initialPersonalInfo!.password;
+      passwordStrength = Helpers.checkPasswordStrength(widget.initialPersonalInfo!.password);
+      passwordMatch = 'Password Match';
+    }
+  }
+
+  @override
+  void dispose() {
+    _fnameController.dispose();
+    _lnameController.dispose();
+    _dobController.dispose();
+    selectedGender = '';
+    _nicController.dispose();
+    _licenseController.dispose();
+    _emailController.dispose();
+    _contactController.dispose();
+    _passwordController.dispose();
+    _confirmPasswordController.dispose();
+    _dobFocusNode.dispose();
+    super.dispose();
+  }
+
+  // void checkEmailAvailability() async {
+  //   bool isEmailExist = await UserService().emailExistInFirebaseAuth(_emailController.text.trim());
+  //   print('---------------$isEmailExist--------------------');
+  //   if(isEmailExist){
+  //     Helpers.showError(context, "Email is already registered.");
+  //     return;
+  //   } 
+  // }
+
+  void redirectPersonalInfoScreen() async {
+    if(_fnameController.text.isEmpty || _lnameController.text.isEmpty || _dobController.text.isEmpty || selectedGender.isEmpty || _nicController.text.isEmpty || _emailController.text.isEmpty || _contactController.text.isEmpty || _passwordController.text.isEmpty || _confirmPasswordController.text.isEmpty){
+      Helpers.showError(context, "All the fields must be completed.");
+      return;
+    }
+
+    if (!_formKey.currentState!.validate()) {
+      return;
+    }
+
     if (_passwordController.text == _confirmPasswordController.text) {
       try {
         String formattedContact = Formatters.formatPhoneNumber(_contactController.text.trim());
@@ -63,6 +126,7 @@ class _PersonalInfoPageState extends State<SignupPersonalInfoScreen> {
         Navigator.pushNamed(context, '/signup-address-info', arguments: {
           'screentitle': widget.screenTitle,
           'personalInfo': personalInfo,
+          'addressInfo': widget.initialAddressInfo, 
         });
       } catch (e) {
         Helpers.showError(context, "Error");
@@ -71,22 +135,39 @@ class _PersonalInfoPageState extends State<SignupPersonalInfoScreen> {
       Helpers.showError(context, "Passwords are doesn't match");
     }
   }
-
-  @override
-  void dispose() {
-    _fnameController.dispose();
-    _lnameController.dispose();
-    _nicController.dispose();
-    _licenseController.dispose();
-    _emailController.dispose();
-    _contactController.dispose();
-    _passwordController.dispose();
-    _confirmPasswordController.dispose();
-    super.dispose();
-  }
-
+  
   @override
   Widget build(BuildContext context) {
+    final routeArgs = ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>?;
+    PersonalInfo? receivedPersonalInfo = routeArgs?['personalInfo'];
+    AddressInfo? receivedAddressInfo = routeArgs?['addressInfo'];
+
+    if (receivedPersonalInfo != null && widget.initialPersonalInfo != receivedPersonalInfo) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        setState(() {
+          widget.initialPersonalInfo = receivedPersonalInfo;
+          _fnameController.text = widget.initialPersonalInfo!.firstName;
+          _lnameController.text = widget.initialPersonalInfo!.lastName;
+          _dobController.text = Formatters.formatDate(widget.initialPersonalInfo!.dob);
+          selectedGender = widget.initialPersonalInfo!.gender;
+          _nicController.text = widget.initialPersonalInfo!.nic;
+          _licenseController.text = widget.initialPersonalInfo!.drivingLicenseNo ?? '';
+          _emailController.text = widget.initialPersonalInfo!.email;
+          _contactController.text = widget.initialPersonalInfo!.contactNumber;
+          _passwordController.text = widget.initialPersonalInfo!.password;
+          _confirmPasswordController.text = widget.initialPersonalInfo!.password;
+          passwordStrength = Helpers.checkPasswordStrength(widget.initialPersonalInfo!.password);
+          passwordMatch = 'Password Match';
+        });
+      });
+    }
+
+    if (receivedAddressInfo != null && widget.initialAddressInfo != receivedAddressInfo) {
+      setState(() {
+        widget.initialAddressInfo = receivedAddressInfo;
+      });
+    }
+
     return CustomContainer(
       child: SingleChildScrollView(
         child: Column(
@@ -95,19 +176,21 @@ class _PersonalInfoPageState extends State<SignupPersonalInfoScreen> {
             SizedBox(height: 20),
             Center(
               child: Text(
-                  widget.screenTitle == 'profilePage' ? '' : 'Sign Up Here',
-                  style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
+                widget.screenTitle == 'profilePage' ? '' : 'Sign Up Here',
+                style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold)
+              ),
             ),
             SizedBox(height: 20),
             Center(
               child: Text(
-                  widget.screenTitle == 'profilePage'
-                      ? 'Edit Personal Information'
-                      : 'Personal Information',
-                  style: TextStyle(
-                      fontSize: 18,
-                      color: const Color(0xFFE50F2A),
-                      fontWeight: FontWeight.w500)),
+                widget.screenTitle == 'profilePage'
+                  ? 'Edit Personal Information'
+                  : 'Personal Information',
+                style: TextStyle(
+                  fontSize: 18,
+                  color: const Color(0xFFE50F2A),
+                  fontWeight: FontWeight.w500)
+              ),
             ),
             SizedBox(height: 15),
             Form(
@@ -132,24 +215,18 @@ class _PersonalInfoPageState extends State<SignupPersonalInfoScreen> {
                     },
                   ),
                   _buildDatePicker(
-                     labelText: 'Date of Birth',
+                    labelText: 'Date of Birth',
                     hintText: 'YYYY-MM-DD',
                     controller: _dobController,
                     context: context,
                   ),
                   Text(
                     "Gender",
-                    style: TextStyle(
-                      fontSize: 16,
-                      color: Colors.black,
-                      fontWeight: FontWeight.bold,
-                    ),
+                    style: TextStyle(fontSize: 16,color: Colors.black,fontWeight: FontWeight.bold),
                   ),
                   SizedBox(height: 5),
                   _buildGenderSelector(),
-                  SizedBox(
-                    height: 10,
-                  ),
+                  SizedBox(height: 10),
                   CustomInputBox(
                     textName: 'NIC',
                     hintText: 'Enter your NIC number',
@@ -167,7 +244,10 @@ class _PersonalInfoPageState extends State<SignupPersonalInfoScreen> {
                     textName: 'Email',
                     hintText: 'Enter your Email',
                     controller: _emailController,
-                    validator: Helpers.validateEmail,
+                    // onChanged: (value){
+                    //   checkEmailAvailability();
+                    // },
+                    validator: Helpers.validateEmail, 
                   ),
                   CustomInputBox(
                     textName: 'Contact Number',
@@ -182,30 +262,71 @@ class _PersonalInfoPageState extends State<SignupPersonalInfoScreen> {
                       return Helpers.validateInputFields(value, 'Please enter your contact number here');
                     },
                   ),
-                  CustomInputBox(
-                    textName: 'Password',
-                    hintText: 'Enter your password',
-                    controller: _passwordController,
-                    hasAstricks: true,
-                    validator: (value) {
-                      return Helpers.validateInputFields(value, 'Please enter your password here');
-                    },
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      CustomInputBox(
+                        textName: 'Password',
+                        hintText: 'Enter your password',
+                        controller: _passwordController,
+                        hasAstricks: true,
+                        onChanged: (value){
+                          setState(() {
+                            passwordStrength = Helpers.checkPasswordStrength(value);
+                          });
+                        },
+                        validator: (value) {
+                          return Helpers.validateInputFields(value, 'Please enter your password here');
+                        },
+                      ),
+                      if (_passwordController.text.isNotEmpty)
+                        Text(
+                          'Password Strength: ${passwordStrength == 'Weak Password' ? 'Password is too weak. Try using a mix of letters, numbers, and symbols.' : passwordStrength}',
+                          style: TextStyle(
+                            color: passwordStrength == 'Strong Password'
+                                ? Colors.green
+                                : passwordStrength == 'Medium Password'
+                                    ? Colors.orange
+                                    : Colors.red,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                      SizedBox(height: 4)
+                    ],
                   ),
-                  CustomInputBox(
-                    textName: 'Confirm Password',
-                    hintText: 'Enter your password again',
-                    controller: _confirmPasswordController,
-                    hasAstricks: true,
-                    validator: (value) {
-                      return Helpers.validateInputFields(value, 'Please enter your password here');
-                    },
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      CustomInputBox(
+                        textName: 'Confirm Password',
+                        hintText: 'Re-Enter your password',
+                        controller: _confirmPasswordController,
+                        hasAstricks: true,
+                        onChanged: (value){
+                          setState(() {
+                            if(value == _passwordController.text){
+                              passwordMatch = 'Password Match';
+                            } else{
+                              passwordMatch = "Password doesn't match";
+                            }
+                          });
+                        },
+                        validator: (value) {
+                          return Helpers.validateInputFields(value, 'Please enter your password here');
+                        },
+                      ),
+                      Text(
+                        passwordMatch,
+                        style: TextStyle(
+                          color: passwordMatch == 'Password Match' ? Colors.green : Colors.red
+                        ),
+                      )
+                    ],
                   ),
                 ],
               ),
             ),
-            SizedBox(
-              height: 10,
-            ),
+            SizedBox(height: 10),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
@@ -215,8 +336,8 @@ class _PersonalInfoPageState extends State<SignupPersonalInfoScreen> {
                     text: "Back",
                     onPressed: () {
                       widget.screenTitle == 'profilePage'
-                          ? Navigator.popAndPushNamed(context, '/profile')
-                          : Navigator.popAndPushNamed(context, '/login');
+                        ? Navigator.popAndPushNamed(context, '/home_profile')
+                        : Navigator.popAndPushNamed(context, '/login');
                     },
                   ),
                 ),
@@ -225,7 +346,7 @@ class _PersonalInfoPageState extends State<SignupPersonalInfoScreen> {
                   child: LoginButton(
                     text: "Next",
                     onPressed: () {
-                      signupUserPersonalInfo();
+                      redirectPersonalInfoScreen();
                     },
                   ),
                 ),
@@ -249,45 +370,37 @@ class _PersonalInfoPageState extends State<SignupPersonalInfoScreen> {
       children: [
         Text(
           labelText,
-          style: TextStyle(
-            fontSize: 16,
-            color: Colors.black,
-            fontWeight: FontWeight.bold,
-          ),
+          style: TextStyle(fontSize: 16,color: Colors.black,fontWeight: FontWeight.bold),
         ),
-        SizedBox(
-          height: 15,
-        ),
+        SizedBox(height: 15),
         GestureDetector(
           onTap: () async {
             DateTime? selectedDate = await showDatePicker(
               context: context,
-              initialDate: DateTime.now(),
+              initialDate: DateTime(2000),
               firstDate: DateTime(1900),
-              lastDate: DateTime.now(),
+              lastDate: DateTime(2005, 12, 31),
             );
 
             if (selectedDate != null) {
-              String formattedDate =
-                  '${selectedDate.year}-${selectedDate.month.toString().padLeft(2, '0')}-${selectedDate.day.toString().padLeft(2, '0')}';
+              String formattedDate = '${selectedDate.year}-${selectedDate.month.toString().padLeft(2, '0')}-${selectedDate.day.toString().padLeft(2, '0')}';
               controller.text = formattedDate;
+              FocusScope.of(context).requestFocus(_dobFocusNode);
             }
           },
           child: AbsorbPointer(
             child: TextFormField(
               controller: controller,
+              focusNode: _dobFocusNode,
               decoration: InputDecoration(
                 hintText: hintText,
-                border:
-                    OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
+                border:OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
               ),
               validator: validator,
             ),
           ),
         ),
-        SizedBox(
-          height: 15,
-        ),
+        SizedBox(height: 15),
       ],
     );
   }
@@ -296,8 +409,8 @@ class _PersonalInfoPageState extends State<SignupPersonalInfoScreen> {
     return DropdownButtonFormField(
       value: selectedGender,
       items: ["Male", "Female"]
-          .map((item) => DropdownMenuItem(value: item, child: Text(item)))
-          .toList(),
+        .map((item) => DropdownMenuItem(value: item, child: Text(item)))
+        .toList(),
       onChanged: (value) {
         setState(() => selectedGender = value.toString());
       },

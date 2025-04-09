@@ -155,7 +155,6 @@ class _EnterOtpPageState extends State<EnterOtpScreen> {
                 textName: 'OTP',
                 hintText: 'Enter your OTP',
                 controller: _otpController,
-                hasAstricks: true,
                 keyboardType: TextInputType.number,
                 inputFormatters: [FilteringTextInputFormatter.digitsOnly],
               ),

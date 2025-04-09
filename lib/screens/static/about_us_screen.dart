@@ -1,5 +1,5 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:lifeblood_blood_donation_app/components/custom_main_app_bar.dart';
 
 class AboutUsScreen extends StatelessWidget {
   const AboutUsScreen({super.key});
@@ -7,21 +7,7 @@ class AboutUsScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Color(0xFFE50F2A),
-        title: Text(
-          'About Us',
-          style: TextStyle(
-              color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold),
-        ),
-        leading: CupertinoNavigationBarBackButton(
-          color: Colors.white,
-          onPressed: () {
-            Navigator.pop(context);
-          },
-        ),
-        leadingWidth: 40,
-      ),
+      appBar: CustomMainAppbar(title: 'About Us', showLeading: true),
       body: Container(
         color: Colors.white,
         child: SingleChildScrollView(
@@ -106,10 +92,7 @@ class AboutUsScreen extends StatelessWidget {
                 Text(
                   '©2025 LifeBlood. All rights reserved. Developed by Group 10 (Batch 12 UOP - NSBM)',
                   textAlign: TextAlign.center,
-                  style: TextStyle(
-                    fontSize: 12,
-                    color: Colors.black54,
-                  ),
+                  style: TextStyle(fontSize: 12,color: Colors.black54),
                 ),
               ],
             ),

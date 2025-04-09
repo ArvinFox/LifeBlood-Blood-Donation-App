@@ -19,6 +19,7 @@ class LifeBlood extends StatelessWidget {
         title: "LifeBlood",
         debugShowCheckedModeBanner: false,
         home: AuthGate(),
+        initialRoute: "/intro",
         routes: AppRoutes.routes,
       ),
     );

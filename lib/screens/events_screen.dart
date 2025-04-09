@@ -1,129 +1,173 @@
 import 'package:flutter/cupertino.dart';
-import 'package:flutter/material.dart';
-import 'package:lifeblood_blood_donation_app/components/event_container.dart';
-import 'package:lifeblood_blood_donation_app/models/events_model.dart';
-import 'package:lifeblood_blood_donation_app/services/events_service.dart';
-//import 'package:social_sharing_plus/social_sharing_plus.dart';
+ import 'package:flutter/material.dart';
+ 
+ class EventsScreen extends StatefulWidget {
+   const EventsScreen({super.key});
+ 
+   @override
+   State<EventsScreen> createState() => _EventsPageState();
+ }
+ 
+ class _EventsPageState extends State<EventsScreen> {
+   void showJoinDialog(BuildContext context) {
+     showDialog(
+       context: context,
+       builder: (context) => AlertDialog(
+         title: Column(
+           children: [
+             Row(
+               mainAxisAlignment: MainAxisAlignment.spaceBetween,
+               children: [
+                 Expanded(
+                   child: Text(
+                     "Be a Hero: Save Lives Through Blood Donation",
+                     style: TextStyle(
+                       fontSize: 16,
+                       fontWeight: FontWeight.bold,
+                       color: Colors.red,
+                     ),
+                   ),
+                 ),
+                 IconButton(
+                   icon: Icon(Icons.close, color: Colors.black),
+                   onPressed: () => Navigator.pop(context),
+                 ),
+               ],
+             ),
+             SizedBox(height: 10),
+             ClipRRect(
+               borderRadius: BorderRadius.circular(10), 
+               child: Image.asset("assets/images/events_banner1.jpg"),
+             ),
+           ],
+         ),
+         content: Text(
+           "You are all invited to participate in blood donation events. Join us and help save lives!",
+           style: TextStyle(fontWeight: FontWeight.bold),
+           textAlign: TextAlign.center,
+         ),
+         actions: [
+           Row(
+             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+             children: [
+               ElevatedButton(
+                 onPressed: () => Navigator.pop(context),
+                 style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
+                 child: Text("Share", style: TextStyle(color: Colors.white)),
+               ),
+               OutlinedButton(
+                 onPressed: () => Navigator.pop(context),
+                 style: OutlinedButton.styleFrom(
+                     side: BorderSide(color: Colors.red)),
+                 child: Text("Cancel", style: TextStyle(color: Colors.red)),
+               ),
+             ],
+           ),
+         ],
+       ),
+     );
+   }
+ 
+   @override
+   Widget build(BuildContext context) {
+     return Scaffold(
+       appBar: AppBar(
+         title: const Text(
+           "Events",
+           style: TextStyle(
+               color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold),
+         ),
+         backgroundColor: Color(0xFFE50F2A),
+         leading: CupertinoNavigationBarBackButton(
+           color: Colors.white,
+           onPressed: () {
+             Navigator.pop(context);
+           },
+         ),
+         leadingWidth: 40, 
+       ),
+       backgroundColor: Colors.white,
+       body: SingleChildScrollView(
+         child: Padding(
+           padding: EdgeInsets.all(20),
+           child: Column(
+             children: [
+               _eventContainer(
+                 imagePath: "assets/images/events_banner1.jpg",
+                 onJoin: () => showJoinDialog(context),
+               ),
+               _eventContainer(
+                 imagePath: "assets/images/events_banner2.png",
+                 onJoin: () => showJoinDialog(context),
+               ),
+               _eventContainer(
+                 imagePath: "assets/images/events_banner1.jpg",
+                 onJoin: () => showJoinDialog(context),
+               ),
+               _eventContainer(
+                 imagePath: "assets/images/events_banner2.png",
+                 onJoin: () => showJoinDialog(context),
+               ),
+             ],
+           ),
+         ),
+       ),
+     );
+   }
 
-class EventsScreen extends StatefulWidget {
-  const EventsScreen({super.key});
-
-  @override
-  State<EventsScreen> createState() => _EventsPageState();
-}
-
-class _EventsPageState extends State<EventsScreen> {
-  final String contentToShare =
-      "Join us for the blood donation event and save lives! Event details: Be a Hero: Save Lives Through Blood Donation at Base Hospital, Homagama.";
-
-  final EventService _eventService = EventService();
-
-  void showJoinDialog(BuildContext context, DonationEvents event) {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: Column(
-          children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Expanded(
-                  child: Text(
-                    event.eventName,
-                    style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.red,
-                    ),
+  Widget _eventContainer({required String imagePath, required VoidCallback onJoin}){
+    return Container(
+      margin: const EdgeInsets.symmetric(vertical: 20),
+      height: 110,
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(15),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black38,
+            blurRadius: 6,
+            offset: Offset(2, 4),
+          ),
+        ],
+      ),
+      child: Row(
+        children: [
+          // Event Image
+          ClipRRect(
+            borderRadius: const BorderRadius.only(
+              topLeft: Radius.circular(15),
+              bottomLeft: Radius.circular(15),
+            ),
+            child: Image.asset(
+              imagePath,
+              width: 250, 
+              height: 110, 
+              fit: BoxFit.fill, 
+            ),
+          ),
+          // Join Event Button
+          Expanded(
+            child: SizedBox(
+              height: 110,
+              child: ElevatedButton(
+                onPressed: onJoin,
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Color.fromARGB(255, 229, 15, 42),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.only(
+                        topRight: Radius.circular(15),
+                        bottomRight: Radius.circular(15)),
                   ),
                 ),
-                IconButton(
-                  icon: Icon(Icons.close, color: Colors.black),
-                  onPressed: () => Navigator.pop(context),
+                child: const Text(
+                  "Join Event",
+                  style: TextStyle(color: Colors.white, fontSize: 17),
                 ),
-              ],
-            ),
-            SizedBox(height: 10),
-            ClipRRect(
-              borderRadius: BorderRadius.circular(10),
-              child: Image.network(event
-                  .eventPosterUrl), // Use network image for the event poster
-            ),
-          ],
-        ),
-        content: Text(
-          event.description,
-          style: TextStyle(fontWeight: FontWeight.bold),
-          textAlign: TextAlign.center,
-        ),
-        actions: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: [
-              ElevatedButton(
-                onPressed: () {
-                  //SocialSharingPlus.shareToSocialMedia(SocialPlatform.whatsapp, contentToShare);
-                },
-                style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
-                child: Text("Share", style: TextStyle(color: Colors.white)),
               ),
-              OutlinedButton(
-                onPressed: () => Navigator.pop(context),
-                style: OutlinedButton.styleFrom(
-                    side: BorderSide(color: Colors.red)),
-                child: Text("Cancel", style: TextStyle(color: Colors.red)),
-              ),
-            ],
+            ),
           ),
         ],
       ),
     );
   }
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.white,
-      appBar: AppBar(
-        title: const Text(
-          "Events",
-          style: TextStyle(
-              color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold),
-        ),
-        backgroundColor: Color(0xFFE50F2A),
-        leading: CupertinoNavigationBarBackButton(
-          color: Colors.white,
-          onPressed: () {
-            Navigator.pop(context);
-          },
-        ),
-        leadingWidth: 40, // Reduce space in between leading and text
-      ),
-      body: StreamBuilder<List<DonationEvents>>(
-        stream: _eventService.getEvents(),
-        builder: (context, snapshot) {
-          if (!snapshot.hasData) {
-            return Center(child: CircularProgressIndicator());
-          }
-
-          var events = snapshot.data!;
-
-          return SingleChildScrollView(
-            child: Padding(
-              padding: EdgeInsets.all(20),
-              child: Column(
-                children: events.map((event) {
-                  return EventContainer(
-                    imagePath: event.eventPosterUrl, // Use dynamic URL
-                    onJoin: () => showJoinDialog(
-                        context, event), // Pass event data to the dialog
-                  );
-                }).toList(),
-              ),
-            ),
-          );
-        },
-      ),
-    );
-  }
-}
+ }

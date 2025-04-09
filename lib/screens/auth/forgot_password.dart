@@ -102,7 +102,7 @@ class _ForgotPasswordPageState extends State<ForgotPasswordScreen> {
               alignment: Alignment.centerRight,
               child: GestureDetector(
                 onTap: () {
-                  Navigator.popAndPushNamed(context, '/login');
+                  Navigator.pop(context);
                 },
                 child: Text(
                   'Back to Login',
@@ -110,9 +110,7 @@ class _ForgotPasswordPageState extends State<ForgotPasswordScreen> {
                 ),
               ),
             ),
-            SizedBox(
-              height: 20,
-            ),
+            SizedBox(height: 20),
             CustomButton(
               onPressed: isLoading
                   ? null
@@ -135,9 +133,7 @@ class _ForgotPasswordPageState extends State<ForgotPasswordScreen> {
               btnBorderColor: Color(0xFFE50F2A),
               labelColor: isLoading ? Colors.white : Color(0xFFE50F2A),
             ),
-            SizedBox(
-              height: 20,
-            ),
+            SizedBox(height: 20),
           ],
         ),
       ),

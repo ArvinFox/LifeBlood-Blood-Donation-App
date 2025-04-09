@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
-class CustomInputBox extends StatelessWidget {
+class CustomInputBox extends StatefulWidget {
   final String textName;
   final String hintText;
   final TextEditingController controller;
@@ -12,6 +12,7 @@ class CustomInputBox extends StatelessWidget {
   final int? multiLines;
   final int? minLines;
   final bool needToEdit;
+  final Function(String)? onChanged;
 
   const CustomInputBox({
     super.key,
@@ -21,11 +22,41 @@ class CustomInputBox extends StatelessWidget {
     this.hasAstricks = false,
     this.keyboardType,
     this.inputFormatters,
-    this.validator, 
+    this.validator,
     this.multiLines,
     this.minLines,
     this.needToEdit = false,
+    this.onChanged
   });
+
+  @override
+  State<CustomInputBox> createState() => _CustomInputBoxState();
+}
+
+class _CustomInputBoxState extends State<CustomInputBox> {
+  bool _obscureText = true;
+  late FocusNode _focusNode;
+
+  @override
+  void initState() {
+    super.initState();
+    _obscureText = widget.hasAstricks;
+    _focusNode = FocusNode();
+
+    _focusNode.addListener(() {
+      if (!_focusNode.hasFocus && widget.hasAstricks) {
+        setState(() {
+          _obscureText = true; 
+        });
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    _focusNode.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -33,7 +64,7 @@ class CustomInputBox extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          textName,
+          widget.textName,
           style: TextStyle(
             fontSize: 16,
             color: Colors.black,
@@ -44,21 +75,35 @@ class CustomInputBox extends StatelessWidget {
           height: 15,
         ),
         TextFormField(
-          controller: controller,
-          obscureText: hasAstricks, //for hide password in password fields
-          keyboardType: keyboardType,
-          inputFormatters: inputFormatters,
-          readOnly: needToEdit,
+          controller: widget.controller,
+          focusNode: _focusNode, // Attach the FocusNode
+          obscureText: widget.hasAstricks ? _obscureText : false, //password visibility
+          keyboardType: widget.keyboardType,
+          inputFormatters: widget.inputFormatters,
+          readOnly: widget.needToEdit,
+          onChanged: widget.onChanged,
           validator: (value) {
-            if (validator != null) {
-              return validator!(value);
+            if (widget.validator != null) {
+              return widget.validator!(value);
             }
           },
           decoration: InputDecoration(
-            hintText: hintText,
+            hintText: widget.hintText,
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(10),
             ),
+            suffixIcon: widget.hasAstricks
+                ? IconButton(
+                    icon: Icon(
+                      _obscureText ? Icons.visibility_off : Icons.visibility,
+                    ),
+                    onPressed: () {
+                      setState(() {
+                        _obscureText = !_obscureText;
+                      });
+                    },
+                  )
+                : null,
           ),
         ),
         SizedBox(

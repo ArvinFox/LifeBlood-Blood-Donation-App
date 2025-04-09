@@ -2,7 +2,6 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:lifeblood_blood_donation_app/components/carousel_container.dart';
-import 'package:lifeblood_blood_donation_app/components/donation_request_card.dart';
 import 'package:lifeblood_blood_donation_app/components/drawer/side_drawer.dart';
 import 'package:lifeblood_blood_donation_app/components/small_button.dart';
 import 'package:lifeblood_blood_donation_app/components/current_activity_card.dart';
@@ -28,9 +27,12 @@ class _HomePageState extends State<HomeScreen> {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final User? currentUser = auth.currentUser;
+      
       if (currentUser != null) {
-        Provider.of<UserProvider>(context, listen: false)
-            .fetchUser(currentUser.uid);
+        final userProvider = Provider.of<UserProvider>(context, listen: false);
+        if(userProvider.user == null){
+          userProvider.fetchUser(currentUser.uid);
+        }
       }
     });
 
@@ -168,29 +170,36 @@ class _HomePageState extends State<HomeScreen> {
               CarouselContainer(),
               SizedBox(height: 20),
 
-              // Current Activities Section
-              Align(
-                alignment: Alignment.centerLeft,
-                child: Text(
-                  "Current Activities",
-                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-                ),
-              ),
-              SizedBox(height: 10),
-
               // Display Current Activities
               Consumer<CurrentActivitiesProvider>(
                 builder: (context, provider, _) {
                   final currentActivities = provider.currentActivities;
-                  return ListView.builder(
-                    shrinkWrap: true,
-                    physics: NeverScrollableScrollPhysics(),
-                    itemCount: currentActivities.length,
-                    itemBuilder: (context, index) {
-                      return CurrentActivityCard(
-                        donationRequest: currentActivities[index],
-                      );
-                    },
+
+                  if (currentActivities.isEmpty) {
+                    return SizedBox.shrink(); // Hide the section if empty
+                  }
+
+                  return Column(
+                    children: [
+                      Align(
+                        alignment: Alignment.centerLeft,
+                        child: Text(
+                          "Current Activities",
+                          style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                        ),
+                      ),
+                      SizedBox(height: 10),
+                      ListView.builder(
+                        shrinkWrap: true,
+                        physics: NeverScrollableScrollPhysics(),
+                        itemCount: currentActivities.length,
+                        itemBuilder: (context, index) {
+                          return CurrentActivityCard(
+                            donationRequest: currentActivities[index],
+                          );
+                        },
+                      ),
+                    ],
                   );
                 },
               ),
@@ -221,7 +230,7 @@ class _HomePageState extends State<HomeScreen> {
                       _showConfirmDialog(
                           context, request); // <-- fixed by passing context
                     },
-                    child: DonationRequestCard(donationRequest: request),
+                    child: _dobationRequestCard(donationRequest: request),
                   );
                 },
               ),
@@ -248,6 +257,84 @@ class _HomePageState extends State<HomeScreen> {
               SizedBox(height: 20),
             ],
           ),
+        ),
+      ),
+    );
+  }
+
+  Widget _dobationRequestCard({required DonationRequestDetails donationRequest}){
+    return Card(
+      child: Container(
+        width: double.infinity,
+        height: 120,
+        padding: const EdgeInsets.all(10),
+        decoration: BoxDecoration(
+          color: Color(0xFFCACACA).withOpacity(0.20),
+          borderRadius: BorderRadius.circular(20),
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            CircleAvatar(
+              backgroundColor: Color(0xFFE50F2A),
+              radius: 30,
+              child: Text(
+                donationRequest.requestBloodType,
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
+            const SizedBox(width: 40),
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Row(
+                  children: [
+                    Text(
+                      'Urgency Level: ',
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 18,
+                      ),
+                    ),
+                    Text(
+                      donationRequest.urgencyLevel,
+                      style: TextStyle(
+                        fontSize: 18,
+                      ),
+                    ),
+                  ],
+                ),
+                Row(
+                  children: [
+                    Text(
+                      'Location: ',
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 18,
+                      ),
+                    ),
+                    Text(
+                      donationRequest.hospitalName,
+                      style: TextStyle(
+                        fontSize: 18,
+                      ),
+                    ),
+                  ],
+                ),
+                Text(
+                  donationRequest.city,
+                  style: TextStyle(
+                    fontSize: 18,
+                  ),
+                ),
+              ],
+            ),
+          ],
         ),
       ),
     );

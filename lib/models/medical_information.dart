@@ -16,7 +16,6 @@ class MedicalInfo{
   Map<String, dynamic> toFirestore() {
     return {
       'bloodType': bloodType,
-      'medicalReport': medicalReport, 
       'healthConditions': healthConditions,
       'registrationDate': Timestamp.fromDate(registrationDate), 
     };
@@ -25,7 +24,6 @@ class MedicalInfo{
   factory MedicalInfo.fromFirestore(Map<String, dynamic> data) {
     return MedicalInfo(
       bloodType: data['bloodType'] ?? '',
-      medicalReport:data['medicalReport'] ?? '',
       healthConditions: data['healthConditions'] ?? '',
       registrationDate: data['registrationDate'].toDate(),
     );

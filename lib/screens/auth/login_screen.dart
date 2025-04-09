@@ -20,8 +20,8 @@ class _LoginScreenState extends State<LoginScreen> {
 
   @override
   void dispose() {
-    _emailController.dispose();
-    _passwordController.dispose();
+    _emailController.clear();
+    _passwordController.clear();
     super.dispose();
   }
 
@@ -122,7 +122,7 @@ class _LoginScreenState extends State<LoginScreen> {
           ),
           const SizedBox(height: 18),
 
-          // "Don't have an account?" with "Sign Up"
+          // Signup Link
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
@@ -147,9 +147,7 @@ class _LoginScreenState extends State<LoginScreen> {
               ),
             ],
           ),
-          SizedBox(
-            height: 20,
-          ),
+          SizedBox(height: 20),
         ],
       ),
     );

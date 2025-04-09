@@ -17,8 +17,7 @@ class EnterMobileNumber extends StatefulWidget {
 }
 
 class _EnterMobileNumberState extends State<EnterMobileNumber> {
-  final TextEditingController _contactNumberController =
-      TextEditingController();
+  final TextEditingController _contactNumberController = TextEditingController();
   final _formKey = GlobalKey<FormState>();
   bool isLoading = false;
   final FirebaseFirestore firestore = FirebaseFirestore.instance;
@@ -126,7 +125,7 @@ class _EnterMobileNumberState extends State<EnterMobileNumber> {
               alignment: Alignment.centerRight,
               child: GestureDetector(
                 onTap: () {
-                  Navigator.popAndPushNamed(context, '/profile');
+                  Navigator.popAndPushNamed(context, '/home_profile');
                 },
                 child: Text(
                   'Back to Profile',
@@ -134,9 +133,7 @@ class _EnterMobileNumberState extends State<EnterMobileNumber> {
                 ),
               ),
             ),
-            SizedBox(
-              height: 20,
-            ),
+            SizedBox(height: 20),
             CustomButton(
               onPressed: isLoading
                   ? null
@@ -159,9 +156,7 @@ class _EnterMobileNumberState extends State<EnterMobileNumber> {
               btnBorderColor: Color(0xFFE50F2A),
               labelColor: isLoading ? Colors.white : Color(0xFFE50F2A),
             ),
-            SizedBox(
-              height: 20,
-            ),
+            SizedBox(height: 20),
           ],
         ),
       ),

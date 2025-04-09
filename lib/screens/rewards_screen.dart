@@ -48,7 +48,7 @@ class _RewardsPageState extends State<RewardsScreen> {
           leading: CupertinoNavigationBarBackButton(
             color: Colors.white,
             onPressed: () {
-              Navigator.popAndPushNamed(context, '/profile');
+              Navigator.popAndPushNamed(context, '/home_profile');
             },
           )),
       body: ListView(

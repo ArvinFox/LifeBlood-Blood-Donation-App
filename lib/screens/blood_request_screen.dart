@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:lifeblood_blood_donation_app/components/blood_request_card.dart';
 import 'package:lifeblood_blood_donation_app/models/donation_request_model.dart';
-import 'package:lifeblood_blood_donation_app/screens/home_screen.dart';
 import 'package:lifeblood_blood_donation_app/providers/current_activity_provider.dart';
 import 'package:provider/provider.dart';
 

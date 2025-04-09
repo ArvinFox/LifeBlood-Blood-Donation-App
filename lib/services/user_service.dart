@@ -4,8 +4,7 @@ import 'package:lifeblood_blood_donation_app/models/user_model.dart';
 
 class UserService {
   final FirebaseAuth auth = FirebaseAuth.instance;
-  final CollectionReference userCollection =
-      FirebaseFirestore.instance.collection('user');
+  final CollectionReference userCollection =  FirebaseFirestore.instance.collection('user');
 
   //user signup
   Future<String> addUser(UserModel user) async {
@@ -89,4 +88,17 @@ class UserService {
       throw Exception("Failed to fetch user: $e");
     }
   }
+
+  // //check if an email is exist in firebase authentication
+  // Future<bool> emailExistInFirebaseAuth(String email) async{
+  //   try{
+  //     List<String> signInEmails = await FirebaseAuth.instance.fetchSignInMethodsForEmail(email);
+  //     print('-------------------------------------------------');
+  //     print('------------------$signInEmails-------------------------------');
+  //     print('-------------------$email------------------------------');
+  //     return signInEmails.isEmpty;
+  //   }catch (e) {
+  //     throw Exception("Failed to check email availability: $e");
+  //   }
+  // }
 }
