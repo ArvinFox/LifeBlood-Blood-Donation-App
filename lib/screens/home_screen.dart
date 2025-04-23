@@ -6,8 +6,9 @@ import 'package:lifeblood_blood_donation_app/components/drawer/side_drawer.dart'
 import 'package:lifeblood_blood_donation_app/components/small_button.dart';
 import 'package:lifeblood_blood_donation_app/components/current_activity_card.dart';
 import 'package:lifeblood_blood_donation_app/models/donation_request_model.dart';
-import 'package:lifeblood_blood_donation_app/providers/user_provider.dart';
 import 'package:lifeblood_blood_donation_app/providers/current_activity_provider.dart';
+import 'package:lifeblood_blood_donation_app/providers/user_provider.dart';
+import 'package:lifeblood_blood_donation_app/utils/helpers.dart';
 import 'package:provider/provider.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -21,22 +22,43 @@ class _HomePageState extends State<HomeScreen> {
   List<DonationRequestDetails> _donationRequests = [];
   final FirebaseAuth auth = FirebaseAuth.instance;
   final FirebaseFirestore firestore = FirebaseFirestore.instance;
+  bool _showDonorPoster = false;
 
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
+    WidgetsBinding.instance.addPostFrameCallback((_)  async {
       final User? currentUser = auth.currentUser;
       
       if (currentUser != null) {
         final userProvider = Provider.of<UserProvider>(context, listen: false);
         if(userProvider.user == null){
-          userProvider.fetchUser(currentUser.uid);
+          await userProvider.fetchUser(currentUser.uid);
+          _showDonorPopup();
+        } else {
+          _showDonorPopup();
         }
       }
     });
-
     _fetchDonationRequests(); // Fetch donation requests when the screen is loaded
+  }
+
+  Future<void> _showDonorPopup() async {
+    final userProvider = Provider.of<UserProvider>(context,listen: false);
+    final user = userProvider.user;
+    if (user == null) return;
+
+    if (user.isDonorPromptShown == null || user.isDonorPromptShown == false) {
+      try{
+        await FirebaseFirestore.instance.collection('user').doc(user.userId).update({
+          'isDonorPromptShown': true,
+        });
+        
+        Future.delayed(Duration.zero, () => _showDonorDialog());
+      } catch (e){
+        Helpers.debugPrintWithBorder('Error updating user.');
+      }
+    }
   }
 
   // Fetch donation requests from Firestore and order by 'createdAt' field
@@ -70,6 +92,35 @@ class _HomePageState extends State<HomeScreen> {
     } catch (e) {
       print("Error fetching donation requests: $e");
     }
+  }
+
+  void _showDonorDialog() {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) => AlertDialog(
+        title: Text('Become a Donor'),
+        content: Text('Do you want to become a blood donor and help save lives?'),
+        actions: [
+          TextButton(
+            onPressed: () {
+              Navigator.of(context).pop();
+              Navigator.pushNamed(context, '/donor-registration');
+            },
+            child: Text('Yes'),
+          ),
+          TextButton(
+            onPressed: () {
+              setState(() {
+                _showDonorPoster = true;
+              });
+              Navigator.of(context).pop();
+            },
+            child: Text('No'),
+          ),
+        ],
+      ),
+    );
   }
 
   // Show confirmation dialog
@@ -128,35 +179,51 @@ class _HomePageState extends State<HomeScreen> {
         .addActivity(request);
   }
 
+  String _getGreetingMessage() {
+    final hour = DateTime.now().hour;
+    if (hour >= 0 && hour < 12) {
+      return "Good Morning!";
+    } else if (hour >= 12 && hour < 16) {
+      return "Good Afternoon!";
+    } else {
+      return "Good Evening!";
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       extendBody: true,
-      appBar: AppBar(
-        iconTheme: IconThemeData(
-          color: Colors.white,
-          size: 30,
-        ),
-        automaticallyImplyLeading: false,
-        backgroundColor: Color(0xFFE50F2A),
-        title: Padding(
-          padding: const EdgeInsets.all(10),
-          child: Consumer<UserProvider>(
-            builder: (context, userProvider, child) {
-              if (userProvider.isLoading) {
-                return Center(child: CircularProgressIndicator());
-              }
-              final user = userProvider.user;
-
-              return Text(
-                'Hi ${user?.personalInfo.firstName}',
-                style: TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.w800,
-                  color: Colors.white,
+      appBar: PreferredSize(
+        preferredSize: Size.fromHeight(60.0),
+        child: AppBar(
+          iconTheme: IconThemeData(
+            color: Colors.white,
+            size: 30,
+          ),
+          automaticallyImplyLeading: false,
+          backgroundColor: Color(0xFFE50F2A),
+          title: Padding(
+            padding: const EdgeInsets.all(10),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  _getGreetingMessage(),
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontWeight: FontWeight.bold
+                  ),
                 ),
-              );
-            },
+                Text(
+                  'Username',
+                  style: TextStyle(
+                    fontSize: 16,
+                    color: Colors.white,
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
       ),
@@ -169,6 +236,30 @@ class _HomePageState extends State<HomeScreen> {
             children: [
               CarouselContainer(),
               SizedBox(height: 20),
+              if (_showDonorPoster)
+              Padding(
+                padding: const EdgeInsets.symmetric(vertical: 10),
+                child: Card(
+                  color: Colors.yellow[100],
+                  elevation: 4,
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+                  child: Padding(
+                    padding: const EdgeInsets.all(16.0),
+                    child: Row(
+                      children: [
+                        Icon(Icons.volunteer_activism, color: Colors.redAccent, size: 30),
+                        SizedBox(width: 10),
+                        Expanded(
+                          child: Text(
+                            'Want to become a donor later? Click here to register and save lives anytime!',
+                            style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
 
               // Display Current Activities
               Consumer<CurrentActivitiesProvider>(
@@ -227,8 +318,7 @@ class _HomePageState extends State<HomeScreen> {
                   final request = _donationRequests[index];
                   return GestureDetector(
                     onTap: () {
-                      _showConfirmDialog(
-                          context, request); // <-- fixed by passing context
+                      _showConfirmDialog(context, request); // <-- fixed by passing context
                     },
                     child: _dobationRequestCard(donationRequest: request),
                   );

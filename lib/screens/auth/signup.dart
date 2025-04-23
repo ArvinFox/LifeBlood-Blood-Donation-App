@@ -5,14 +5,14 @@ import 'package:lifeblood_blood_donation_app/services/user_service.dart';
 import 'package:lifeblood_blood_donation_app/utils/helpers.dart';
 import '../../components/custom_container.dart';
 
-class LoginScreen extends StatefulWidget {
-  const LoginScreen({super.key});
+class SignupScreen extends StatefulWidget {
+  const SignupScreen({super.key});
 
   @override
-  State<LoginScreen> createState() => _LoginScreenState();
+  State<SignupScreen> createState() => _SignupScreenState();
 }
 
-class _LoginScreenState extends State<LoginScreen> {
+class _SignupScreenState extends State<SignupScreen> {
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
   final _formKey = GlobalKey<FormState>();
@@ -25,7 +25,7 @@ class _LoginScreenState extends State<LoginScreen> {
     super.dispose();
   }
 
-  void loginUser() async {
+  Future<void> signupUser() async {
     final auth = UserService();
 
     setState(() {
@@ -33,10 +33,12 @@ class _LoginScreenState extends State<LoginScreen> {
     });
 
     try {
-      await auth.signInWithEmailAndPassword(_emailController.text.trim(), _passwordController.text.trim());
-      Navigator.pushNamed(context, '/home');
+      await auth.createUser(context,_emailController.text.trim(), _passwordController.text.trim());
+      Helpers.showSucess(context, 'Signup sucessfully');
+      Navigator.pushNamed(context, '/login');
     } catch (e) {
-      Helpers.showError(context, "Login failed. Please try again using correct credentials.");
+      Helpers.showError(context, "Signup failed. Please try again.");
+      print('---------------------$e----------------------');
     } finally {
       setState(() {
         isLoading = false;
@@ -53,7 +55,7 @@ class _LoginScreenState extends State<LoginScreen> {
           const SizedBox(height: 20),
           const Center(
             child: Text(
-              'Welcome Back',
+              'Sign Up Here',
               style: TextStyle(
                 fontSize: 30,
                 fontWeight: FontWeight.w900,
@@ -62,7 +64,7 @@ class _LoginScreenState extends State<LoginScreen> {
           ),
           Center(
             child: Image.asset(
-              'assets/images/login.png',
+              'assets/images/signup.png',
               height: 250,
             ),
           ),
@@ -86,27 +88,27 @@ class _LoginScreenState extends State<LoginScreen> {
             ),
           ),
 
-          // Forgot password link
+          // back to login link
           Align(
             alignment: Alignment.centerRight,
             child: GestureDetector(
               onTap: () {
-                Navigator.pushNamed(context, '/forgot-password');
+                Navigator.pushNamed(context, '/login');
               },
               child: Text(
-                'Forgot Password?',
+                'Back to login',
                 style: TextStyle(color: Colors.red),
               ),
             ),
           ),
           const SizedBox(height: 25),
 
-          // Login button
+          // signup button
           CustomButton(
             onPressed: isLoading ? null : () {
-              loginUser();
+              signupUser();
             },
-            btnLabel: 'Login',
+            btnLabel: 'Sign Up',
             buttonChild: isLoading ? SizedBox(
               width: 20,
               height: 20,
@@ -119,33 +121,6 @@ class _LoginScreenState extends State<LoginScreen> {
             btnColor: isLoading ? Colors.grey : Colors.white,
             btnBorderColor: Color(0xFFE50F2A),
             labelColor: isLoading ? Colors.grey :Color(0xFFE50F2A) ,
-          ),
-          const SizedBox(height: 18),
-
-          // Signup Link
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              const Text(
-                "Don't have an account?",
-                style: TextStyle(
-                  color: Color(0xFF616161),
-                ),
-              ),
-              const SizedBox(width: 5),
-              GestureDetector(
-                onTap: () {
-                  Navigator.pushNamed(context, '/signup');
-                },
-                child: const Text(
-                  "Sign Up",
-                  style: TextStyle(
-                    color: Colors.red,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ),
-            ],
           ),
           SizedBox(height: 20),
         ],

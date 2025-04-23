@@ -1,8 +1,8 @@
 import 'dart:io';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
+import 'package:lifeblood_blood_donation_app/components/custom_main_app_bar.dart';
 import 'package:lifeblood_blood_donation_app/models/events_model.dart';
 import 'package:lifeblood_blood_donation_app/providers/event_provider.dart';
 import 'package:lifeblood_blood_donation_app/services/events_service.dart';
@@ -138,21 +138,7 @@ _Be a hero. Save lives. Donate blood._
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text(
-          "Events",
-          style: TextStyle(
-              color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold),
-        ),
-        backgroundColor: Color(0xFFE50F2A),
-        leading: CupertinoNavigationBarBackButton(
-          color: Colors.white,
-          onPressed: () {
-            Navigator.pop(context);
-          },
-        ),
-        leadingWidth: 40, 
-      ),
+      appBar: CustomMainAppbar(title: 'Events', showLeading: true),
       backgroundColor: Colors.white,
       body: Consumer<EventProvider>(
       builder: (context, eventProvider, child){

@@ -1,36 +1,43 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/material.dart';
 import 'package:lifeblood_blood_donation_app/models/user_model.dart';
+import 'package:lifeblood_blood_donation_app/utils/helpers.dart';
 
 class UserService {
   final FirebaseAuth auth = FirebaseAuth.instance;
   final CollectionReference userCollection =  FirebaseFirestore.instance.collection('user');
 
   //user signup
-  Future<String> addUser(UserModel user) async {
+  Future<void> createUser(BuildContext context,String email, password) async {
     try {
-      UserCredential userCredential = await auth.createUserWithEmailAndPassword(
-          email: user.personalInfo.email, password: user.personalInfo.password);
+      UserCredential userCredential = await auth.createUserWithEmailAndPassword(email: email, password: password);
 
-      //get the user id from firebase auth
-      String uId = userCredential.user?.uid ?? '';
-      user.personalInfo.userId = uId;
+      User? user = userCredential.user;
 
-      await userCollection.doc(uId).set(user.toFirestore());
-      return uId;
-    } on FirebaseAuthException catch (e) {
-      throw Exception(e.code);
+      if(user != null){
+        await userCollection.doc(user.uid).set({
+          'email': user.email,
+          'created_at': DateTime.now(),
+          'isDonorPromptShown': false,
+        });
+      }
+      
+    } on FirebaseAuthException catch (e){
+      if(e.code == 'email-already-in-use'){
+        Helpers.showError(context, "Email is already registered. Please try a different email or login.");
+      } else {
+        Helpers.showError(context, "Signup failed: ${e.message}");
+      }
     } catch (e) {
       throw Exception("An error occurred while adding the user: $e");
     }
   }
 
   //user login
-  Future<UserCredential> signInWithEmailAndPassword(
-      String email, password) async {
+  Future<UserCredential> signInWithEmailAndPassword(String email, password) async {
     try {
-      UserCredential userCredential = await auth.signInWithEmailAndPassword(
-          email: email, password: password);
+      UserCredential userCredential = await auth.signInWithEmailAndPassword(email: email, password: password);
       return userCredential;
     } on FirebaseAuthException catch (e) {
       throw Exception(e.code);
@@ -88,17 +95,4 @@ class UserService {
       throw Exception("Failed to fetch user: $e");
     }
   }
-
-  // //check if an email is exist in firebase authentication
-  // Future<bool> emailExistInFirebaseAuth(String email) async{
-  //   try{
-  //     List<String> signInEmails = await FirebaseAuth.instance.fetchSignInMethodsForEmail(email);
-  //     print('-------------------------------------------------');
-  //     print('------------------$signInEmails-------------------------------');
-  //     print('-------------------$email------------------------------');
-  //     return signInEmails.isEmpty;
-  //   }catch (e) {
-  //     throw Exception("Failed to check email availability: $e");
-  //   }
-  // }
 }

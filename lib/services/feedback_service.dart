@@ -2,8 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import '../models/feedback_model.dart';
 
 class FeedbackService {
-  final CollectionReference feedbackCollection =
-      FirebaseFirestore.instance.collection('feedbacks');
+  final CollectionReference feedbackCollection = FirebaseFirestore.instance.collection('feedbacks');
 
   // Add feedback to Firestore
   Future<void> addFeedback(UserFeedback feedback) async {
