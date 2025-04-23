@@ -1,45 +1,67 @@
 name: lifeblood_blood_donation_app
-description: "A new Flutter project."
-publish_to: 'none'
+description: "LifeBlood helps build a stronger donor community by enabling fast and secure blood donations through an intuitive Flutter application."
+publish_to: 'none'  # Prevents accidental publishing to pub.dev
 
+# App version
 version: 1.0.0+1
 
+# Flutter SDK environment
 environment:
   sdk: ^3.6.1
 
+# -----------------------------------------------------------------------
+# Dependencies: Core Flutter and Third-party Packages
+# -----------------------------------------------------------------------
 dependencies:
   flutter:
     sdk: flutter
  
-  cupertino_icons: ^1.0.8
-  carousel_slider: ^5.0.0
-  curved_navigation_bar: ^1.0.6
-  intl: ^0.20.2
-  crypto: ^3.0.0
-  file_picker: ^9.0.2
-  shared_preferences: ^2.5.2
-  lottie: ^3.3.1
-  provider: ^6.1.2
-  share_plus: ^7.2.1
-  path_provider: ^2.0.5
-  http: ^1.3.0
-  path: ^1.8.3
+  # UI & UX Enhancements
+  cupertino_icons: ^1.0.8         # iOS-style icons
+  carousel_slider: ^5.0.0         # Image carousels
+  curved_navigation_bar: ^1.0.6   # Fancy curved bottom navigation bar
+  lottie: ^3.3.1                  # Lottie animations
+
+  # Utilities & Helpers
+  intl: ^0.20.2                   # Internationalization/date formatting
+  crypto: ^3.0.0                  # Cryptographic hashing (e.g. MD5/SHA)
+  file_picker: ^9.0.2             # Pick files from device
+  shared_preferences: ^2.5.2      # Persistent local storage
+  share_plus: ^7.2.1              # Native sharing across platforms
+  path_provider: ^2.0.5           # Get paths to storage locations
+  http: ^1.3.0                    # HTTP requests
+  path: ^1.8.3                    # Path manipulations
   
-  firebase_core: ^3.12.1
-  cloud_firestore: ^5.6.5
-  firebase_auth: ^5.5.1
-  twilio_flutter: ^0.9.0
-  supabase_flutter: ^2.8.4
+  # State Management
+  provider: ^6.1.2                # State management made easy
 
+  # Twilio Integration
+  twilio_flutter: ^0.9.0          # SMS and phone verification via Twilio
+  
+  # Firebase Integration
+  firebase_core: ^3.12.1          # Core Firebase SDK
+  cloud_firestore: ^5.6.5         # Cloud Firestore database
+  firebase_auth: ^5.5.1           # Firebase Authentication
 
+  # Supabase Integration
+  supabase_flutter: ^2.8.4        #  Storage for files & documents 
+
+# -----------------------------------------------------------------------
+# Development Dependencies: Linting and Testing
+# -----------------------------------------------------------------------
 dev_dependencies:
   flutter_test:
     sdk: flutter
 
-  flutter_lints: ^5.0.0
+flutter_lints: ^5.0.0             # Recommended linter rules
 
+# -----------------------------------------------------------------------
+# Flutter Specific Configurations
+# -----------------------------------------------------------------------
 flutter:
   uses-material-design: true
+
+  # Assets: Images and Lottie animations
   assets:
     - assets/images/
     - assets/lottie/
@@ -50,9 +72,4 @@ flutter:
   #       - asset: fonts/Schyler-Regular.ttf
   #       - asset: fonts/Schyler-Italic.ttf
   #         style: italic
-  #   - family: Trajan Pro
-  #     fonts:
-  #       - asset: fonts/TrajanPro.ttf
-  #       - asset: fonts/TrajanPro_Bold.ttf
-  #         weight: 700
  

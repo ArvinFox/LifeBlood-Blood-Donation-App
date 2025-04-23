@@ -1,7 +1,13 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:lifeblood_blood_donation_app/models/donation_request_model.dart';
+import 'package:lifeblood_blood_donation_app/models/notification_model.dart';
+import 'package:lifeblood_blood_donation_app/providers/current_activity_provider.dart';
+import 'package:lifeblood_blood_donation_app/providers/notification_provider.dart';
+import 'package:lifeblood_blood_donation_app/providers/user_provider.dart';
+import 'package:lifeblood_blood_donation_app/services/notification_service.dart';
+import 'package:lifeblood_blood_donation_app/utils/helpers.dart';
+import 'package:provider/provider.dart';
 
 class NotificationScreen extends StatefulWidget {
   final NotificationPageNavigation navigation;
@@ -16,110 +22,260 @@ class NotificationScreen extends StatefulWidget {
 }
 
 class _NotificationScreenState extends State<NotificationScreen> {
-  bool _isBorderVisible = true;
   DonationRequestDetails? latestRequest;
+  final NotificationService _notificationService = NotificationService();
 
   @override
   void initState() {
     super.initState();
-    _fetchLatestDonationRequest();
-  }
-
-  void _fetchLatestDonationRequest() async {
-    try {
-      var snapshot = await FirebaseFirestore.instance
-          .collection('requests')
-          .orderBy('createdAt', descending: true)
-          .limit(1)
-          .get();
-
-      if (snapshot.docs.isNotEmpty) {
-        setState(() {
-          latestRequest =
-              DonationRequestDetails.fromFirestore(snapshot.docs.first.data());
-        });
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final notificationsProvder = Provider.of<NotificationProvider>(context, listen: false);
+      final userProvider = Provider.of<UserProvider>(context, listen:  false);
+      if (userProvider.user != null) {
+        notificationsProvder.fetchNotifications(userProvider.user!.userId!);
       }
-    } catch (e) {
-      print("Error fetching donation request: $e");
-    }
-  }
-
-  void _borderVisible() {
-    setState(() {
-      _isBorderVisible = false;
     });
   }
 
-  void showJoinDialog(BuildContext context,VoidCallback borderVisible) {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: Column(
-          children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Expanded(
-                  child: Text(
-                    "Let's Donate Blood & Save Lives",
-                    style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.red,
-                    ),
-                  ),
-                ),
-                IconButton(
-                  icon: Icon(Icons.close, color: Colors.black),
-                  onPressed: () => Navigator.pop(context),
-                ),
-              ],
-            ),
-            SizedBox(height: 10),
-            ClipRRect(
-              borderRadius: BorderRadius.circular(10),
-              child: Image.asset(
-                "assets/images/events_banner2.png",
-              ),
-            ),
-          ],
-        ),
-        content: Text(
-          "You are all invited to participate in blood donation events. Join us and help save lives!",
-          style: TextStyle(fontWeight: FontWeight.bold),
-          textAlign: TextAlign.center,
-        ),
-        actions: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: [
-              ElevatedButton(
-                onPressed: () {
-                  //SocialSharingPlus.shareToSocialMedia(SocialPlatform.whatsapp, contentToShare);
-                },
-                style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
-                child: Text("Share", style: TextStyle(color: Colors.white)),
-              ),
-              OutlinedButton(
-                onPressed: () {
-                  borderVisible();
-                  Navigator.pop(context);
-                },
-                style:
-                    OutlinedButton.styleFrom(side: BorderSide(color: Colors.red)),
-                child: Text("Cancel", style: TextStyle(color: Colors.red)),
-              ),
-            ],
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: Colors.white,
+      appBar: AppBar(
+        backgroundColor: Color(0xFFE50F2A),
+        iconTheme: IconThemeData(color: Colors.white),
+        title: Text(
+          " Notifications",
+          style: TextStyle(
+            color: Colors.white,
+            fontSize: 25,
+            fontWeight: FontWeight.w500,
           ),
+        ),
+        automaticallyImplyLeading:
+            widget.navigation == NotificationPageNavigation.sideDrawer
+                ? true
+                : false,
+        leading: widget.navigation == NotificationPageNavigation.sideDrawer
+            ? CupertinoNavigationBarBackButton(
+                color: Colors.white,
+                onPressed: () {
+                  Navigator.popAndPushNamed(context, "/home");
+                },
+              )
+            : null,
+        leadingWidth: 40,
+        actions: [
+          Consumer<UserProvider>(
+            builder: (context, userProvider, child) {
+              return IconButton(
+                icon: Icon(
+                  Icons.mark_email_read_outlined,
+                  size: 30,
+                ),
+                onPressed: () {
+                  Provider.of<NotificationProvider>(context, listen: false)
+                    .markAllAsRead(userProvider.user!.userId!);
+                },
+              );
+            },
+          ),
+          SizedBox(width: 20),
         ],
+      ),
+      body: Consumer<NotificationProvider>(
+        builder: (context, notificationProvider, child) {
+          if (notificationProvider.isLoading) {
+            return const Center(child: CircularProgressIndicator());
+          } else if (notificationProvider.notifications.isEmpty) {
+            return const Center(child: Text("No new notifications."));
+          } else {
+            final List<Future<Widget>> fetchedNotifications = notificationProvider.notifications.map((notification) {
+              return _buildNotificationCard(notification);
+            }).toList();
+
+            return FutureBuilder<List<Widget>>(
+              future: Future.wait(fetchedNotifications),
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return const Center(child: CircularProgressIndicator());
+                } else if (snapshot.hasError) {
+                  return Center(child: Text('Error loading notifications: ${snapshot.error}'));
+                } else if (snapshot.hasData) {
+                  return SingleChildScrollView(
+                    child: Column(
+                      children: snapshot.data!,
+                    ),
+                  );
+                } else {
+                  return const SizedBox.shrink();
+                }
+              },
+            );
+          }
+        },
       ),
     );
   }
 
-  void showConfirmationPopup(BuildContext context, String bloodType,String urgencyLevel, String hospital, String city) {
+  Future<Widget> _buildNotificationCard(NotificationModel notification) async {
+    final request = await _notificationService.getDonationRequestDetailsId(notification.requestId);
+
+    return GestureDetector(
+      onTap: () {
+        if (!notification.isRead) {
+          Provider.of<NotificationProvider>(context, listen: false)
+          .markAsRead(notification.notificationId);
+        }
+      },
+      child: Padding(
+        padding: EdgeInsets.all(10),
+        child: Card(
+          color: Colors.grey[200],
+          elevation: notification.isRead ? 1 : 5,
+          shape: RoundedRectangleBorder(
+            side: BorderSide(
+              color: notification.isRead ? Colors.transparent : const Color.fromARGB(255, 255, 200, 200),
+              width: 2.0,
+            ),
+            borderRadius: BorderRadius.circular(4.0),
+          ),
+          child: Container(
+            width: double.infinity,
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(20),
+            ),
+            child: Padding(
+              padding: const EdgeInsets.all(15),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    notification.type == 'status_update'
+                      ? (notification.status == 'accepted'
+                        ? "Request Accepted"
+                        : "Request Cancelled")
+                      : "Lifesaving Alert: Donate Blood Now!",
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.red,
+                    ),
+                  ),
+                  SizedBox(height: 5),
+      
+                  Row(
+                    children: [
+                      Icon(Icons.alarm, size: 20),
+                      SizedBox(width: 10),
+                      Text(
+                        "${notification.timestamp.hour}:${notification.timestamp.minute.toString().padLeft(2, '0')} ${notification.timestamp.hour < 12 ? 'AM' : 'PM'}",
+                        style: TextStyle(
+                          fontSize: 12,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ],
+                  ),
+                  SizedBox(height: 10),
+      
+                  if (notification.type == 'new_request' && request != null) ...[
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      children: [
+                        Image.asset(
+                          "assets/images/emergency.jpg",
+                          width: 150,
+                          height: 140,
+                        ),
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              "Blood Type : ${request.requestBloodType}",
+                              style: TextStyle(
+                                fontSize: 12,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            Text(
+                              "Urgency Level : ${request.urgencyLevel}",
+                              style: TextStyle(
+                                fontSize: 12,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            Text(
+                              "Location : ${request.hospitalName} - \n${request.city}",
+                              style: TextStyle(
+                                fontSize: 12,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                    SizedBox(height: 10),
+                    Align(
+                      alignment: Alignment.centerRight,
+                      child: GestureDetector(
+                        onTap: () {
+                          showConfirmationPopup(context, request.requestBloodType, request.urgencyLevel, request.hospitalName, request.city, notification.requestId);
+                          if (!notification.isRead) {
+                            Provider.of<NotificationProvider>(context, listen: false)
+                            .markAsRead(notification.notificationId);
+                          }
+                        },
+                        child: Text(
+                          "Read More.....",
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ] else if (notification.type == 'status_update') ...[
+                    Container(
+                      padding: const EdgeInsets.all(10),
+                      decoration: BoxDecoration(
+                        color: notification.status == 'accepted'
+                          ? Colors.green.withOpacity(0.1)
+                          : Colors.red.withOpacity(0.1),
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      child: Row(
+                        children: [
+                          Icon(
+                            notification.status == 'accepted' ? Icons.check_circle : Icons.cancel,
+                            color: notification.status == 'accepted' ? Colors.green : Colors.red,
+                          ),
+                          SizedBox(width: 10),
+                          Expanded(
+                            child: Text(
+                              "Your donation request has been ${notification.status}.",
+                              style: TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ],
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  void showConfirmationPopup(BuildContext context, String bloodType,String urgencyLevel, String hospital, String city, String requestId) {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
+        backgroundColor: const Color.fromARGB(255, 255, 244, 244),
         title: Column(
           children: [
             SizedBox(height: 10),
@@ -188,8 +344,12 @@ class _NotificationScreenState extends State<NotificationScreen> {
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
               ElevatedButton(
-                onPressed: () {
-                  
+                onPressed: () async {
+                  final request = await _notificationService.getDonationRequestDetailsId(requestId);
+                  Provider.of<CurrentActivitiesProvider>(context, listen: false)
+                    .addActivity(request!);
+                  Helpers.showSucess(context, "Blood donation request confirmed and added to your activities.");
+                  Navigator.pop(context);
                 },
                 style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
                 child: Text("Confirm", style: TextStyle(color: Colors.white)),
@@ -205,238 +365,6 @@ class _NotificationScreenState extends State<NotificationScreen> {
             ],
           ),
         ],
-      ),
-    );
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.white,
-      appBar: AppBar(
-        backgroundColor: Color(0xFFE50F2A),
-        iconTheme: IconThemeData(color: Colors.white),
-        title: Text(
-          " Notifications",
-          style: TextStyle(
-            color: Colors.white,
-            fontSize: 25,
-            fontWeight: FontWeight.w500,
-          ),
-        ),
-        automaticallyImplyLeading:
-            widget.navigation == NotificationPageNavigation.sideDrawer
-                ? true
-                : false,
-        leading: widget.navigation == NotificationPageNavigation.sideDrawer
-            ? CupertinoNavigationBarBackButton(
-                color: Colors.white,
-                onPressed: () {
-                  Navigator.popAndPushNamed(context, "/home");
-                },
-              )
-            : null,
-        leadingWidth: 40,
-        actions: [
-          IconButton(
-            icon: Icon(
-              Icons.mark_email_read_outlined,
-              size: 30,
-            ),
-            onPressed: () {
-              _borderVisible();
-            },
-          ),
-          SizedBox(width: 20),
-        ],
-      ),
-      body: SingleChildScrollView(
-        child: Column(
-          children: [
-            _buildNotificationCard(),
-            latestRequest != null
-                ? _buildLifeSavingAlertCard(
-                    latestRequest!.requestBloodType,
-                    latestRequest!.urgencyLevel,
-                    latestRequest!.hospitalName,
-                    latestRequest!.city,
-                    latestRequest!.createdAt,
-                  )
-                : Center(child: CircularProgressIndicator()),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildNotificationCard() {
-    return Padding(
-      padding: EdgeInsets.all(10),
-      child: Card(
-        child: Container(
-          width: double.infinity,
-          height: 250,
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(20),
-            border: _isBorderVisible
-                ? Border.all(
-                    color: Colors.grey,
-                    width: 2,
-                  )
-                : null,
-          ),
-          child: Padding(
-            padding: const EdgeInsets.all(15),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: [
-                Text(
-                  "Let's Donate Blood & Save Lives",
-                  style: TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                Row(
-                  children: [
-                    Icon(
-                      Icons.alarm,
-                      size: 20,
-                    ),
-                    SizedBox(width: 10),
-                    Text(
-                      "12:00 AM",
-                      style: TextStyle(
-                        fontSize: 12,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ],
-                ),
-                Image.asset("assets/images/events_banner2.png"),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.end,
-                  children: [
-                    GestureDetector(
-                      onTap: () {
-                        showJoinDialog(context, _borderVisible);
-                      },
-                      child: Text(
-                        "Read More.....",
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ],
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildLifeSavingAlertCard(String bloodType, String urgencyLevel,
-      String hospital, String city, DateTime createdAt) {
-    return Padding(
-      padding: EdgeInsets.all(10),
-      child: Card(
-        child: Container(
-          width: double.infinity,
-          height: 250,
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(20),
-          ),
-          child: Padding(
-            padding: const EdgeInsets.all(15),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: [
-                Text(
-                  "Lifesaving Alert: Donate Blood Now!",
-                  style: TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.red),
-                ),
-                Row(
-                  children: [
-                    Icon(
-                      Icons.alarm,
-                      size: 20,
-                    ),
-                    SizedBox(width: 10),
-                    Text(
-                      "${createdAt.hour}:${createdAt.minute.toString().padLeft(2, '0')} ${createdAt.hour < 12 ? 'AM' : 'PM'}",
-                      style: TextStyle(
-                        fontSize: 12,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ],
-                ),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  children: [
-                    Image.asset(
-                      "assets/images/emergency.jpg",
-                      width: 150,
-                      height: 140,
-                    ),
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          "Blood Type : $bloodType",
-                          style: TextStyle(
-                            fontSize: 12,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                        Text(
-                          "Urgency Level : $urgencyLevel",
-                          style: TextStyle(
-                            fontSize: 12,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                        Text(
-                          "Location : $hospital - \n$city",
-                          style: TextStyle(
-                            fontSize: 12,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.end,
-                  children: [
-                    GestureDetector(
-                      onTap: () {
-                        showConfirmationPopup(context, bloodType, urgencyLevel, hospital, city);
-                      },
-                      child: Text(
-                        "Read More.....",
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ],
-            ),
-          ),
-        ),
       ),
     );
   }

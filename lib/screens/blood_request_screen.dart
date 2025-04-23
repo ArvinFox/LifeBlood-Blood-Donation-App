@@ -38,7 +38,7 @@ class _BloodRequestScreenState extends State<BloodRequestScreen> {
           .get();
 
       List<DonationRequestDetails> fetchedRequests = querySnapshot.docs
-          .map((doc) => DonationRequestDetails.fromFirestore(doc.data()))
+          .map((doc) => DonationRequestDetails.fromFirestore(doc))
           .toList();
 
       setState(() {

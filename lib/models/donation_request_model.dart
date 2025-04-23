@@ -25,7 +25,6 @@ class DonationRequestDetails {
 
   Map<String, dynamic> toFirestore() {
     return {
-      // 'requestId': requestId,
       'patientName': patientName,
       'requestBloodType': requestBloodType,
       'urgencyLevel': urgencyLevel,
@@ -38,9 +37,11 @@ class DonationRequestDetails {
   }
 
   // Fetch Data from Firestore
-  factory DonationRequestDetails.fromFirestore(Map<String, dynamic> data) {
+  factory DonationRequestDetails.fromFirestore(DocumentSnapshot doc) {
+    Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
+
     return DonationRequestDetails(
-      requestId: data['requestId'] ?? '',
+      requestId: doc.id,
       patientName: data['patientName'] ?? '',
       requestBloodType: data['requestBloodType'] ?? '',
       urgencyLevel: data['urgencyLevel'] ?? '',

@@ -13,9 +13,13 @@ class CurrentActivitiesProvider with ChangeNotifier {
 
   // Add activity to current activities and save it to SharedPreferences
   Future<void> addActivity(DonationRequestDetails request) async {
-    _currentActivities.add(request);
-    await _saveCurrentActivities();
-    notifyListeners();
+    bool exists = _currentActivities.any((activity) => activity.requestId == request.requestId);
+
+    if (!exists) {
+      _currentActivities.add(request);
+      await _saveCurrentActivities();
+      notifyListeners();
+    }
   }
 
   // Load current activities from SharedPreferences
