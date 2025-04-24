@@ -6,16 +6,16 @@ class UserModel {
   final DateTime? dob;
   final String? gender;
   final String? nic;
-  final String? drivingLicenseNo;
-  final String email;
+  final String? email;
   final String? contactNumber;
   final String? address;
   final String? city;
   final String? province;
   final String? bloodType;
-  String? medicalReport;
   final String? healthConditions;
+  final int? donationCount;
   final bool? isActive;
+  final bool? isDonor;
   final bool isDonorPromptShown;
   final DateTime createdAt;
 
@@ -25,16 +25,16 @@ class UserModel {
     this.dob,
     this.gender,
     this.nic,
-    this.drivingLicenseNo,
     required this.email,
     this.contactNumber,
     this.address,
     this.city,
     this.province,
     this.bloodType,
-    this.medicalReport,
     this.healthConditions,
+    this.donationCount,
     this.isActive,
+    this.isDonor,
     required this.isDonorPromptShown,
     required this.createdAt,
   });
@@ -45,7 +45,6 @@ class UserModel {
       'dob': dob != null ? Timestamp.fromDate(dob!) : null,
       'gender': gender,
       'nic': nic,
-      'drivingLicenseNo': drivingLicenseNo,
       'email': email,
       'contactNumber': contactNumber,
       'address': address,
@@ -53,7 +52,9 @@ class UserModel {
       'province': province,
       'bloodType': bloodType,
       'healthConditions': healthConditions,
+      'donation_count':donationCount,
       'isActive': isActive,
+      'isDonor': isDonor,
       'isDonorPromptShown': isDonorPromptShown,
       'created_at': createdAt
     };
@@ -66,7 +67,6 @@ class UserModel {
       dob: data['dob'] != null ? (data['dob'] as Timestamp).toDate() : null,
       gender: data['gender'] ?? '',
       nic: data['nic'] ?? '',
-      drivingLicenseNo: data['drivingLicenseNo'] ?? '',
       email: data['email'] ?? '',
       contactNumber: data['contactNumber'] ?? '',
       address: data['address'] ?? '',
@@ -74,7 +74,9 @@ class UserModel {
       province: data['province'] ?? '',
       bloodType: data['bloodType'] ?? '',
       healthConditions: data['healthConditions'] ?? '',
+      donationCount: data['donation_count'] != null ? data['donation_count'] as int : 0,
       isActive: data['isActive'] as bool? ?? false,
+      isDonor: data['isDonor'] as bool? ?? false,
       isDonorPromptShown: data['isDonorPromptShown'] as bool? ?? false,
       createdAt: data['created_at'] != null ? (data['created_at'] as Timestamp).toDate() : DateTime.now(),
     );

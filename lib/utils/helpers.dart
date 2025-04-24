@@ -1,16 +1,7 @@
-import 'dart:convert';
 import 'dart:math';
-import 'package:crypto/crypto.dart';
 import 'package:flutter/material.dart';
 
 class Helpers {
-  //hashed password to store in firestore databse
-  String hashPassword(String password) {
-    final byte = utf8.encode(password); //convert password to byte
-    final hashed = sha256.convert(byte); //hashed the byte
-    return hashed.toString(); //convert hashed to readable string
-  }
-
   //for validate email
   static String? validateEmail(String? value) {
     if (value == null || value.isEmpty) {

@@ -27,7 +27,6 @@ class _ResetPasswordPageState extends State<ResetPasswordScreen> {
     final FirebaseFirestore firestore = FirebaseFirestore.instance;
     final FirebaseAuth auth = FirebaseAuth.instance;
     final authService = UserService();
-    Helpers helper = Helpers();
 
     setState(() {
       isLoading = true;
@@ -42,7 +41,7 @@ class _ResetPasswordPageState extends State<ResetPasswordScreen> {
     }
 
     try{
-      final user = await firestore.collection('user').where('personalInfo.contactNumber',isEqualTo: widget.contactNumber).get();
+      final user = await firestore.collection('user').where('contactNumber',isEqualTo: widget.contactNumber).get();
 
       if(user.docs.isEmpty){
         Helpers.showError(context, "User not found.");
@@ -53,7 +52,7 @@ class _ResetPasswordPageState extends State<ResetPasswordScreen> {
       }
 
       DocumentSnapshot userDoc = user.docs.first;
-      String userId = userDoc['personalInfo']['userId'];
+      String userId = userDoc.id;
 
       if (userId == null || userId.isEmpty) {
         Helpers.showError(context, "User ID is invalid.");
@@ -75,11 +74,6 @@ class _ResetPasswordPageState extends State<ResetPasswordScreen> {
         return;
       }
       
-      String hashedPassword = helper.hashPassword(_newPasswordController.text);
-      await firestore.collection('user').doc(userId).update({
-        'personalInfo.password': hashedPassword,
-      });
-
       Helpers.showSucess(context, "Password reset successfully.");
       authService.signOut(); //for logout user
       Navigator.pushNamed(context, '/login');

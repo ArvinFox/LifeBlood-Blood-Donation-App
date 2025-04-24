@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:lifeblood_blood_donation_app/screens/static/get_started_page.dart';
+import 'package:lifeblood_blood_donation_app/services/auth_gate.dart';
 import 'package:lottie/lottie.dart';
 
 class SplashScreen extends StatefulWidget {
@@ -68,7 +68,7 @@ class _SplashScreenState extends State<SplashScreen> {
       context,
       PageRouteBuilder(
         transitionDuration: const Duration(milliseconds: 1500), 
-        pageBuilder: (context, animation, secondaryAnimation) => const GetStartedPage(),
+        pageBuilder: (context, animation, secondaryAnimation) => const AuthGate(),
         transitionsBuilder: (context, animation, secondaryAnimation, child) {
           final curvedAnimation = CurvedAnimation(
             parent: animation,

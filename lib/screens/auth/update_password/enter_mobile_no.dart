@@ -50,7 +50,7 @@ class _EnterMobileNumberState extends State<EnterMobileNumber> {
     try {
       QuerySnapshot query = await firestore
           .collection('user')
-          .where('personalInfo.contactNumber', isEqualTo: contactNumber)
+          .where('contactNumber', isEqualTo: contactNumber)
           .get();
 
       if (query.docs.isNotEmpty) {

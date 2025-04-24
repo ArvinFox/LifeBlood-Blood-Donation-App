@@ -11,6 +11,7 @@ class UserProvider extends ChangeNotifier{
   UserModel? get user => _user;
   bool  get isLoading => _isLoading;
 
+  // Fetch user
   Future<void> fetchUser(String id) async {
     _isLoading = true;
     notifyListeners();
@@ -31,6 +32,17 @@ class UserProvider extends ChangeNotifier{
 
     _isLoading = false;
     notifyListeners();
+  }
+
+  //update user availability status
+  Future<void> fetchUserAvailability(String userId, bool isActive) async{
+    try {
+      await _userService.updateAvailabilityStatus(userId, isActive);
+      await fetchUser(userId);
+    } catch (e) { 
+      Helpers.debugPrintWithBorder("Error creating notification: $e");
+      notifyListeners();
+    }
   }
 
 }

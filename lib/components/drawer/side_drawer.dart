@@ -90,7 +90,7 @@ class _NavDrawerState extends State<NavDrawer> {
     try {
       await auth.deleteUser();
       Navigator.pop(context);
-      Navigator.pushReplacementNamed(context, '/select-role');
+      Navigator.pushReplacementNamed(context, '/login');
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
@@ -166,7 +166,7 @@ class _NavDrawerState extends State<NavDrawer> {
       await auth.signOut();
       print("logout....");
       Navigator.pop(context);
-      Navigator.pushReplacementNamed(context, '/select-role');
+      Navigator.pushReplacementNamed(context, '/login');
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(

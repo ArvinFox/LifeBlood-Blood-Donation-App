@@ -35,29 +35,13 @@ class CustomInputBox extends StatefulWidget {
 
 class _CustomInputBoxState extends State<CustomInputBox> {
   bool _obscureText = true;
-  late FocusNode _focusNode;
 
   @override
   void initState() {
     super.initState();
     _obscureText = widget.hasAstricks;
-    _focusNode = FocusNode();
-
-    _focusNode.addListener(() {
-      if (!_focusNode.hasFocus && widget.hasAstricks) {
-        setState(() {
-          _obscureText = true; 
-        });
-      }
-    });
   }
-
-  @override
-  void dispose() {
-    _focusNode.dispose();
-    super.dispose();
-  }
-
+  
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -71,12 +55,9 @@ class _CustomInputBoxState extends State<CustomInputBox> {
             fontWeight: FontWeight.bold,
           ),
         ),
-        SizedBox(
-          height: 15,
-        ),
+        SizedBox(height: 10),
         TextFormField(
           controller: widget.controller,
-          focusNode: _focusNode, // Attach the FocusNode
           obscureText: widget.hasAstricks ? _obscureText : false, //password visibility
           keyboardType: widget.keyboardType,
           inputFormatters: widget.inputFormatters,

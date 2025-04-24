@@ -20,15 +20,18 @@ class UserService {
           'email': user.email,
           'created_at': DateTime.now(),
           'isDonorPromptShown': false,
+          'isDonor': false
         });
       }
       
     } on FirebaseAuthException catch (e){
       if(e.code == 'email-already-in-use'){
         Helpers.showError(context, "Email is already registered. Please try a different email or login.");
+        Navigator.pushNamed(context, '/login');
       } else {
         Helpers.showError(context, "Signup failed: ${e.message}");
       }
+      throw Exception(e);
     } catch (e) {
       throw Exception("An error occurred while adding the user: $e");
     }
@@ -55,8 +58,8 @@ class UserService {
       User? user = auth.currentUser;
 
       if (user != null) {
-        await userCollection.doc(user.uid).delete();
         await user.delete();
+        await userCollection.doc(user.uid).delete();
       } else {
         throw Exception('No user is currently logged in..');
       }
@@ -93,6 +96,26 @@ class UserService {
       return UserModel.fromFirestore(userDoc.data() as Map<String, dynamic>, userId);
     } catch (e) {
       throw Exception("Failed to fetch user: $e");
+    }
+  }
+
+  //get donor status
+  Stream<bool> getDonorStatus(String userId) {
+    return userCollection.doc(userId).snapshots().map((snapshot) {
+      final data = snapshot.data() as Map<String, dynamic>?;
+      print("------------------------------Data from Firestore: $data---------------------------");
+      return data?['isDonor'] ?? false;
+    });
+  }
+
+  //update user availability status
+  Future<void> updateAvailabilityStatus(String userId, bool isActive) async{
+    try{
+      await userCollection.doc(userId).update({
+        'isActive': isActive
+      });
+    } catch (e){
+      throw Exception("Failed to update user: $e");
     }
   }
 }

@@ -1,4 +1,8 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:lifeblood_blood_donation_app/providers/user_provider.dart';
+import 'package:lifeblood_blood_donation_app/utils/formatters.dart';
+import 'package:provider/provider.dart';
 
 class HeaderDrawer extends StatefulWidget {
   const HeaderDrawer({super.key});
@@ -8,6 +12,23 @@ class HeaderDrawer extends StatefulWidget {
 }
 
 class _HeaderDrawerState extends State<HeaderDrawer> {
+  final FirebaseAuth auth = FirebaseAuth.instance;
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final User? currentUser = auth.currentUser;
+      
+      if (currentUser != null) {
+        final userProvider = Provider.of<UserProvider>(context, listen: false);
+        if(userProvider.user == null){
+          userProvider.fetchUser(currentUser.uid);
+        }
+      }
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -26,12 +47,23 @@ class _HeaderDrawerState extends State<HeaderDrawer> {
               backgroundImage: AssetImage("assets/images/profile.jpg"),
             ),
           ),
-          Text(
-            "Hi @Username",
-            style: TextStyle(
-              color: Colors.white,
-              fontSize: 20,
-            ),
+          Consumer<UserProvider>(
+            builder: (context, userProvider, child) {
+              final user = userProvider.user;
+              if (user == null || user.isDonor == false) {
+                return Text(
+                  Formatters.truncateEmail(user?.email ?? ''),
+                  style: TextStyle(
+                    fontSize: 18,
+                    color: Colors.white,
+                  ),
+                );
+              } 
+              return Text(
+                user.fullName!,
+                style: TextStyle(fontSize: 20, color: Colors.white)
+              );
+            },
           ),
           TextButton(
             onPressed: () {

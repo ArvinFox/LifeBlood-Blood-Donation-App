@@ -18,4 +18,16 @@ class Formatters {
     }
     return '${date.year}-${date.month.toString().padLeft(2, '0')}-${date.day.toString().padLeft(2,'0')}';
   }
+
+  //truncate email
+  static String truncateEmail(String email, {int cutoff = 10}) {
+  if (email.length <= cutoff + 5) return email; 
+  final atIndex = email.indexOf('@');
+  if (atIndex == -1 || atIndex <= cutoff) return email;
+
+  final namePart = email.substring(0, cutoff);
+  final domainPart = email.substring(atIndex);
+  return '$namePart...$domainPart';
+}
+
 }

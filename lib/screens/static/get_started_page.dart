@@ -124,15 +124,15 @@ class GetStartedPage extends StatelessWidget {
                   ),
                   const SizedBox(height: 40),
                   CustomButton(
-                          btnLabel: 'Get Started',
-                          cornerRadius: 50,
-                          onPressed: () {
-                            Navigator.pushNamed(context, "/select-role");
-                          },
-                          btnColor: Color(0xFFE50F2A),
-                          btnBorderColor: Colors.transparent,
-                          labelColor: Colors.white,
-                        ),
+                    btnLabel: 'Get Started',
+                    cornerRadius: 50,
+                    onPressed: () {
+                      Navigator.pushNamed(context, "/login");
+                    },
+                    btnColor: Color(0xFFE50F2A),
+                    btnBorderColor: Colors.transparent,
+                    labelColor: Colors.white,
+                  ),
                 ],
               ),
             ),

@@ -35,10 +35,8 @@ class _SignupScreenState extends State<SignupScreen> {
     try {
       await auth.createUser(context,_emailController.text.trim(), _passwordController.text.trim());
       Helpers.showSucess(context, 'Signup sucessfully');
+      auth.signOut();
       Navigator.pushNamed(context, '/login');
-    } catch (e) {
-      Helpers.showError(context, "Signup failed. Please try again.");
-      print('---------------------$e----------------------');
     } finally {
       setState(() {
         isLoading = false;

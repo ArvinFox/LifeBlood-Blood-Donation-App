@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:lifeblood_blood_donation_app/screens/donor_registration.dart';
 import 'package:lifeblood_blood_donation_app/screens/blood_request_screen.dart';
 import 'package:lifeblood_blood_donation_app/screens/donation_history_screen.dart';
 import 'package:lifeblood_blood_donation_app/screens/events_screen.dart';
@@ -13,6 +14,7 @@ class UserRoutes {
   static Map<String, WidgetBuilder> routes = {
     '/home': (context) => MainLayoutScreen(selectIndex: 0,),
     '/home_profile': (context) => MainLayoutScreen(selectIndex: 3),
+    '/donor-registration': (context) => DonorRegistration(),
     '/find-donor': (context) => FindDonorScreen(navigation: NavigationPage.sideDrawer,),
     '/notifications': (context) => NotificationScreen(navigation: NotificationPageNavigation.sideDrawer,),
     '/profile': (context) => ProfileScreen(navigation: ProfilePageNavigation.sideDrawer,),

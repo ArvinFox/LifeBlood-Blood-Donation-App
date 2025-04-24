@@ -24,7 +24,6 @@ dependencies:
 
   # Utilities & Helpers
   intl: ^0.20.2                   # Internationalization/date formatting
-  crypto: ^3.0.0                  # Cryptographic hashing (e.g. MD5/SHA)
   file_picker: ^9.0.2             # Pick files from device
   shared_preferences: ^2.5.2      # Persistent local storage
   share_plus: ^7.2.1              # Native sharing across platforms
