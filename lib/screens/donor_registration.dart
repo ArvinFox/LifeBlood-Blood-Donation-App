@@ -5,13 +5,17 @@ import 'package:file_picker/file_picker.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:intl/intl.dart';
 import 'package:lifeblood_blood_donation_app/components/custom_main_app_bar.dart';
 import 'package:lifeblood_blood_donation_app/components/login_button.dart';
 import 'package:lifeblood_blood_donation_app/components/text_field.dart';
 import 'package:lifeblood_blood_donation_app/models/user_model.dart';
+import 'package:lifeblood_blood_donation_app/providers/user_provider.dart';
 import 'package:lifeblood_blood_donation_app/utils/formatters.dart';
 import 'package:lifeblood_blood_donation_app/utils/helpers.dart';
+import 'package:provider/provider.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class DonorRegistration extends StatefulWidget {
   const DonorRegistration({super.key});
@@ -51,6 +55,64 @@ class _DonorRegistrationState extends State<DonorRegistration> {
   };
 
   @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      final userProvider = Provider.of<UserProvider>(context, listen: false);
+      final user = userProvider.user;
+
+      if (user != null && user.hasCompletedProfile == true) {
+        _fullNameController.text = user.fullName ?? '';
+        _contactNumberController.text = user.contactNumber ?? '';
+        _nicController.text = user.nic ?? '';
+        _addressController.text = user.address ?? '';
+        _healthConditionController.text = user.healthConditions ?? '';
+
+        selectedGender = user.gender;
+        selectedProvince = user.province;
+        selectedCity = user.city;
+        selectedBloodType = user.bloodType;
+
+        if (user.dob != null) {
+          _selectedDate = user.dob;
+          final DateFormat formatter = DateFormat('d-M-yyyy');
+          _dobController.text = formatter.format(user.dob!);
+        }
+
+        final supabase = Supabase.instance.client;
+        final userId = user.userId;
+        
+        final filesList = await supabase.storage
+          .from('medical-reports')
+          .list(path: userId);
+
+        FileObject? reportFile;
+        try {
+          reportFile = filesList.firstWhere((file) => file.name.startsWith('medical_report_'));
+        } catch (e) {
+          reportFile = null;
+        }
+
+        if (reportFile != null) {
+          final signedUrlResponse = await supabase.storage
+              .from('medical-reports')
+              .createSignedUrl('$userId/${reportFile.name}', 60 * 60);
+
+          if (signedUrlResponse.isNotEmpty) {
+            setState(() {
+              medicalReportBase64 = signedUrlResponse;
+            });
+          }
+        }
+
+        setState(() {
+          isSelected = true;
+        });
+      }
+    });
+  }
+
+  @override
   void dispose() {
     super.dispose();
     _fullNameController.dispose();
@@ -59,11 +121,6 @@ class _DonorRegistrationState extends State<DonorRegistration> {
     _addressController.dispose();
     _dobController.dispose();
     _healthConditionController.dispose();
-    _selectedDate = null;
-    selectedGender = null;
-    selectedProvince = null;
-    selectedCity = null;
-    selectedBloodType = null;
   }
 
   void _handleFileUploaded(String base64Data) {
@@ -101,7 +158,7 @@ class _DonorRegistrationState extends State<DonorRegistration> {
         healthConditions: _healthConditionController.text.trim(),
         donationCount: 0,
         isActive: true,
-        isDonor: false,
+        isDonorVerified: false,
         isDonorPromptShown: true,
         createdAt: DateTime.now()
       );
@@ -113,8 +170,12 @@ class _DonorRegistrationState extends State<DonorRegistration> {
           await uploadMedicalReport(context, medicalReportBase64!, user);
         }
 
+        final userProvider = Provider.of<UserProvider>(context, listen: false);
+        userProvider.updateStatus(userProvider.user!.userId!, 'hasCompletedProfile', true);
+
         Helpers.showSucess(context, 'Donor Registration Sucessfully');
-        Navigator.pushNamed(context, '/');
+        Navigator.pop(context);
+        
       } catch (e){
         Helpers.showError(context, 'Error : $e');
       }
@@ -123,30 +184,42 @@ class _DonorRegistrationState extends State<DonorRegistration> {
 
   Future<String?> uploadMedicalReport(BuildContext context,String base64Image, String userId) async {
     try {
+      // Delete existing files
+      // final storage = Supabase.instance.client.storage.from('medical-reports');
+
+      // final List<FileObject>? existingFiles = await storage.list(path: userId);
+
+      // if (existingFiles != null) {
+      //   for (final file in existingFiles) {
+      //     if (file.name.startsWith('medical_report_')) {
+      //       final fullPath = '$userId/${file.name}';
+      //       await storage.remove([fullPath]);
+      //       Helpers.debugPrintWithBorder('Deleted old report: $fullPath');
+      //     }
+      //   }
+      // }
+
       final fileBytes = base64Decode(base64Image);
 
-      final fileName = 'medical_report_$userId.${medicalReportBase64!.substring(0, 10)}.pdf';
+      final timestamp = DateTime.now().millisecondsSinceEpoch;
+      final fileName = 'medical_report_$userId\_$timestamp.pdf';
       final filePath = '$userId/$fileName';
 
-      final response = await Supabase.instance.client.storage
-          .from('medical-reports')
-          .uploadBinary(
-            filePath,
-            fileBytes,
-            fileOptions: const FileOptions(contentType: 'application/pdf'), 
-          );
+      await Supabase.instance.client.storage
+        .from('medical-reports')
+        .uploadBinary(
+          filePath,
+          fileBytes,
+          fileOptions: const FileOptions(contentType: 'application/pdf'), 
+        );
 
-      if (response != null) {
-        final publicUrl = Supabase.instance.client.storage
-            .from('medical-reports')
-            .getPublicUrl(filePath);
+      final publicUrl = Supabase.instance.client.storage
+        .from('medical-reports')
+        .getPublicUrl(filePath);
 
-        Helpers.debugPrintWithBorder('Medical Report uploaded to: $publicUrl');
-        return publicUrl;
-      } else {
-        Helpers.showError(context, "Failed to upload medical report.");
-        return null;
-      }
+      Helpers.debugPrintWithBorder('Medical Report uploaded to: $publicUrl');
+      return publicUrl;
+      
     } catch (e) {
       Helpers.debugPrintWithBorder('Medical Report upload error: $e');
       Helpers.showError(context, "Error uploading medical report.");
@@ -156,6 +229,8 @@ class _DonorRegistrationState extends State<DonorRegistration> {
 
   @override
   Widget build(BuildContext context) {
+    final userProvider = Provider.of<UserProvider>(context, listen: false);
+
     return Scaffold(
       appBar: CustomMainAppbar(title: 'Donor Registration', showLeading: true),
       backgroundColor: Colors.white,
@@ -295,7 +370,27 @@ class _DonorRegistrationState extends State<DonorRegistration> {
                   style: TextStyle(fontSize: 16,color: Colors.black,fontWeight: FontWeight.bold),
                 ),
                 SizedBox(height: 15),
-                //file picker for select medical report
+                if (medicalReportBase64 != null && userProvider.user!.hasCompletedProfile!)
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text("Your uploaded report:", style: TextStyle(fontWeight: FontWeight.w600)),
+                      SizedBox(height: 10),
+                      GestureDetector(
+                        onTap: () {
+                          launchUrl(Uri.parse(medicalReportBase64!));
+                        },
+                        child: Text(
+                          "View Medical Report",
+                          style: TextStyle(
+                            color: Colors.blue,
+                            decoration: TextDecoration.underline,
+                          ),
+                        ),
+                      ),
+                      SizedBox(height: 20),
+                    ],
+                  ),
                 MedicalReportPicker(
                   onFileUploaded: _handleFileUploaded,
                 ),
@@ -349,12 +444,12 @@ class _DonorRegistrationState extends State<DonorRegistration> {
     );
   }
 
-  Widget _buildDatePicker(String lable,TextEditingController controller,DateTime? selectedDate,Function(DateTime) onDateSelected,String? hintText) {
+  Widget _buildDatePicker(String label,TextEditingController controller,DateTime? selectedDate,Function(DateTime) onDateSelected,String? hintText) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          lable,
+          label,
           style: TextStyle(
             fontSize: 16,
             color: Colors.black,

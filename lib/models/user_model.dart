@@ -15,7 +15,8 @@ class UserModel {
   final String? healthConditions;
   final int? donationCount;
   final bool? isActive;
-  final bool? isDonor;
+  final bool? isDonorVerified;
+  final bool? hasCompletedProfile;
   final bool isDonorPromptShown;
   final DateTime createdAt;
 
@@ -34,7 +35,8 @@ class UserModel {
     this.healthConditions,
     this.donationCount,
     this.isActive,
-    this.isDonor,
+    this.isDonorVerified,
+    this.hasCompletedProfile,
     required this.isDonorPromptShown,
     required this.createdAt,
   });
@@ -54,7 +56,8 @@ class UserModel {
       'healthConditions': healthConditions,
       'donation_count':donationCount,
       'isActive': isActive,
-      'isDonor': isDonor,
+      'isDonorVerified': isDonorVerified,
+      'hasCompletedProfile': hasCompletedProfile,
       'isDonorPromptShown': isDonorPromptShown,
       'created_at': createdAt
     };
@@ -76,7 +79,8 @@ class UserModel {
       healthConditions: data['healthConditions'] ?? '',
       donationCount: data['donation_count'] != null ? data['donation_count'] as int : 0,
       isActive: data['isActive'] as bool? ?? false,
-      isDonor: data['isDonor'] as bool? ?? false,
+      isDonorVerified: data['isDonorVerified'] as bool? ?? false,
+      hasCompletedProfile: data['hasCompletedProfile'] as bool? ?? false,
       isDonorPromptShown: data['isDonorPromptShown'] as bool? ?? false,
       createdAt: data['created_at'] != null ? (data['created_at'] as Timestamp).toDate() : DateTime.now(),
     );

@@ -30,6 +30,7 @@ dependencies:
   path_provider: ^2.0.5           # Get paths to storage locations
   http: ^1.3.0                    # HTTP requests
   path: ^1.8.3                    # Path manipulations
+  url_launcher: ^6.3.1            # Launch URLs, email, phone, etc.
   
   # State Management
   provider: ^6.1.2                # State management made easy

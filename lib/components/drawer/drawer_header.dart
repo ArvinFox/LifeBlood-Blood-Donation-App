@@ -1,4 +1,3 @@
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:lifeblood_blood_donation_app/providers/user_provider.dart';
 import 'package:lifeblood_blood_donation_app/utils/formatters.dart';
@@ -12,25 +11,10 @@ class HeaderDrawer extends StatefulWidget {
 }
 
 class _HeaderDrawerState extends State<HeaderDrawer> {
-  final FirebaseAuth auth = FirebaseAuth.instance;
-
-  @override
-  void initState() {
-    super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      final User? currentUser = auth.currentUser;
-      
-      if (currentUser != null) {
-        final userProvider = Provider.of<UserProvider>(context, listen: false);
-        if(userProvider.user == null){
-          userProvider.fetchUser(currentUser.uid);
-        }
-      }
-    });
-  }
-
   @override
   Widget build(BuildContext context) {
+    final userProvider = Provider.of<UserProvider>(context, listen: false);
+
     return Container(
       color: Color(0xFFE50F2A),
       width: double.infinity,
@@ -47,24 +31,20 @@ class _HeaderDrawerState extends State<HeaderDrawer> {
               backgroundImage: AssetImage("assets/images/profile.jpg"),
             ),
           ),
-          Consumer<UserProvider>(
-            builder: (context, userProvider, child) {
-              final user = userProvider.user;
-              if (user == null || user.isDonor == false) {
-                return Text(
-                  Formatters.truncateEmail(user?.email ?? ''),
-                  style: TextStyle(
-                    fontSize: 18,
-                    color: Colors.white,
-                  ),
-                );
-              } 
-              return Text(
-                user.fullName!,
-                style: TextStyle(fontSize: 20, color: Colors.white)
-              );
-            },
-          ),
+          if (userProvider.user == null || userProvider.user!.isDonorVerified == false) ...[
+            Text(
+              Formatters.truncateEmail(userProvider.user!.email ?? ''),
+              style: TextStyle(
+                fontSize: 18,
+                color: Colors.white,
+              ),
+            ),
+          ] else ...[
+            Text(
+              userProvider.user!.fullName!,
+              style: TextStyle(fontSize: 20, color: Colors.white)
+            ),
+          ],
           TextButton(
             onPressed: () {
               Navigator.pushReplacementNamed(context, '/profile');

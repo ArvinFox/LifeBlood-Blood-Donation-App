@@ -37,7 +37,7 @@ class _ProfilePageState extends State<ProfileScreen> {
       context: context, 
       builder: (context) => AlertDialog(
         title: Text('Access Restricted'),
-        content: Text('This feature is only accessible for registered users.'),
+        content: Text('This feature is only accessible for verified users.'),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context), 
@@ -94,7 +94,7 @@ class _ProfilePageState extends State<ProfileScreen> {
               Consumer<UserProvider>(
                 builder: (context, userProvider, child) {
                   final user = userProvider.user;
-                  if (user == null || user.isDonor == false) {
+                  if (user == null || user.isDonorVerified == false) {
                     return Column(
                       children: [
                         Center(
@@ -103,7 +103,7 @@ class _ProfilePageState extends State<ProfileScreen> {
                         SizedBox(height: 30),
                       ],
                     );
-                  } else if (user.isDonor == true) {
+                  } else if (user.isDonorVerified == true) {
                     return Column(
                       children: [
                         Text(
@@ -137,7 +137,7 @@ class _ProfilePageState extends State<ProfileScreen> {
                       child: Consumer<UserProvider>(
                         builder: (context, userProvider, child) {
                           final user = userProvider.user;
-                          if (user!.isDonor == true) {
+                          if (user!.isDonorVerified == true) {
                             return Text(
                               "Donation Count\n${user.donationCount.toString()}",
                               style: TextStyle(color: Colors.white,fontWeight: FontWeight.bold),
@@ -191,7 +191,7 @@ class _ProfilePageState extends State<ProfileScreen> {
                       return Switch(
                         padding: EdgeInsets.only(right: 20),
                         value: isAvailable,
-                        onChanged: (user != null && user.isDonor == true)
+                        onChanged: (user != null && user.isDonorVerified == true)
                           ? (value) async {
                               setState(() {
                                 isAvailable = value;
@@ -220,7 +220,7 @@ class _ProfilePageState extends State<ProfileScreen> {
 
               // Profile Options
               Consumer<UserProvider>(builder: (context, userProvider, child) {
-                final isDonor = userProvider.user?.isDonor ?? true;
+                final isDonor = userProvider.user?.isDonorVerified ?? true;
 
                 return Column(
                   children: [

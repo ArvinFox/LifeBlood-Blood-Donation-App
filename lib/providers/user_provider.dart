@@ -18,17 +18,11 @@ class UserProvider extends ChangeNotifier{
 
     try {
       UserModel? userData = await _userService.getUserById(id);
-      if(userData != null){
-        _user = userData;
-      } else{
-        _user = null;
-      }
+      _user = userData;
       
     } catch (e) {
       Helpers.debugPrintWithBorder("Error fetching user: $e");
     }
-
-    await Future.delayed(Duration(seconds: 1));
 
     _isLoading = false;
     notifyListeners();
@@ -45,4 +39,19 @@ class UserProvider extends ChangeNotifier{
     }
   }
 
+  // Update status
+  Future<void> updateStatus(String userId, String property, bool value) async {
+    _isLoading = true;
+    notifyListeners();
+
+    try {
+      await _userService.updateStatus(userId, property, value);
+      await fetchUser(userId);
+    } catch (e) {
+      Helpers.debugPrintWithBorder("Error updating status: $e");
+    }
+
+    _isLoading = false;
+    notifyListeners();
+  }
 }

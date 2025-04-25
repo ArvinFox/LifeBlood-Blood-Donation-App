@@ -20,14 +20,14 @@ class UserService {
           'email': user.email,
           'created_at': DateTime.now(),
           'isDonorPromptShown': false,
-          'isDonor': false
+          'isDonorVerified': false,
+          'hasCompletedProfile': false,
         });
       }
       
     } on FirebaseAuthException catch (e){
       if(e.code == 'email-already-in-use'){
         Helpers.showError(context, "Email is already registered. Please try a different email or login.");
-        Navigator.pushNamed(context, '/login');
       } else {
         Helpers.showError(context, "Signup failed: ${e.message}");
       }
@@ -99,12 +99,20 @@ class UserService {
     }
   }
 
+  // Update status
+  Future<void> updateStatus(String userId, String property, bool value) async {
+    try {
+      await userCollection.doc(userId).update({property: value});
+    } catch (e) {
+      throw Exception("Failed to update status [$property]: $e");
+    }
+  }
+
   //get donor status
   Stream<bool> getDonorStatus(String userId) {
     return userCollection.doc(userId).snapshots().map((snapshot) {
       final data = snapshot.data() as Map<String, dynamic>?;
-      print("------------------------------Data from Firestore: $data---------------------------");
-      return data?['isDonor'] ?? false;
+      return data?['isDonorVerified'] ?? false;
     });
   }
 

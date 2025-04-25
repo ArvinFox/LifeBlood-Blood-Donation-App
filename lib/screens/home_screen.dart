@@ -7,13 +7,9 @@ import 'package:lifeblood_blood_donation_app/components/small_button.dart';
 import 'package:lifeblood_blood_donation_app/components/current_activity_card.dart';
 import 'package:lifeblood_blood_donation_app/models/donation_request_model.dart';
 import 'package:lifeblood_blood_donation_app/providers/current_activity_provider.dart';
-import 'package:lifeblood_blood_donation_app/providers/donor_status_provider.dart';
 import 'package:lifeblood_blood_donation_app/providers/user_provider.dart';
-import 'package:lifeblood_blood_donation_app/services/user_service.dart';
 import 'package:lifeblood_blood_donation_app/utils/helpers.dart';
 import 'package:provider/provider.dart';
-
-bool _donorPopupShown = false;
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -26,54 +22,79 @@ class _HomePageState extends State<HomeScreen> {
   List<BloodRequest> _donationRequests = [];
   final FirebaseAuth auth = FirebaseAuth.instance;
   final FirebaseFirestore firestore = FirebaseFirestore.instance;
-  final UserService _userService = UserService();
 
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_)  async {
-      if (_donorPopupShown) return;
-      _donorPopupShown = true;
-
       final User? currentUser = auth.currentUser;
       if (currentUser != null) {
         final userProvider = Provider.of<UserProvider>(context, listen: false);
-        if(userProvider.user == null){
+        
+        if (userProvider.user == null) {
           await userProvider.fetchUser(currentUser.uid);
         }
-        _donorStatus(currentUser.uid);
-        _showDonorPopup();
-        print('--------------Donor popup triggered----------------------');
+
+        await Future.delayed(Duration(milliseconds: 800));
+        final currentRoute = ModalRoute.of(context)!.settings.name!;
+        if (currentRoute == '/home') {
+          _showDonorPopup();
+        }
       }
     });
     _fetchDonationRequests(); // Fetch donation requests when the screen is loaded
   }
 
-  Future<void> _showDonorPopup() async {
+  void _showDonorPopup() async {
     final userProvider = Provider.of<UserProvider>(context, listen: false);
-    final donorProvider = Provider.of<DonorStatusProvider>(context, listen: false);
     final user = userProvider.user;
-    if (user == null || donorProvider.donorDialogShown) return;
 
-    if (user.isDonorPromptShown == null || user.isDonorPromptShown == false) {
+    if (user != null && !user.isDonorPromptShown) {
       try {
-        await FirebaseFirestore.instance.collection('user').doc(user.userId).update({
-          'isDonorPromptShown': true,
-        });
-
-        donorProvider.markDialogShown();
         _showDonorDialog();
+        await userProvider.updateStatus(user.userId!, 'isDonorPromptShown', true);
       } catch (e) {
-        Helpers.debugPrintWithBorder('Error updating user.');
+        Helpers.debugPrintWithBorder('Error displaying donor popup: $e');
       }
     }
   }
 
-  void _donorStatus(String userId) {
-    _userService.getDonorStatus(userId).listen((isDonor) {
-      final provider = Provider.of<DonorStatusProvider>(context, listen: false);
-      provider.setShowDonorPoster(!isDonor);
-    });
+  void _showDonorDialog() {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) => AlertDialog(
+        backgroundColor: const Color.fromARGB(255, 255, 238, 238),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+        title: Text('Complete Your Donor Profile', style: TextStyle(fontWeight: FontWeight.bold)),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(Icons.favorite, color: Colors.red, size: 40),
+            SizedBox(height: 10),
+            Text(
+              'Thank you for signing up!\nTo start donating blood and help save lives, please complete your donor profile.',
+              textAlign: TextAlign.center,
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () {
+              Navigator.of(context).pop();
+              Navigator.pushNamed(context, '/donor-registration');
+            },
+            child: Text('Complete Now'),
+          ),
+          TextButton(
+            onPressed: () {
+              Navigator.of(context).pop();
+            },
+            child: Text('Later'),
+          ),
+        ],
+      ),
+    );
   }
 
   // Fetch donation requests from Firestore and order by 'createdAt' field
@@ -113,51 +134,38 @@ class _HomePageState extends State<HomeScreen> {
     }
   }
 
-  void _showDonorDialog() {
-    showDialog(
-      context: context,
-      barrierDismissible: false,
-      builder: (context) => AlertDialog(
-        title: Text('Become a Donor'),
-        content: Text('Do you want to become a blood donor and help save lives?'),
-        actions: [
-          TextButton(
-            onPressed: () {
-              Navigator.of(context).pop();
-              Navigator.pushNamed(context, '/donor-registration');
-            },
-            child: Text('Yes'),
-          ),
-          TextButton(
-            onPressed: () {
-              Navigator.of(context).pop();
-            },
-            child: Text('No'),
-          ),
-        ],
-      ),
-    );
-  }
-
   // Show confirmation dialog
-  void _showConfirmDialog(
+  void _showRequestConfirmDialog(
       BuildContext context, BloodRequest request) {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: Text('Confirm Blood Donation'),
-        content:
-            Text('Are you sure you want to donate blood for this request?'),
+        backgroundColor: const Color.fromARGB(255, 255, 238, 238),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        title: Row(
+          children: [
+            Icon(Icons.bloodtype, color: Colors.redAccent),
+            SizedBox(width: 8),
+            Text('Confirm Donation', style: TextStyle(fontWeight: FontWeight.bold)),
+          ],
+        ),
+        content: Text('Are you sure you want to donate blood for this request?', style: TextStyle(fontSize: 16)),
         actions: [
-          TextButton(
+          TextButton.icon(
+            icon: Icon(Icons.cancel, color: Colors.grey),
             onPressed: () => Navigator.pop(context),
-            child: Text('Cancel'),
+            label: Text('Cancel', style: TextStyle(color: Colors.grey[600])),
           ),
-          TextButton(
+          ElevatedButton.icon(
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.redAccent,
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+            ),
+            icon: Icon(Icons.check, color: Colors.white),
+            label: Text('Confirm', style: TextStyle(color: Colors.white)),
             onPressed: () async {
               Navigator.pop(context);
-              final provider = Provider.of<CurrentActivitiesProvider>(context,
-                  listen: false);
+              final provider = Provider.of<CurrentActivitiesProvider>(context, listen: false);
               final isAlreadyAdded = provider.currentActivities
                   .any((r) => r.requestId == request.requestId);
 
@@ -165,9 +173,9 @@ class _HomePageState extends State<HomeScreen> {
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(
                     content: Text(
-                      'This Request is already Added to your Current Activities. Check it out under Current Activities Section.',
+                      'This request is already in to your Current Activities. You can view it there.',
                     ),
-                    backgroundColor: Colors.redAccent,
+                    backgroundColor: Colors.orange[700],
                   ),
                 );
               } else {
@@ -175,13 +183,12 @@ class _HomePageState extends State<HomeScreen> {
 
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(
-                    content: Text('Blood Donation Confirmed and Added to Current Activities!'),
-                    backgroundColor: Colors.green,
+                    content: Text('Donation confirmed! The request has been added to your Current Activities.'),
+                    backgroundColor: Colors.green[600],
                   ),
                 );
               }
             },
-            child: Text('Confirm'),
           ),
         ],
       ),
@@ -203,12 +210,6 @@ class _HomePageState extends State<HomeScreen> {
         ],
       )
     );
-  }
-
-  // Add selected request to Current Activities
-  void _addToCurrentActivities(BloodRequest request) {
-    Provider.of<CurrentActivitiesProvider>(context, listen: false)
-        .addActivity(request);
   }
 
   String _getGreetingMessage() {
@@ -240,28 +241,42 @@ class _HomePageState extends State<HomeScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
-                  _getGreetingMessage(),
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontWeight: FontWeight.bold
-                  ),
-                ),
                 Consumer<UserProvider>(
-                  builder: (context, userProvider,_){
+                  builder: (context, userProvider, child) {
                     final user = userProvider.user;
-                    if(user == null || user.isDonor == false){
-                      return SizedBox.shrink();
+                    Widget widget;
+
+                    if (user == null || !user.isDonorVerified!) {
+                      widget = SizedBox.shrink();
+                    } else {
+                      String firstName = user.fullName!.split(' ').first;
+                      if (firstName == '') {
+                        firstName = user.fullName!;
+                      }
+
+                      widget = Text(
+                        'Hi $firstName',
+                        style: TextStyle(
+                          fontSize: 17,
+                          color: Colors.white,
+                          fontWeight: FontWeight.bold
+                        ),
+                      );
                     }
 
-                    final firstName = user.fullName!.split(' ').first;
-                    return Text(
-                      'Hi $firstName',
-                      style: TextStyle(
-                        fontSize: 16,
-                        color: Colors.white,
-                        fontWeight: FontWeight.bold
-                      ),
+                    return Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          _getGreetingMessage(),
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontWeight: FontWeight.bold
+                          ),
+                        ),
+                        SizedBox(height: 2),
+                        widget,
+                      ],
                     );
                   }
                 ),
@@ -279,54 +294,101 @@ class _HomePageState extends State<HomeScreen> {
             children: [
               CarouselContainer(),
               SizedBox(height: 8),
-              Consumer<DonorStatusProvider>(
-                builder: (context, donorProvider, _){
-                  final user = Provider.of<UserProvider>(context, listen: false).user;
-                  final hasFullName = user?.fullName != null && user!.fullName!.trim().isNotEmpty;
+              Consumer<UserProvider>(
+                builder: (context, userProvider, child) {
+                  final user = userProvider.user;
 
-                  return donorProvider.showDonorPoster
-                    ? 
-                      Padding(
-                        padding: const EdgeInsets.symmetric(vertical: 10),
-                        child: InkWell(
-                          onTap: (){
-                            if(hasFullName){
-                              showAlert(context);
-                            } else {
-                              Navigator.pushNamed(context, '/donor-registration');
-                            }
-                          },
-                          borderRadius: BorderRadius.circular(15),
-                          child: Card(
-                            color: Colors.yellow[100],
-                            elevation: 4,
-                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
-                            child: Padding(
-                              padding: const EdgeInsets.all(16.0),
-                              child: Row(
-                                children: [
-                                  Icon(Icons.volunteer_activism, color: Colors.redAccent, size: 30),
-                                  SizedBox(width: 10),
-                                  Expanded(
-                                    child: Text(
-                                      'Want to become a donor later? Click here to register and save lives anytime!',
-                                      style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
-                                    ),
+                  final isDonorVerified = user?.isDonorVerified ?? false;
+                  final hasCompletedProfile = user?.hasCompletedProfile ?? false;
+
+                  if (userProvider.isLoading) {
+                    return const Center(child: CircularProgressIndicator());
+                  }
+
+                  if (isDonorVerified) {
+                    // If verified
+                    return SizedBox.shrink();
+                  } else if (hasCompletedProfile) {
+                    // If completed profile but not yet verified
+                    return Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 10),
+                      child: InkWell(
+                        onTap: () {
+                          Navigator.pushNamed(context, '/donor-registration');
+                        },
+                        borderRadius: BorderRadius.circular(15),
+                        child: Card(
+                          color: Colors.blue[50],
+                          elevation: 4,
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+                          child: Padding(
+                            padding: const EdgeInsets.all(16),
+                            child: Row(
+                              children: [
+                                Icon(Icons.info_outline, color: Colors.blueAccent, size: 30),
+                                SizedBox(width: 10),
+                                Expanded(
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        "Your donor profile has been submitted and is awaiting verification.",
+                                        style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
+                                      ),
+                                      SizedBox(height: 6),
+                                      Text(
+                                        "Tap here if you'd like to review or update your details.",
+                                        style: TextStyle(fontSize: 14, fontStyle: FontStyle.italic, color: Colors.blueAccent),
+                                      ),
+                                    ],
                                   ),
-                                ],
-                              ),
+                                ),
+                              ],
                             ),
                           ),
                         ),
-                    ) 
-                    : SizedBox.shrink();
+                      ),
+                    );
+                  } else {
+                    // Show link to complete profile
+                    return Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 10),
+                      child: InkWell(
+                        onTap: () {
+                          Navigator.pushNamed(context, '/donor-registration');
+                        },
+                        borderRadius: BorderRadius.circular(15),
+                        child: Card(
+                          color: Colors.yellow[100],
+                          elevation: 4,
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+                          child: Padding(
+                            padding: const EdgeInsets.all(16.0),
+                            child: Row(
+                              children: [
+                                Icon(Icons.volunteer_activism, color: Colors.redAccent, size: 30),
+                                SizedBox(width: 10),
+                                Expanded(
+                                  child: Text(
+                                    'Complete your donor profile to start saving lives. Tap here to get started!',
+                                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
+                                  ),
+                                ),
+                                Icon(Icons.arrow_forward_ios, size: 16, color: Colors.redAccent),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ),
+                    );
+                  }
                 },
               ),
               
 
               // Display Current Activities
               Consumer<CurrentActivitiesProvider>(
-                builder: (context, provider, _) {
+                builder: (context, provider, child) {
                   final currentActivities = provider.currentActivities;
 
                   if (currentActivities.isEmpty) {
@@ -381,9 +443,9 @@ class _HomePageState extends State<HomeScreen> {
                   final request = _donationRequests[index];
                   return GestureDetector(
                     onTap: () {
-                      _showConfirmDialog(context, request); // <-- fixed by passing context
+                      _showRequestConfirmDialog(context, request); // <-- fixed by passing context
                     },
-                    child: _dobationRequestCard(donationRequest: request),
+                    child: _donationRequestCard(donationRequest: request),
                   );
                 },
               ),
@@ -415,7 +477,7 @@ class _HomePageState extends State<HomeScreen> {
     );
   }
 
-  Widget _dobationRequestCard({required BloodRequest donationRequest}){
+  Widget _donationRequestCard({required BloodRequest donationRequest}){
     return Card(
       child: Container(
         width: double.infinity,
