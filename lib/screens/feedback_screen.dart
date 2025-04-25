@@ -1,7 +1,10 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:lifeblood_blood_donation_app/components/custom_main_app_bar.dart';
 import 'package:lifeblood_blood_donation_app/models/feedback_model.dart';
 import 'package:lifeblood_blood_donation_app/services/feedback_service.dart';
+import 'package:lifeblood_blood_donation_app/services/user_service.dart';
+import 'package:lifeblood_blood_donation_app/utils/helpers.dart';
 
 class FeedbackScreen extends StatefulWidget {
   const FeedbackScreen({super.key});
@@ -13,6 +16,7 @@ class FeedbackScreen extends StatefulWidget {
 class _FeedbackPageState extends State<FeedbackScreen> {
   final FeedbackService _feedbackService = FeedbackService();
   final TextEditingController commentController = TextEditingController();
+  final UserService userService = UserService();
   int ratingCount = 0;
 
   void showFeedbackDialog(BuildContext context){
@@ -52,10 +56,23 @@ class _FeedbackPageState extends State<FeedbackScreen> {
                     const SizedBox(height: 20),
                     _buildCustomButton(
                       () async {
-                        if (ratingCount > 0 &&
-                            commentController.text.isNotEmpty) {
+                        if (ratingCount > 0 && commentController.text.isNotEmpty) {
+                          final user = FirebaseAuth.instance.currentUser;
+
+                          if(user == null){
+                            Helpers.showError(context, "You must be logged in to make a request.");
+                            return;
+                          }
+
+                          final userData = await userService.getUserById(user.uid);
+
+                          if(userData == null || userData.fullName == null){
+                            Helpers.showError(context, "User data not found.");
+                            return;
+                          }
+
                           UserFeedback feedback = UserFeedback(
-                            feedbackId: DateTime.now().millisecondsSinceEpoch,
+                            userName: userData.fullName!,
                             feedbackContent: commentController.text,
                             rating: ratingCount,
                             createdAt: DateTime.now(),
@@ -141,6 +158,16 @@ class _FeedbackPageState extends State<FeedbackScreen> {
         children: [
           Text(
             feedback.feedbackContent,
+            style: const TextStyle(
+              fontSize: 14,
+              fontWeight: FontWeight.w500,
+              color: Colors.black,
+            ),
+            textAlign: TextAlign.center,
+          ),
+          const SizedBox(height: 8),
+          Text(
+            '-  ${feedback.userName}  -',
             style: const TextStyle(
               fontSize: 14,
               fontWeight: FontWeight.w500,

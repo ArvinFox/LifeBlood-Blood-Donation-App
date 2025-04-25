@@ -8,7 +8,7 @@ class FeedbackService {
   Future<void> addFeedback(UserFeedback feedback) async {
     try {
       await feedbackCollection.add({
-        // 'userId': feedback.userId,
+        'userName': feedback.userName,
         'feedbackContent': feedback.feedbackContent,
         'rating': feedback.rating,
         'createdAt': Timestamp.fromDate(feedback.createdAt),
@@ -26,8 +26,7 @@ class FeedbackService {
         .map((snapshot) {
       return snapshot.docs.map((doc) {
         return UserFeedback(
-          feedbackId: doc.id.hashCode, // Using hashCode as a temporary ID
-          // userId: doc['userId'],
+          userName: doc['userName'],
           feedbackContent: doc['feedbackContent'],
           rating: doc['rating'],
           createdAt: (doc['createdAt'] as Timestamp).toDate(),
