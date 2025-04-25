@@ -1,9 +1,9 @@
 import 'package:curved_navigation_bar/curved_navigation_bar.dart';
 import 'package:flutter/material.dart';
-import 'package:lifeblood_blood_donation_app/screens/find_donor_screen.dart';
 import 'package:lifeblood_blood_donation_app/screens/home_screen.dart';
 import 'package:lifeblood_blood_donation_app/screens/notification_screen.dart';
 import 'package:lifeblood_blood_donation_app/screens/profile_screen.dart';
+import 'package:lifeblood_blood_donation_app/screens/request_donors.dart';
 
 class MainLayoutScreen extends StatefulWidget {
   final int selectIndex;
@@ -29,7 +29,7 @@ class _MainLayoutScreenState extends State<MainLayoutScreen> {
 
   final List<Widget> pages = [
     HomeScreen(),
-    FindDonorScreen(navigation: NavigationPage.bottomNavigation),
+    RequestDonors(navigation: NavigationPage.bottomNavigation),
     NotificationScreen(navigation: NotificationPageNavigation.bottomNavigation),
     ProfileScreen(navigation: ProfilePageNavigation.bottomNavigation),
   ];

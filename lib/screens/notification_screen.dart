@@ -22,7 +22,7 @@ class NotificationScreen extends StatefulWidget {
 }
 
 class _NotificationScreenState extends State<NotificationScreen> {
-  DonationRequestDetails? latestRequest;
+  BloodRequest? latestRequest;
   final NotificationService _notificationService = NotificationService();
 
   @override

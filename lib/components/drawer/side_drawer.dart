@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:lifeblood_blood_donation_app/screens/request_donors.dart';
 import 'package:lifeblood_blood_donation_app/screens/static/about_us_screen.dart';
 import 'package:lifeblood_blood_donation_app/screens/feedback_screen.dart';
-import 'package:lifeblood_blood_donation_app/screens/find_donor_screen.dart';
 import 'package:lifeblood_blood_donation_app/screens/home_screen.dart';
 import 'package:lifeblood_blood_donation_app/screens/auth/login_screen.dart';
 import 'package:lifeblood_blood_donation_app/screens/main_layout_screen.dart';
@@ -351,7 +351,7 @@ class _NavDrawerState extends State<NavDrawer> {
               case DrawerSelection.home:
                 return MainLayoutScreen(selectIndex: 0);
               case DrawerSelection.search:
-                return FindDonorScreen(navigation: NavigationPage.sideDrawer);
+                return RequestDonors(navigation: NavigationPage.sideDrawer);
               case DrawerSelection.settings:
                 return HomeScreen();
               case DrawerSelection.notifications:

@@ -1,55 +1,62 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
-class DonationRequestDetails {
-  final String requestId;
-  final String patientName;
-  final String requestBloodType;
-  final String urgencyLevel;
-  final String hospitalName;
-  final String city;
-  final String province;
-  final String contactNumber;
-  final DateTime createdAt;
+class BloodRequest {
+  String? requestId;
+  String patientName;
+  String requestedBy;
+  String requestBloodType;
+  String urgencyLevel;
+  String requestQuantity;
+  String province;
+  String city;
+  String hospitalName;
+  String contactNumber; 
+  DateTime createdAt;
 
-  DonationRequestDetails({
-    required this.requestId,
+  BloodRequest({
+    this.requestId,
     required this.patientName,
+    required this.requestedBy,
     required this.requestBloodType,
     required this.urgencyLevel,
-    required this.hospitalName,
-    required this.city,
+    required this.requestQuantity,
     required this.province,
+    required this.city,
+    required this.hospitalName,
     required this.contactNumber,
     required this.createdAt,
   });
 
+  // Convert a BloodRequest to a Map for Firestore
   Map<String, dynamic> toFirestore() {
     return {
       'patientName': patientName,
+      'requestedBy': requestedBy,
       'requestBloodType': requestBloodType,
       'urgencyLevel': urgencyLevel,
-      'hospitalName': hospitalName,
-      'city': city,
+      'requestQuantity': requestQuantity,
       'province': province,
+      'city': city,
+      'hospitalName': hospitalName,
       'contactNumber': contactNumber,
-      'createdAt': Timestamp.fromDate(createdAt),
+      'createdAt': createdAt,
     };
   }
 
-  // Fetch Data from Firestore
-  factory DonationRequestDetails.fromFirestore(DocumentSnapshot doc) {
-    Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
-
-    return DonationRequestDetails(
-      requestId: doc.id,
-      patientName: data['patientName'] ?? '',
-      requestBloodType: data['requestBloodType'] ?? '',
-      urgencyLevel: data['urgencyLevel'] ?? '',
-      hospitalName: data['hospitalName'] ?? '',
-      city: data['city'] ?? '',
-      province: data['province'] ?? '',
-      contactNumber: data['contactNumber'] ?? '',
-      createdAt: (data['createdAt'] as Timestamp).toDate(),
+  // Create a BloodRequest from a Firestore document snapshot
+  factory BloodRequest.fromFirestore(DocumentSnapshot doc) {
+    final data = doc.data() as Map<String, dynamic>;
+    return BloodRequest(
+      patientName: data['patientName'],
+      requestedBy: data['requestedBy'],
+      requestBloodType: data['requestBloodType'],
+      urgencyLevel: data['urgencyLevel'],
+      requestQuantity: data['requestQuantity'],
+      province: data['province'],
+      city: data['city'],
+      hospitalName: data['hospitalName'],
+      contactNumber: data['contactNumber'],
+      createdAt: data['createdAt'],
     );
   }
 }

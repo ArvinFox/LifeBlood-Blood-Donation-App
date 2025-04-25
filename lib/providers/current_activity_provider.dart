@@ -3,16 +3,16 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:lifeblood_blood_donation_app/models/donation_request_model.dart';
 
 class CurrentActivitiesProvider with ChangeNotifier {
-  List<DonationRequestDetails> _currentActivities = [];
+  List<BloodRequest> _currentActivities = [];
 
-  List<DonationRequestDetails> get currentActivities => _currentActivities;
+  List<BloodRequest> get currentActivities => _currentActivities;
 
   CurrentActivitiesProvider() {
     _loadCurrentActivities();
   }
 
   // Add activity to current activities and save it to SharedPreferences
-  Future<void> addActivity(DonationRequestDetails request) async {
+  Future<void> addActivity(BloodRequest request) async {
     bool exists = _currentActivities.any((activity) => activity.requestId == request.requestId);
 
     if (!exists) {
@@ -30,7 +30,7 @@ class CurrentActivitiesProvider with ChangeNotifier {
     if (activitiesList != null) {
       _currentActivities = activitiesList.map((activity) {
         List<String> activityDetails = activity.split(',');
-        return DonationRequestDetails(
+        return BloodRequest(
           requestId: activityDetails[0],
           patientName: activityDetails[1],
           requestBloodType: activityDetails[2],
@@ -39,7 +39,9 @@ class CurrentActivitiesProvider with ChangeNotifier {
           city: activityDetails[5],
           province: activityDetails[6],
           contactNumber: activityDetails[7],
-          createdAt: DateTime.parse(activityDetails[8]),
+          requestedBy: activityDetails[8],
+          requestQuantity: activityDetails[9],
+          createdAt: DateTime.parse(activityDetails[10]),
         );
       }).toList();
       notifyListeners();
@@ -67,7 +69,7 @@ class CurrentActivitiesProvider with ChangeNotifier {
   }
 
   // Optional: Remove an activity
-  Future<void> removeActivity(DonationRequestDetails request) async {
+  Future<void> removeActivity(BloodRequest request) async {
     _currentActivities.removeWhere((r) => r.requestId == request.requestId);
     await _saveCurrentActivities();
     notifyListeners();

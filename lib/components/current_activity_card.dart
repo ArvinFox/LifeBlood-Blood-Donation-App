@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:lifeblood_blood_donation_app/models/donation_request_model.dart';
 
 class CurrentActivityCard extends StatelessWidget {
-  final DonationRequestDetails donationRequest;
+  final BloodRequest donationRequest;
 
   const CurrentActivityCard({
     super.key,

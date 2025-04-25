@@ -23,7 +23,7 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomeScreen> {
-  List<DonationRequestDetails> _donationRequests = [];
+  List<BloodRequest> _donationRequests = [];
   final FirebaseAuth auth = FirebaseAuth.instance;
   final FirebaseFirestore firestore = FirebaseFirestore.instance;
   final UserService _userService = UserService();
@@ -85,20 +85,24 @@ class _HomePageState extends State<HomeScreen> {
           .limit(3) // Limit to latest 3 requests
           .get();
 
-      List<DonationRequestDetails> donationRequests = [];
+      List<BloodRequest> donationRequests = [];
       for (var doc in snapshot.docs) {
         var data = doc.data() as Map<String, dynamic>;
-        donationRequests.add(DonationRequestDetails(
-          requestId: doc.id,
-          patientName: data['patientName'] ?? '',
-          requestBloodType: data['requestBloodType'] ?? '',
-          urgencyLevel: data['urgencyLevel'] ?? '',
-          hospitalName: data['hospitalName'] ?? '',
-          city: data['city'] ?? '',
-          province: data['province'] ?? '',
-          contactNumber: data['contactNumber'] ?? '',
-          createdAt: (data['createdAt'] as Timestamp).toDate(),
-        ));
+        donationRequests.add(
+          BloodRequest(
+            requestId: doc.id,
+            patientName: data['patientName'] ?? '',
+            requestedBy: data['requestBy'] ?? '',
+            requestBloodType: data['requestBloodType'] ?? '',
+            requestQuantity: data['requestQuantity'] ?? '',
+            urgencyLevel: data['urgencyLevel'] ?? '',
+            hospitalName: data['hospitalName'] ?? '',
+            city: data['city'] ?? '',
+            province: data['province'] ?? '',
+            contactNumber: data['contactNumber'] ?? '',
+            createdAt: (data['createdAt'] as Timestamp).toDate(),
+          )
+        );
       }
 
       setState(() {
@@ -137,7 +141,7 @@ class _HomePageState extends State<HomeScreen> {
 
   // Show confirmation dialog
   void _showConfirmDialog(
-      BuildContext context, DonationRequestDetails request) {
+      BuildContext context, BloodRequest request) {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
@@ -202,7 +206,7 @@ class _HomePageState extends State<HomeScreen> {
   }
 
   // Add selected request to Current Activities
-  void _addToCurrentActivities(DonationRequestDetails request) {
+  void _addToCurrentActivities(BloodRequest request) {
     Provider.of<CurrentActivitiesProvider>(context, listen: false)
         .addActivity(request);
   }
@@ -411,7 +415,7 @@ class _HomePageState extends State<HomeScreen> {
     );
   }
 
-  Widget _dobationRequestCard({required DonationRequestDetails donationRequest}){
+  Widget _dobationRequestCard({required BloodRequest donationRequest}){
     return Card(
       child: Container(
         width: double.infinity,

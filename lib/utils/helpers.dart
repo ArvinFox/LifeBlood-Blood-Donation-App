@@ -14,15 +14,6 @@ class Helpers {
     return null;
   }
 
-  //convert DOB string to DateTime
-  static DateTime? setDob(String dob) {
-    try {
-      return DateTime.tryParse(dob);
-    } catch (e) {
-      return null;
-    }
-  }
-
   //validate input fields
   static String? validateInputFields(String? value, String errorMessage) {
     if (value == null || value.isEmpty) {
@@ -70,20 +61,28 @@ class Helpers {
     return otp.toString();
   }
 
-  //password strength checker
-  static checkPasswordStrength(String password){
-    if(password.length < 6) return 'Weak Password';
-
-    bool hasLetters = password.contains(RegExp(r'[A-Za-z]'));
-    bool hasNumbers = password.contains(RegExp(r'\d'));
-    bool hasSpecialCharacters = password.contains(RegExp(r'[!@#\$%^&*(),.?":{}|<>]'));
-
-    if(password.length >= 6 && hasLetters && hasNumbers && hasSpecialCharacters){
-      return 'Strong Password';
-    } else if(password.length >= 4 && hasLetters && hasNumbers){
-      return 'Medium Password';
-    } else{
-      return 'Weak Password';
-    }
+  static TableRow buildTableRow(String label, String value) {
+    return TableRow(
+      children: [
+        Padding(
+          padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 16),
+          child: Text(
+            label,
+            style: const TextStyle(
+              fontSize: 18,
+              fontWeight: FontWeight.bold,
+              color: Colors.black,
+            ),
+          ),
+        ),
+        Padding(
+          padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 16),
+          child: Text(
+            value,
+            style: const TextStyle(fontSize: 18, color: Colors.black),
+          ),
+        ),
+      ],
+    );
   }
 }

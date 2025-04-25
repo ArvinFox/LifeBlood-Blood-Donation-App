@@ -69,12 +69,12 @@ class NotificationService {
   }
 
   // Get donation request details from ID
-  Future<DonationRequestDetails?> getDonationRequestDetailsId(String requestId) async {
+  Future<BloodRequest?> getDonationRequestDetailsId(String requestId) async {
     try {
       DocumentSnapshot doc = await _db.collection("requests").doc(requestId).get();
       if (!doc.exists) return null;
 
-      return DonationRequestDetails.fromFirestore(doc);
+      return BloodRequest.fromFirestore(doc);
     } catch (e) {
       throw Exception("Failed to get donation request details by ID: $e");
     }

@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:lifeblood_blood_donation_app/models/donation_request_model.dart';
 
 class BloodRequestCard extends StatelessWidget {
-  final DonationRequestDetails bloodRequestDetails;
+  final BloodRequest bloodRequestDetails;
   final Function onConfirm; // Add the onConfirm callback
 
   const BloodRequestCard({

@@ -17,8 +17,8 @@ class _BloodRequestScreenState extends State<BloodRequestScreen> {
   final TextEditingController _provinceController = TextEditingController();
   final TextEditingController _cityController = TextEditingController();
 
-  List<DonationRequestDetails> bloodRequests = [];
-  List<DonationRequestDetails> displayedRequests = [];
+  List<BloodRequest> bloodRequests = [];
+  List<BloodRequest> displayedRequests = [];
 
   int itemsToLoad = 2;
 
@@ -37,8 +37,8 @@ class _BloodRequestScreenState extends State<BloodRequestScreen> {
           .orderBy('createdAt', descending: true)
           .get();
 
-      List<DonationRequestDetails> fetchedRequests = querySnapshot.docs
-          .map((doc) => DonationRequestDetails.fromFirestore(doc))
+      List<BloodRequest> fetchedRequests = querySnapshot.docs
+          .map((doc) => BloodRequest.fromFirestore(doc))
           .toList();
 
       setState(() {
@@ -105,7 +105,7 @@ class _BloodRequestScreenState extends State<BloodRequestScreen> {
     });
   }
 
-  void _addToCurrentActivities(DonationRequestDetails request) {
+  void _addToCurrentActivities(BloodRequest request) {
     final provider =
         Provider.of<CurrentActivitiesProvider>(context, listen: false);
 
