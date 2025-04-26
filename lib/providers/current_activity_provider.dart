@@ -13,7 +13,8 @@ class CurrentActivitiesProvider with ChangeNotifier {
 
   // Add activity to current activities and save it to SharedPreferences
   Future<void> addActivity(BloodRequest request) async {
-    bool exists = _currentActivities.any((activity) => activity.requestId == request.requestId);
+    bool exists = _currentActivities
+        .any((activity) => activity.requestId == request.requestId);
 
     if (!exists) {
       _currentActivities.add(request);

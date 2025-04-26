@@ -14,7 +14,6 @@ class CurrentActivityCard extends StatelessWidget {
     return Card(
       child: Container(
         width: double.infinity,
-        height: 150,
         padding: const EdgeInsets.all(12),
         decoration: BoxDecoration(
           color: const Color(0xFFCACACA).withOpacity(0.20),
@@ -24,6 +23,7 @@ class CurrentActivityCard extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Row(
+              crossAxisAlignment: CrossAxisAlignment.start, // To align from top
               children: [
                 CircleAvatar(
                   backgroundColor: const Color(0xFFE50F2A),
@@ -37,62 +37,95 @@ class CurrentActivityCard extends StatelessWidget {
                     ),
                   ),
                 ),
-                const SizedBox(width: 40),
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
-                      children: [
-                        const Text(
-                          'Urgency Level: ',
-                          style: TextStyle(
-                            fontWeight: FontWeight.bold,
-                            fontSize: 18,
-                          ),
+                const SizedBox(width: 20),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      RichText(
+                        text: TextSpan(
+                          children: [
+                            const TextSpan(
+                              text: 'Urgency Level: ',
+                              style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                                fontSize: 18,
+                                color: Colors.black,
+                              ),
+                            ),
+                            TextSpan(
+                              text: donationRequest.urgencyLevel,
+                              style: const TextStyle(
+                                fontWeight: FontWeight.bold,
+                                fontSize: 18,
+                                color: Colors.black,
+                              ),
+                            ),
+                          ],
                         ),
-                        Text(
-                          donationRequest.urgencyLevel,
-                          style: const TextStyle(
-                            fontSize: 18,
-                          ),
-                        ),
-                      ],
-                    ),
-                    Row(
-                      children: [
-                        const Text(
-                          'Location: ',
-                          style: TextStyle(
-                            fontWeight: FontWeight.bold,
-                            fontSize: 18,
-                          ),
-                        ),
-                        Text(
-                          donationRequest.hospitalName,
-                          style: const TextStyle(
-                            fontSize: 18,
-                          ),
-                        ),
-                      ],
-                    ),
-                    Text(
-                      donationRequest.city,
-                      style: const TextStyle(
-                        fontSize: 18,
+                        softWrap: true,
                       ),
-                    ),
-                  ],
+                      const SizedBox(height: 6),
+                      RichText(
+                        text: TextSpan(
+                          children: [
+                            const TextSpan(
+                              text: 'Location: ',
+                              style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                                fontSize: 18,
+                                color: Colors.black,
+                              ),
+                            ),
+                            TextSpan(
+                              text: donationRequest.hospitalName,
+                              style: const TextStyle(
+                                fontWeight: FontWeight.normal,
+                                fontSize: 18,
+                                color: Colors.black,
+                              ),
+                            ),
+                          ],
+                        ),
+                        softWrap: true,
+                      ),
+                      const SizedBox(height: 4),
+                      RichText(
+                        text: TextSpan(
+                          children: [
+                            const TextSpan(
+                              text: 'City: ',
+                              style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                                fontSize: 18,
+                                color: Colors.black,
+                              ),
+                            ),
+                            TextSpan(
+                              text: donationRequest.city,
+                              style: const TextStyle(
+                                fontWeight: FontWeight.normal,
+                                fontSize: 18,
+                                color: Colors.black,
+                              ),
+                            ),
+                          ],
+                        ),
+                        softWrap: true,
+                      ),
+                    ],
+                  ),
                 ),
               ],
             ),
             const SizedBox(height: 10),
-            // "View Location" link
             Align(
               alignment: Alignment.centerRight,
               child: GestureDetector(
                 onTap: () {},
                 child: const Text(
-                  "View Location",
+                  "View Details",
                   style: TextStyle(
                     color: Color(0xFFE50F2A),
                     fontSize: 16,

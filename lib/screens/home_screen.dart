@@ -27,17 +27,17 @@ class _HomePageState extends State<HomeScreen> {
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_)  async {
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
       final User? currentUser = auth.currentUser;
       if (currentUser != null) {
         final userProvider = Provider.of<UserProvider>(context, listen: false);
-        
+
         if (userProvider.user == null) {
           await userProvider.fetchUser(currentUser.uid);
         }
 
         Provider.of<MedicalReportProvider>(context, listen: false)
-          .fetchReport(userProvider.user!.userId!);
+            .fetchReport(userProvider.user!.userId!);
 
         await Future.delayed(Duration(milliseconds: 800));
         final currentRoute = ModalRoute.of(context)!.settings.name!;
@@ -56,7 +56,8 @@ class _HomePageState extends State<HomeScreen> {
     if (user != null && !user.isDonorPromptShown) {
       try {
         _showDonorDialog();
-        await userProvider.updateStatus(user.userId!, 'isDonorPromptShown', true);
+        await userProvider.updateStatus(
+            user.userId!, 'isDonorPromptShown', true);
       } catch (e) {
         Helpers.debugPrintWithBorder('Error displaying donor popup: $e');
       }
@@ -70,7 +71,8 @@ class _HomePageState extends State<HomeScreen> {
       builder: (context) => AlertDialog(
         backgroundColor: const Color.fromARGB(255, 255, 238, 238),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
-        title: Text('Complete Your Donor Profile', style: TextStyle(fontWeight: FontWeight.bold)),
+        title: Text('Complete Your Donor Profile',
+            style: TextStyle(fontWeight: FontWeight.bold)),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
@@ -113,21 +115,19 @@ class _HomePageState extends State<HomeScreen> {
       List<BloodRequest> donationRequests = [];
       for (var doc in snapshot.docs) {
         var data = doc.data() as Map<String, dynamic>;
-        donationRequests.add(
-          BloodRequest(
-            requestId: doc.id,
-            patientName: data['patientName'] ?? '',
-            requestedBy: data['requestBy'] ?? '',
-            requestBloodType: data['requestBloodType'] ?? '',
-            requestQuantity: data['requestQuantity'] ?? '',
-            urgencyLevel: data['urgencyLevel'] ?? '',
-            hospitalName: data['hospitalName'] ?? '',
-            city: data['city'] ?? '',
-            province: data['province'] ?? '',
-            contactNumber: data['contactNumber'] ?? '',
-            createdAt: (data['createdAt'] as Timestamp).toDate(),
-          )
-        );
+        donationRequests.add(BloodRequest(
+          requestId: doc.id,
+          patientName: data['patientName'] ?? '',
+          requestedBy: data['requestBy'] ?? '',
+          requestBloodType: data['requestBloodType'] ?? '',
+          requestQuantity: data['requestQuantity'] ?? '',
+          urgencyLevel: data['urgencyLevel'] ?? '',
+          hospitalName: data['hospitalName'] ?? '',
+          city: data['city'] ?? '',
+          province: data['province'] ?? '',
+          contactNumber: data['contactNumber'] ?? '',
+          createdAt: (data['createdAt'] as Timestamp).toDate(),
+        ));
       }
 
       setState(() {
@@ -139,8 +139,7 @@ class _HomePageState extends State<HomeScreen> {
   }
 
   // Show confirmation dialog
-  void _showRequestConfirmDialog(
-      BuildContext context, BloodRequest request) {
+  void _showRequestConfirmDialog(BuildContext context, BloodRequest request) {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
@@ -150,10 +149,12 @@ class _HomePageState extends State<HomeScreen> {
           children: [
             Icon(Icons.bloodtype, color: Colors.redAccent),
             SizedBox(width: 8),
-            Text('Confirm Donation', style: TextStyle(fontWeight: FontWeight.bold)),
+            Text('Confirm Donation',
+                style: TextStyle(fontWeight: FontWeight.bold)),
           ],
         ),
-        content: Text('Are you sure you want to donate blood for this request?', style: TextStyle(fontSize: 16)),
+        content: Text('Are you sure you want to donate blood for this request?',
+            style: TextStyle(fontSize: 16)),
         actions: [
           OutlinedButton.icon(
             icon: Icon(Icons.cancel, color: Colors.grey),
@@ -161,20 +162,23 @@ class _HomePageState extends State<HomeScreen> {
             label: Text('Cancel', style: TextStyle(color: Colors.grey[600])),
             style: OutlinedButton.styleFrom(
               side: BorderSide(color: Colors.grey),
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8)),
             ),
           ),
           SizedBox(width: 8),
           ElevatedButton.icon(
             style: ElevatedButton.styleFrom(
               backgroundColor: Colors.redAccent,
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8)),
             ),
             icon: Icon(Icons.check, color: Colors.white),
             label: Text('Confirm', style: TextStyle(color: Colors.white)),
             onPressed: () async {
               Navigator.pop(context);
-              final provider = Provider.of<CurrentActivitiesProvider>(context, listen: false);
+              final provider = Provider.of<CurrentActivitiesProvider>(context,
+                  listen: false);
               final isAlreadyAdded = provider.currentActivities
                   .any((r) => r.requestId == request.requestId);
 
@@ -192,7 +196,8 @@ class _HomePageState extends State<HomeScreen> {
 
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(
-                    content: Text('Donation confirmed! The request has been added to your Current Activities.'),
+                    content: Text(
+                        'Donation confirmed! The request has been added to your Current Activities.'),
                     backgroundColor: Colors.green[600],
                   ),
                 );
@@ -205,20 +210,18 @@ class _HomePageState extends State<HomeScreen> {
   }
 
   //display alert
-  void showAlert(BuildContext context){
+  void showAlert(BuildContext context) {
     showDialog(
-      context: context, 
-      builder: (context) => AlertDialog(
-        title: Text('Already Submitted Data'),
-        content: Text('You are already submitted data. We will notify you after verifying your details.\nThank you for your support!'),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: Text('OK')
-          )
-        ],
-      )
-    );
+        context: context,
+        builder: (context) => AlertDialog(
+              title: Text('Already Submitted Data'),
+              content: Text(
+                  'You are already submitted data. We will notify you after verifying your details.\nThank you for your support!'),
+              actions: [
+                TextButton(
+                    onPressed: () => Navigator.pop(context), child: Text('OK'))
+              ],
+            ));
   }
 
   String _getGreetingMessage() {
@@ -252,45 +255,40 @@ class _HomePageState extends State<HomeScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Consumer<UserProvider>(
-                  builder: (context, userProvider, child) {
-                    final user = userProvider.user;
-                    Widget widget;
+                Consumer<UserProvider>(builder: (context, userProvider, child) {
+                  final user = userProvider.user;
+                  Widget widget;
 
-                    if (user == null || !user.isDonorVerified!) {
-                      widget = SizedBox.shrink();
-                    } else {
-                      String firstName = user.fullName!.split(' ').first;
-                      if (firstName == '') {
-                        firstName = user.fullName!;
-                      }
-
-                      widget = Text(
-                        'Hi $firstName',
-                        style: TextStyle(
-                          fontSize: 17,
-                          color: Colors.white,
-                          fontWeight: FontWeight.bold
-                        ),
-                      );
+                  if (user == null || !user.isDonorVerified!) {
+                    widget = SizedBox.shrink();
+                  } else {
+                    String firstName = user.fullName!.split(' ').first;
+                    if (firstName == '') {
+                      firstName = user.fullName!;
                     }
 
-                    return Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          _getGreetingMessage(),
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontWeight: FontWeight.bold
-                          ),
-                        ),
-                        SizedBox(height: 2),
-                        widget,
-                      ],
+                    widget = Text(
+                      'Hi $firstName',
+                      style: TextStyle(
+                          fontSize: 17,
+                          color: Colors.white,
+                          fontWeight: FontWeight.bold),
                     );
                   }
-                ),
+
+                  return Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        _getGreetingMessage(),
+                        style: TextStyle(
+                            color: Colors.white, fontWeight: FontWeight.bold),
+                      ),
+                      SizedBox(height: 2),
+                      widget,
+                    ],
+                  );
+                }),
               ],
             ),
           ),
@@ -309,8 +307,9 @@ class _HomePageState extends State<HomeScreen> {
                 builder: (context, userProvider, child) {
                   final user = userProvider.user;
 
-                  final isDonorVerified = user?.isDonorVerified ?? false;               
-                  final hasCompletedProfile = user?.hasCompletedProfile ?? false;
+                  final isDonorVerified = user?.isDonorVerified ?? false;
+                  final hasCompletedProfile =
+                      user?.hasCompletedProfile ?? false;
 
                   if (userProvider.isLoading) {
                     return const Center(child: CircularProgressIndicator());
@@ -318,12 +317,15 @@ class _HomePageState extends State<HomeScreen> {
                     return Consumer<MedicalReportProvider>(
                       builder: (context, medicalReportProvider, child) {
                         if (medicalReportProvider.isLoading) {
-                          return const Center(child: CircularProgressIndicator());
+                          return const Center(
+                              child: CircularProgressIndicator());
                         }
 
                         bool isDonorRejected = false;
                         if (medicalReportProvider.report != null) {
-                          isDonorRejected = medicalReportProvider.report!.status == 'Rejected';
+                          isDonorRejected =
+                              medicalReportProvider.report!.status ==
+                                  'Rejected';
                         }
 
                         if (isDonorVerified) {
@@ -335,31 +337,40 @@ class _HomePageState extends State<HomeScreen> {
                             padding: const EdgeInsets.symmetric(vertical: 10),
                             child: InkWell(
                               onTap: () {
-                                Navigator.pushNamed(context, '/donor-registration');
+                                Navigator.pushNamed(
+                                    context, '/donor-registration');
                               },
                               borderRadius: BorderRadius.circular(15),
                               child: Card(
                                 color: Colors.red[100],
                                 elevation: 4,
-                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+                                shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(15)),
                                 child: Padding(
                                   padding: const EdgeInsets.all(16),
                                   child: Row(
                                     children: [
-                                      Icon(Icons.error_outline, color: Colors.redAccent, size: 30),
+                                      Icon(Icons.error_outline,
+                                          color: Colors.redAccent, size: 30),
                                       SizedBox(width: 10),
                                       Expanded(
                                         child: Column(
-                                          crossAxisAlignment: CrossAxisAlignment.start,
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
                                           children: [
                                             Text(
                                               "Your donor profile was rejected.",
-                                              style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+                                              style: TextStyle(
+                                                  fontSize: 16,
+                                                  fontWeight: FontWeight.w600),
                                             ),
                                             SizedBox(height: 6),
                                             Text(
                                               "Please review and update your details to resubmit.",
-                                              style: TextStyle(fontSize: 14, fontStyle: FontStyle.italic, color: Colors.redAccent),
+                                              style: TextStyle(
+                                                  fontSize: 14,
+                                                  fontStyle: FontStyle.italic,
+                                                  color: Colors.redAccent),
                                             ),
                                           ],
                                         ),
@@ -376,31 +387,40 @@ class _HomePageState extends State<HomeScreen> {
                             padding: const EdgeInsets.symmetric(vertical: 10),
                             child: InkWell(
                               onTap: () {
-                                Navigator.pushNamed(context, '/donor-registration');
+                                Navigator.pushNamed(
+                                    context, '/donor-registration');
                               },
                               borderRadius: BorderRadius.circular(15),
                               child: Card(
                                 color: Colors.blue[50],
                                 elevation: 4,
-                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+                                shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(15)),
                                 child: Padding(
                                   padding: const EdgeInsets.all(16),
                                   child: Row(
                                     children: [
-                                      Icon(Icons.info_outline, color: Colors.blueAccent, size: 30),
+                                      Icon(Icons.info_outline,
+                                          color: Colors.blueAccent, size: 30),
                                       SizedBox(width: 10),
                                       Expanded(
                                         child: Column(
-                                          crossAxisAlignment: CrossAxisAlignment.start,
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
                                           children: [
                                             Text(
                                               "Your donor profile has been submitted and is awaiting verification.",
-                                              style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
+                                              style: TextStyle(
+                                                  fontSize: 16,
+                                                  fontWeight: FontWeight.w500),
                                             ),
                                             SizedBox(height: 6),
                                             Text(
                                               "Tap here if you'd like to review or update your details.",
-                                              style: TextStyle(fontSize: 14, fontStyle: FontStyle.italic, color: Colors.blueAccent),
+                                              style: TextStyle(
+                                                  fontSize: 14,
+                                                  fontStyle: FontStyle.italic,
+                                                  color: Colors.blueAccent),
                                             ),
                                           ],
                                         ),
@@ -417,26 +437,32 @@ class _HomePageState extends State<HomeScreen> {
                             padding: const EdgeInsets.symmetric(vertical: 10),
                             child: InkWell(
                               onTap: () {
-                                Navigator.pushNamed(context, '/donor-registration');
+                                Navigator.pushNamed(
+                                    context, '/donor-registration');
                               },
                               borderRadius: BorderRadius.circular(15),
                               child: Card(
                                 color: Colors.yellow[100],
                                 elevation: 4,
-                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+                                shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(15)),
                                 child: Padding(
                                   padding: const EdgeInsets.all(16.0),
                                   child: Row(
                                     children: [
-                                      Icon(Icons.volunteer_activism, color: Colors.redAccent, size: 30),
+                                      Icon(Icons.volunteer_activism,
+                                          color: Colors.redAccent, size: 30),
                                       SizedBox(width: 10),
                                       Expanded(
                                         child: Text(
                                           'Complete your donor profile to start saving lives. Tap here to get started!',
-                                          style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
+                                          style: TextStyle(
+                                              fontSize: 16,
+                                              fontWeight: FontWeight.w500),
                                         ),
                                       ),
-                                      Icon(Icons.arrow_forward_ios, size: 16, color: Colors.redAccent),
+                                      Icon(Icons.arrow_forward_ios,
+                                          size: 16, color: Colors.redAccent),
                                     ],
                                   ),
                                 ),
@@ -449,7 +475,6 @@ class _HomePageState extends State<HomeScreen> {
                   }
                 },
               ),
-              
 
               // Display Current Activities
               Consumer<CurrentActivitiesProvider>(
@@ -466,7 +491,8 @@ class _HomePageState extends State<HomeScreen> {
                         alignment: Alignment.centerLeft,
                         child: Text(
                           "Current Activities",
-                          style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                          style: TextStyle(
+                              fontSize: 20, fontWeight: FontWeight.bold),
                         ),
                       ),
                       SizedBox(height: 10),
@@ -497,8 +523,25 @@ class _HomePageState extends State<HomeScreen> {
                 style: TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
                 textAlign: TextAlign.center,
               ),
-              SizedBox(height: 20),
-
+              SizedBox(height: 5),
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.end,
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  SmallButton(
+                    buttonLabel: "See More Donation Requests",
+                    buttonHeight: 40,
+                    buttonWidth: 240,
+                    buttonColor: Colors.white,
+                    borderColor: Colors.black,
+                    labelColor: Colors.black,
+                    onTap: () {
+                      Navigator.pushNamed(context, '/donation-request');
+                    },
+                  ),
+                ],
+              ),
+              SizedBox(height: 5),
               // Donation Requests
               ListView.builder(
                 shrinkWrap: true,
@@ -509,46 +552,25 @@ class _HomePageState extends State<HomeScreen> {
                   return GestureDetector(
                     onTap: () {
                       if (userProvider.user!.isDonorVerified!) {
-                        _showRequestConfirmDialog(context, request); // <-- fixed by passing context
+                        _showRequestConfirmDialog(
+                            context, request); // <-- fixed by passing context
                       } else {
                         if (userProvider.user!.hasCompletedProfile!) {
-                          _showDonorNotVerifiedPopup(
-                            context,
-                            title: "Verification Pending",
-                            message: "Your donor profile is under review. You can accept requests once you are verified."
-                          );
+                          _showDonorNotVerifiedPopup(context,
+                              title: "Verification Pending",
+                              message:
+                                  "Your donor profile is under review. You can accept requests once you are verified.");
                         } else {
-                          _showDonorNotVerifiedPopup(
-                            context,
-                            title: "Complete Your Profile",
-                            message: "Please complete your donor profile to start accepting blood donation requests."
-                          );
+                          _showDonorNotVerifiedPopup(context,
+                              title: "Complete Your Profile",
+                              message:
+                                  "Please complete your donor profile to start accepting blood donation requests.");
                         }
                       }
                     },
                     child: _donationRequestCard(donationRequest: request),
                   );
                 },
-              ),
-              SizedBox(height: 20),
-
-              // "See More" button for donation requests
-              Row(
-                crossAxisAlignment: CrossAxisAlignment.end,
-                mainAxisAlignment: MainAxisAlignment.end,
-                children: [
-                  SmallButton(
-                    buttonLabel: "See More",
-                    buttonHeight: 40,
-                    buttonWidth: 120,
-                    buttonColor: Colors.white,
-                    borderColor: Colors.black,
-                    labelColor: Colors.black,
-                    onTap: () {
-                      Navigator.pushNamed(context, '/donation-request');
-                    },
-                  ),
-                ],
               ),
               SizedBox(height: 20),
             ],
@@ -558,7 +580,8 @@ class _HomePageState extends State<HomeScreen> {
     );
   }
 
-  void _showDonorNotVerifiedPopup(BuildContext context, {required String title, required String message}) {
+  void _showDonorNotVerifiedPopup(BuildContext context,
+      {required String title, required String message}) {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
@@ -575,77 +598,110 @@ class _HomePageState extends State<HomeScreen> {
     );
   }
 
-  Widget _donationRequestCard({required BloodRequest donationRequest}){
+  Widget _donationRequestCard({required BloodRequest donationRequest}) {
     return Card(
       child: Container(
         width: double.infinity,
-        height: 120,
         padding: const EdgeInsets.all(10),
         decoration: BoxDecoration(
-          color: Color(0xFFCACACA).withOpacity(0.20),
+          color: const Color(0xFFCACACA).withOpacity(0.20),
           borderRadius: BorderRadius.circular(20),
         ),
         child: Row(
-          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             CircleAvatar(
-              backgroundColor: Color(0xFFE50F2A),
+              backgroundColor: const Color(0xFFE50F2A),
               radius: 30,
               child: Text(
                 donationRequest.requestBloodType,
-                style: TextStyle(
+                style: const TextStyle(
                   color: Colors.white,
                   fontSize: 20,
                   fontWeight: FontWeight.bold,
                 ),
               ),
             ),
-            const SizedBox(width: 40),
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Row(
-                  children: [
-                    Text(
-                      'Urgency Level: ',
-                      style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        fontSize: 18,
-                      ),
+            const SizedBox(width: 20),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  RichText(
+                    text: TextSpan(
+                      children: [
+                        const TextSpan(
+                          text: 'Urgency Level: ',
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 18,
+                            color: Colors.black,
+                          ),
+                        ),
+                        TextSpan(
+                          text: donationRequest.urgencyLevel,
+                          style: const TextStyle(
+                            fontWeight: FontWeight
+                                .bold, // value is also bold for urgency
+                            fontSize: 18,
+                            color: Colors.black,
+                          ),
+                        ),
+                      ],
                     ),
-                    Text(
-                      donationRequest.urgencyLevel,
-                      style: TextStyle(
-                        fontSize: 18,
-                      ),
-                    ),
-                  ],
-                ),
-                Row(
-                  children: [
-                    Text(
-                      'Location: ',
-                      style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        fontSize: 18,
-                      ),
-                    ),
-                    Text(
-                      donationRequest.hospitalName,
-                      style: TextStyle(
-                        fontSize: 18,
-                      ),
-                    ),
-                  ],
-                ),
-                Text(
-                  donationRequest.city,
-                  style: TextStyle(
-                    fontSize: 18,
+                    softWrap: true,
                   ),
-                ),
-              ],
+                  const SizedBox(height: 6),
+                  RichText(
+                    text: TextSpan(
+                      children: [
+                        const TextSpan(
+                          text: 'Location: ',
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 18,
+                            color: Colors.black,
+                          ),
+                        ),
+                        TextSpan(
+                          text: donationRequest.hospitalName,
+                          style: const TextStyle(
+                            fontWeight: FontWeight.normal,
+                            fontSize: 18,
+                            color: Colors.black,
+                          ),
+                        ),
+                      ],
+                    ),
+                    softWrap: true,
+                  ),
+                  const SizedBox(height: 4),
+                  RichText(
+                    text: TextSpan(
+                      children: [
+                        const TextSpan(
+                          text: 'City: ',
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 18,
+                            color: Colors.black,
+                          ),
+                        ),
+                        TextSpan(
+                          text: donationRequest.city,
+                          style: const TextStyle(
+                            fontWeight: FontWeight.normal,
+                            fontSize: 18,
+                            color: Colors.black,
+                          ),
+                        ),
+                      ],
+                    ),
+                    softWrap: true,
+                  ),
+                ],
+              ),
             ),
           ],
         ),
