@@ -11,6 +11,12 @@ class UserProvider extends ChangeNotifier {
   UserModel? get user => _user;
   bool  get isLoading => _isLoading;
 
+  // Reset user (when logged out)
+  void resetUser() {
+    _user = null;
+    notifyListeners();
+  }
+
   // Fetch user
   Future<void> fetchUser(String id) async {
     _isLoading = true;

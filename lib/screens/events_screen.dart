@@ -39,28 +39,30 @@ class _EventsPageState extends State<EventsScreen> {
     final time = DateFormat('hh:mm a').format(event.dateAndTime);
 
     try{
-      //download the image
+      // Download the image
       final response = await http.get(Uri.parse(imageUrl));
       final bytes = response.bodyBytes;
 
-      //get temporary directory for store image
+      // Get temporary directory to store image
       final temp = await getTemporaryDirectory();
       final imagePath = path.join(temp.path, 'event_image.jpg');
 
-      //save image locally
+      // Save image locally
       final image = File(imagePath);
       await image.writeAsBytes(bytes);
 
-final shareText = '''
-🩸 *${event.eventName}* 
+      final shareText = '''
+🩸 *${event.eventName}*
 
 🗓️ *Date:* $date
-⏰ *Time* $time
-📌 *Location* Location......
+⏰ *Time:* $time
+📍 *Location:* ${event.location}
 
+📝 *Details:*
 ${event.description}
 
-_Be a hero. Save lives. Donate blood._
+❤️ Be a Hero. Save Lives. Donate Blood!  
+#BloodDonation #SaveLives
 ''';
 
       Share.shareXFiles([XFile(image.path)], text: shareText);

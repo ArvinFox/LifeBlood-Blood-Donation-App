@@ -23,6 +23,23 @@ class Helpers {
     }
   }
 
+  // Check password strength
+  static checkPasswordStrength(String password) {
+    if (password.length < 6) return 'Weak Password';
+
+    bool hasLetters = password.contains(RegExp(r'[A-Za-z]'));
+    bool hasNumbers = password.contains(RegExp(r'\d'));
+    bool hasSpecialCharacters = password.contains(RegExp(r'[!@#\$%^&*(),.?":{}|<>]'));
+
+    if (password.length >= 6 && hasLetters && hasNumbers && hasSpecialCharacters) {
+      return 'Strong Password';
+    } else if (password.length >= 4 && hasLetters && hasNumbers) {
+      return 'Medium Password';
+    } else {
+      return 'Weak Password';
+    }
+  }
+
   //error message
   static void showError(BuildContext context, String message) {
     ScaffoldMessenger.of(context).showSnackBar(

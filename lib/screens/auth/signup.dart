@@ -17,6 +17,7 @@ class _SignupScreenState extends State<SignupScreen> {
   final _passwordController = TextEditingController();
   final _formKey = GlobalKey<FormState>();
   bool isLoading = false;
+  String passwordStrength = '';
 
   @override
   void dispose() {
@@ -76,11 +77,37 @@ class _SignupScreenState extends State<SignupScreen> {
                   controller: _emailController,
                   validator: Helpers.validateEmail,
                 ),
-                CustomInputBox(
-                  textName: 'Password',
-                  hintText: 'Enter your password',
-                  controller: _passwordController,
-                  hasAstricks: true,
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    CustomInputBox(
+                      textName: 'Password',
+                      hintText: 'Enter your password',
+                      controller: _passwordController,
+                      hasAstricks: true,
+                      onChanged: (value){
+                        setState(() {
+                          passwordStrength = Helpers.checkPasswordStrength(value);
+                        });
+                      },
+                      validator: (value) {
+                        return Helpers.validateInputFields(value, 'Please enter your password here');
+                      },
+                    ),
+                    if (_passwordController.text.isNotEmpty)
+                      Text(
+                        'Password Strength: ${passwordStrength == 'Weak Password' ? 'Password is too weak. Try using a mix of letters, numbers, and symbols.' : passwordStrength}',
+                        style: TextStyle(
+                          color: passwordStrength == 'Strong Password'
+                              ? Colors.green
+                              : passwordStrength == 'Medium Password'
+                                  ? Colors.orange
+                                  : Colors.red,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                    SizedBox(height: 4)
+                  ],
                 ),
               ],
             ),

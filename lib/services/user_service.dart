@@ -99,6 +99,18 @@ class UserService {
     }
   }
 
+  // Get all users
+  Future<List<UserModel?>> getAllUsers() async {
+    try {
+      QuerySnapshot userDocs = await userCollection.get();
+      return userDocs.docs.map((doc) {
+        return UserModel.fromFirestore(doc.data() as Map<String, dynamic>, doc.id);
+      }).toList();
+    } catch (e) {
+      throw Exception("Failed to fetch all users: $e");
+    }
+  }
+
   // Update status
   Future<void> updateStatus(String userId, String property, bool value) async {
     try {

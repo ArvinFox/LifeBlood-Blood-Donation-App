@@ -4,7 +4,7 @@ class DonationEvents {
   final String? eventId;
   final String eventName;
   final String description;
-  // final String location;
+  final String location;
   final DateTime dateAndTime;
   final DateTime createdAt;
 
@@ -12,7 +12,7 @@ class DonationEvents {
     this.eventId,
     required this.eventName,
     required this.description,
-    // required this.location,
+    required this.location,
     required this.dateAndTime,
     required this.createdAt,
   });
@@ -22,7 +22,7 @@ class DonationEvents {
       eventId: id,
       eventName: data['event_name'] ?? '',
       description: data['description'] ?? '',
-      // location: data['location'] ?? '',
+      location: data['location'] ?? '',
       dateAndTime: (data['date_and_time'] as Timestamp).toDate(),
       createdAt: (data['created_at'] as Timestamp).toDate(),
     );

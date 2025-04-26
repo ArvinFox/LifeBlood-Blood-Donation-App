@@ -26,20 +26,6 @@ class BloodRequestCard extends StatelessWidget {
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.red,
-                  ),
-                  onPressed: () {
-                    Navigator.pop(context); // Close the dialog
-                    onConfirm(); // Call the confirm function
-                  },
-                  child: const Text(
-                    "Yes",
-                    style: TextStyle(color: Colors.white),
-                  ),
-                ),
-                const SizedBox(width: 30),
                 OutlinedButton(
                   style: OutlinedButton.styleFrom(
                     side:
@@ -51,6 +37,20 @@ class BloodRequestCard extends StatelessWidget {
                   child: const Text(
                     "No",
                     style: TextStyle(color: Color(0xFFE50F2A)),
+                  ),
+                ),
+                const SizedBox(width: 30),
+                ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.red,
+                  ),
+                  onPressed: () {
+                    Navigator.pop(context); // Close the dialog
+                    onConfirm(); // Call the confirm function
+                  },
+                  child: const Text(
+                    "Yes",
+                    style: TextStyle(color: Colors.white),
                   ),
                 ),
               ],

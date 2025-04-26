@@ -30,8 +30,8 @@ class NotificationProvider with ChangeNotifier {
   Future<void> createNotification(NotificationModel notification) async {
     try {
       await _notificationService.createNotification(notification);
-
       fetchNotifications(notification.userId);
+      
     } catch (e) { 
       Helpers.debugPrintWithBorder("Error creating notification: $e");
       notifyListeners();

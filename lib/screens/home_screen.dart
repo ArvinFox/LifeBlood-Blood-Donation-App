@@ -155,11 +155,16 @@ class _HomePageState extends State<HomeScreen> {
         ),
         content: Text('Are you sure you want to donate blood for this request?', style: TextStyle(fontSize: 16)),
         actions: [
-          TextButton.icon(
+          OutlinedButton.icon(
             icon: Icon(Icons.cancel, color: Colors.grey),
             onPressed: () => Navigator.pop(context),
             label: Text('Cancel', style: TextStyle(color: Colors.grey[600])),
+            style: OutlinedButton.styleFrom(
+              side: BorderSide(color: Colors.grey),
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+            ),
           ),
+          SizedBox(width: 8),
           ElevatedButton.icon(
             style: ElevatedButton.styleFrom(
               backgroundColor: Colors.redAccent,

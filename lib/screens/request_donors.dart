@@ -5,10 +5,13 @@ import 'package:lifeblood_blood_donation_app/components/custom_main_app_bar.dart
 import 'package:lifeblood_blood_donation_app/components/login_button.dart';
 import 'package:lifeblood_blood_donation_app/components/text_field.dart';
 import 'package:lifeblood_blood_donation_app/models/donation_request_model.dart';
+import 'package:lifeblood_blood_donation_app/models/notification_model.dart';
+import 'package:lifeblood_blood_donation_app/providers/notification_provider.dart';
 import 'package:lifeblood_blood_donation_app/services/request_service.dart';
 import 'package:lifeblood_blood_donation_app/services/user_service.dart';
 import 'package:lifeblood_blood_donation_app/utils/formatters.dart';
 import 'package:lifeblood_blood_donation_app/utils/helpers.dart';
+import 'package:provider/provider.dart';
 
 class RequestDonors extends StatefulWidget {
   final NavigationPage navigation;
@@ -85,66 +88,12 @@ class _RequestDonorsState extends State<RequestDonors> {
     super.dispose();
   }
 
-  void submitRequest() async {
-    String formattedContact = Formatters.formatPhoneNumber(_contactNumberController.text.trim());
-    final user = FirebaseAuth.instance.currentUser;
-
-    if(user == null){
-      Helpers.showError(context, "You must be logged in to make a request.");
-      return;
-    }
-
-    final userData = await userService.getUserById(user.uid);
-
-    if(userData == null || userData.fullName == null){
-      Helpers.showError(context, "User data not found.");
-      return;
-    }
-
-    BloodRequest request = BloodRequest(
-      patientName: _patientNameController.text,
-      requestedBy: userData.fullName!,
-      contactNumber: formattedContact,
-      requestBloodType: selectedBloodType!,
-      urgencyLevel: selectedUrgency!,
-      requestQuantity: selectedQuantity!,
-      province: selectedProvince!,
-      city: selectedCity!,
-      hospitalName: selectedHospital!,
-      createdAt: DateTime.now(),
-    );
-
-    try {
-      await requestService.createRequest(request);
-      print("Request saved successfully!");
-      resetForm();
-      Navigator.pushNamed(context, '/home');
-      Helpers.showSucess(context, "Request submitted!");
-    } catch (e) {
-      print("Error saving request: $e");
-      Helpers.showError(context, "Failed to submit request");
-    }
-  }
-
   void submitForm() {
     if (_formKey.currentState!.validate() && selectedUrgency != null && selectedQuantity != null && selectedProvince != null && selectedCity != null && selectedHospital != null && selectedBloodType != null) {
-    _showConfirmationDialog();
+      _showConfirmationDialog();
     } else {
       Helpers.showError(context, "Please fill all fields");
     }
-  }
-
-  void resetForm() {
-    _patientNameController.clear();
-    _contactNumberController.clear();
-    setState(() {
-      selectedBloodType = null;
-      selectedUrgency = null;
-      selectedQuantity = null;
-      selectedProvince = null;
-      selectedCity = null;
-      selectedHospital = null;
-    });
   }
 
   void _showConfirmationDialog() {
@@ -205,6 +154,77 @@ class _RequestDonorsState extends State<RequestDonors> {
         ],
       ),
     );
+  }
+
+  void submitRequest() async {
+    final user = FirebaseAuth.instance.currentUser;
+    if (user == null) {
+      Helpers.showError(context, "You must be logged in to make a request.");
+      return;
+    }
+
+    final userData = await userService.getUserById(user.uid);
+
+    if (userData == null || userData.fullName == null){
+      Helpers.showError(context, "User data not found.");
+      return;
+    }
+
+    String formattedContact = Formatters.formatPhoneNumber(_contactNumberController.text.trim());
+
+    BloodRequest request = BloodRequest(
+      patientName: _patientNameController.text,
+      requestedBy: userData.fullName!,
+      contactNumber: formattedContact,
+      requestBloodType: selectedBloodType!,
+      urgencyLevel: selectedUrgency!,
+      requestQuantity: selectedQuantity!,
+      province: selectedProvince!,
+      city: selectedCity!,
+      hospitalName: selectedHospital!,
+      createdAt: DateTime.now(),
+    );
+
+    try {
+      final requestId = await requestService.createRequest(request);
+
+      final notificationProvider = Provider.of<NotificationProvider>(context, listen: false);
+      final users = await userService.getAllUsers();
+      for (var user in users) {
+        if (user != null && user.isDonorVerified! && user.bloodType! == selectedBloodType) {
+          final notification = NotificationModel(
+            userId: user.userId!, 
+            requestId: requestId, 
+            type: 'new_request', 
+            isRead: false,
+            timestamp: DateTime.now(),
+          );
+          notificationProvider.createNotification(notification);
+        }
+      }
+
+      print("Request saved successfully!");
+      resetForm();
+      Navigator.pushNamed(context, '/home');
+      Helpers.showSucess(context, "Request submitted!");
+      
+    } catch (e) {
+      print("Error saving request: $e");
+      Helpers.showError(context, "Failed to submit request");
+    }
+  }
+
+  void resetForm() {
+    _patientNameController.clear();
+    _contactNumberController.clear();
+    setState(() {
+      selectedBloodType = null;
+      selectedUrgency = null;
+      selectedQuantity = null;
+      selectedProvince = null;
+      selectedCity = null;
+      selectedHospital = null;
+    });
   }
 
   @override
@@ -355,7 +375,7 @@ class _RequestDonorsState extends State<RequestDonors> {
                 const SizedBox(height: 40),
                 LoginButton(
                   text: 'Submit', 
-                  onPressed: (){
+                  onPressed: () {
                     submitForm();
                   }
                 )

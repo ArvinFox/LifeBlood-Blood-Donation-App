@@ -101,6 +101,7 @@ class _NotificationScreenState extends State<NotificationScreen> {
                   return const Center(child: CircularProgressIndicator());
                 } else if (snapshot.hasError) {
                   return Center(child: Text('Error loading notifications: ${snapshot.error}'));
+                  // return Center(child: Text('Error loading notifications. Please check back later.'));
                 } else if (snapshot.hasData) {
                   return SingleChildScrollView(
                     child: Column(
@@ -125,7 +126,7 @@ class _NotificationScreenState extends State<NotificationScreen> {
       onTap: () {
         if (!notification.isRead) {
           Provider.of<NotificationProvider>(context, listen: false)
-          .markAsRead(notification.notificationId);
+          .markAsRead(notification.notificationId!);
         }
       },
       child: Padding(
@@ -224,7 +225,7 @@ class _NotificationScreenState extends State<NotificationScreen> {
                           showConfirmationPopup(context, request.requestBloodType, request.urgencyLevel, request.hospitalName, request.city, notification.requestId);
                           if (!notification.isRead) {
                             Provider.of<NotificationProvider>(context, listen: false)
-                            .markAsRead(notification.notificationId);
+                            .markAsRead(notification.notificationId!);
                           }
                         },
                         child: Text(
@@ -343,17 +344,6 @@ class _NotificationScreenState extends State<NotificationScreen> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
-              ElevatedButton(
-                onPressed: () async {
-                  final request = await _notificationService.getDonationRequestDetailsId(requestId);
-                  Provider.of<CurrentActivitiesProvider>(context, listen: false)
-                    .addActivity(request!);
-                  Helpers.showSucess(context, "Blood donation request confirmed and added to your activities.");
-                  Navigator.pop(context);
-                },
-                style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
-                child: Text("Confirm", style: TextStyle(color: Colors.white)),
-              ),
               OutlinedButton(
                 onPressed: () {
                   Navigator.pop(context);
@@ -361,6 +351,23 @@ class _NotificationScreenState extends State<NotificationScreen> {
                 style:
                     OutlinedButton.styleFrom(side: BorderSide(color: Colors.red)),
                 child: Text("Cancel", style: TextStyle(color: Colors.red)),
+              ),
+              ElevatedButton(
+                onPressed: () async {
+                  final request = await _notificationService.getDonationRequestDetailsId(requestId);
+                  final currentActivityProvider = Provider.of<CurrentActivitiesProvider>(context, listen: false);
+
+                  if (currentActivityProvider.currentActivities.contains(request)) {
+                    Helpers.showError(context, "The request has already been confirmed and added to your activities. Please view it there.");
+                    return;
+                  }
+                  
+                  currentActivityProvider..addActivity(request!);
+                  Helpers.showSucess(context, "Blood donation request confirmed and added to your activities.");
+                  Navigator.pop(context);
+                },
+                style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
+                child: Text("Confirm", style: TextStyle(color: Colors.white)),
               ),
             ],
           ),

@@ -34,7 +34,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
     try {
       await auth.signInWithEmailAndPassword(_emailController.text.trim(), _passwordController.text.trim());
-      Navigator.pushNamed(context, '/home');
+      Navigator.pushReplacementNamed(context, '/home');
     } catch (e) {
       Helpers.showError(context, "Login failed. Please try again using correct credentials.");
     } finally {

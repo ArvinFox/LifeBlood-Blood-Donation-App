@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:lifeblood_blood_donation_app/providers/user_provider.dart';
 import 'package:lifeblood_blood_donation_app/screens/request_donors.dart';
 import 'package:lifeblood_blood_donation_app/screens/static/about_us_screen.dart';
 import 'package:lifeblood_blood_donation_app/screens/feedback_screen.dart';
@@ -9,6 +10,7 @@ import 'package:lifeblood_blood_donation_app/screens/notification_screen.dart';
 import 'package:lifeblood_blood_donation_app/screens/static/privacy_policy_screen.dart';
 import 'package:lifeblood_blood_donation_app/components/drawer/drawer_header.dart';
 import 'package:lifeblood_blood_donation_app/services/user_service.dart';
+import 'package:provider/provider.dart';
 
 class NavDrawer extends StatefulWidget {
   const NavDrawer({super.key});
@@ -161,12 +163,18 @@ class _NavDrawerState extends State<NavDrawer> {
   //Logout functionality
   void logoutUser(BuildContext context) async {
     final auth = UserService();
+    final userProvider = Provider.of<UserProvider>(context, listen: false);
 
     try {
       await auth.signOut();
-      print("logout....");
+      userProvider.resetUser(); // Reset user after logged out
       Navigator.pop(context);
-      Navigator.pushReplacementNamed(context, '/login');
+      Navigator.pushNamedAndRemoveUntil(
+        context, 
+        '/login', 
+        (route) => false,
+      );
+      // Navigator.pushReplacementNamed(context, '/login');
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(

@@ -46,17 +46,18 @@ class BloodRequest {
   // Create a BloodRequest from a Firestore document snapshot
   factory BloodRequest.fromFirestore(DocumentSnapshot doc) {
     final data = doc.data() as Map<String, dynamic>;
+
     return BloodRequest(
-      patientName: data['patientName'],
-      requestedBy: data['requestedBy'],
-      requestBloodType: data['requestBloodType'],
-      urgencyLevel: data['urgencyLevel'],
-      requestQuantity: data['requestQuantity'],
-      province: data['province'],
-      city: data['city'],
-      hospitalName: data['hospitalName'],
-      contactNumber: data['contactNumber'],
-      createdAt: data['createdAt'],
+      patientName: data['patientName'] ?? '',
+      requestedBy: data['requestedBy'] ?? '',
+      requestBloodType: data['requestBloodType'] ?? '',
+      urgencyLevel: data['urgencyLevel'] ?? '',
+      requestQuantity: data['requestQuantity'] ?? '',
+      province: data['province'] ?? '',
+      city: data['city'] ?? '',
+      hospitalName: data['hospitalName'] ?? '',
+      contactNumber: data['contactNumber'] ?? '',
+      createdAt: (data['createdAt'] as Timestamp).toDate(),
     );
   }
 }
