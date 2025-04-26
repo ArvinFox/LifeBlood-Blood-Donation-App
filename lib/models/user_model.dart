@@ -18,7 +18,8 @@ class UserModel {
   final bool? isDonorVerified;
   final bool? hasCompletedProfile;
   final bool isDonorPromptShown;
-  final DateTime createdAt;
+  final DateTime? createdAt;
+  final DateTime? profileCompletedAt;
 
   UserModel({
     this.userId,
@@ -38,7 +39,8 @@ class UserModel {
     this.isDonorVerified,
     this.hasCompletedProfile,
     required this.isDonorPromptShown,
-    required this.createdAt,
+    this.createdAt,
+    this.profileCompletedAt,
   });
 
   Map<String, dynamic> toFirestore() {
@@ -54,12 +56,13 @@ class UserModel {
       'province': province,
       'bloodType': bloodType,
       'healthConditions': healthConditions,
-      'donation_count':donationCount,
+      'donationCount':donationCount,
       'isActive': isActive,
       'isDonorVerified': isDonorVerified,
       'hasCompletedProfile': hasCompletedProfile,
       'isDonorPromptShown': isDonorPromptShown,
-      'created_at': createdAt
+      'createdAt': createdAt != null ? Timestamp.fromDate(createdAt!) : null,
+      'profileCompletedAt': profileCompletedAt != null ? Timestamp.fromDate(profileCompletedAt!) : null,
     };
   }
 
@@ -77,12 +80,13 @@ class UserModel {
       province: data['province'] ?? '',
       bloodType: data['bloodType'] ?? '',
       healthConditions: data['healthConditions'] ?? '',
-      donationCount: data['donation_count'] != null ? data['donation_count'] as int : 0,
+      donationCount: data['donationCount'] != null ? data['donationCount'] as int : 0,
       isActive: data['isActive'] as bool? ?? false,
       isDonorVerified: data['isDonorVerified'] as bool? ?? false,
       hasCompletedProfile: data['hasCompletedProfile'] as bool? ?? false,
       isDonorPromptShown: data['isDonorPromptShown'] as bool? ?? false,
-      createdAt: data['created_at'] != null ? (data['created_at'] as Timestamp).toDate() : DateTime.now(),
+      createdAt: data['createdAt'] != null ? (data['createdAt'] as Timestamp).toDate() : null,
+      profileCompletedAt: data['profileCompletedAt'] != null ? (data['profileCompletedAt'] as Timestamp).toDate() : null,
     );
   }
 }

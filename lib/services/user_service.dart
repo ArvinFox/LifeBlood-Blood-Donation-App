@@ -18,7 +18,7 @@ class UserService {
       if(user != null){
         await userCollection.doc(user.uid).set({
           'email': user.email,
-          'created_at': DateTime.now(),
+          'createdAt': DateTime.now(),
           'isDonorPromptShown': false,
           'isDonorVerified': false,
           'hasCompletedProfile': false,

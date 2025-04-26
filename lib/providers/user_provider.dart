@@ -3,7 +3,7 @@ import 'package:lifeblood_blood_donation_app/models/user_model.dart';
 import 'package:lifeblood_blood_donation_app/services/user_service.dart';
 import 'package:lifeblood_blood_donation_app/utils/helpers.dart';
 
-class UserProvider extends ChangeNotifier{
+class UserProvider extends ChangeNotifier {
   final UserService _userService = UserService();
   UserModel? _user;
   bool _isLoading = false;

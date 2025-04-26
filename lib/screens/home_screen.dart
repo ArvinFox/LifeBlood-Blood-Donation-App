@@ -7,6 +7,7 @@ import 'package:lifeblood_blood_donation_app/components/small_button.dart';
 import 'package:lifeblood_blood_donation_app/components/current_activity_card.dart';
 import 'package:lifeblood_blood_donation_app/models/donation_request_model.dart';
 import 'package:lifeblood_blood_donation_app/providers/current_activity_provider.dart';
+import 'package:lifeblood_blood_donation_app/providers/medical_report_provider.dart';
 import 'package:lifeblood_blood_donation_app/providers/user_provider.dart';
 import 'package:lifeblood_blood_donation_app/utils/helpers.dart';
 import 'package:provider/provider.dart';
@@ -34,6 +35,9 @@ class _HomePageState extends State<HomeScreen> {
         if (userProvider.user == null) {
           await userProvider.fetchUser(currentUser.uid);
         }
+
+        Provider.of<MedicalReportProvider>(context, listen: false)
+          .fetchReport(userProvider.user!.userId!);
 
         await Future.delayed(Duration(milliseconds: 800));
         final currentRoute = ModalRoute.of(context)!.settings.name!;
@@ -225,6 +229,8 @@ class _HomePageState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final userProvider = Provider.of<UserProvider>(context, listen: false);
+
     return Scaffold(
       extendBody: true,
       appBar: PreferredSize(
@@ -298,88 +304,142 @@ class _HomePageState extends State<HomeScreen> {
                 builder: (context, userProvider, child) {
                   final user = userProvider.user;
 
-                  final isDonorVerified = user?.isDonorVerified ?? false;
+                  final isDonorVerified = user?.isDonorVerified ?? false;               
                   final hasCompletedProfile = user?.hasCompletedProfile ?? false;
 
                   if (userProvider.isLoading) {
                     return const Center(child: CircularProgressIndicator());
-                  }
+                  } else {
+                    return Consumer<MedicalReportProvider>(
+                      builder: (context, medicalReportProvider, child) {
+                        if (medicalReportProvider.isLoading) {
+                          return const Center(child: CircularProgressIndicator());
+                        }
 
-                  if (isDonorVerified) {
-                    // If verified
-                    return SizedBox.shrink();
-                  } else if (hasCompletedProfile) {
-                    // If completed profile but not yet verified
-                    return Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 10),
-                      child: InkWell(
-                        onTap: () {
-                          Navigator.pushNamed(context, '/donor-registration');
-                        },
-                        borderRadius: BorderRadius.circular(15),
-                        child: Card(
-                          color: Colors.blue[50],
-                          elevation: 4,
-                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
-                          child: Padding(
-                            padding: const EdgeInsets.all(16),
-                            child: Row(
-                              children: [
-                                Icon(Icons.info_outline, color: Colors.blueAccent, size: 30),
-                                SizedBox(width: 10),
-                                Expanded(
-                                  child: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
+                        bool isDonorRejected = false;
+                        if (medicalReportProvider.report != null) {
+                          isDonorRejected = medicalReportProvider.report!.status == 'Rejected';
+                        }
+
+                        if (isDonorVerified) {
+                          // If verified
+                          return SizedBox.shrink();
+                        } else if (isDonorRejected) {
+                          // If profile was rejected
+                          return Padding(
+                            padding: const EdgeInsets.symmetric(vertical: 10),
+                            child: InkWell(
+                              onTap: () {
+                                Navigator.pushNamed(context, '/donor-registration');
+                              },
+                              borderRadius: BorderRadius.circular(15),
+                              child: Card(
+                                color: Colors.red[100],
+                                elevation: 4,
+                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+                                child: Padding(
+                                  padding: const EdgeInsets.all(16),
+                                  child: Row(
                                     children: [
-                                      Text(
-                                        "Your donor profile has been submitted and is awaiting verification.",
-                                        style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
-                                      ),
-                                      SizedBox(height: 6),
-                                      Text(
-                                        "Tap here if you'd like to review or update your details.",
-                                        style: TextStyle(fontSize: 14, fontStyle: FontStyle.italic, color: Colors.blueAccent),
+                                      Icon(Icons.error_outline, color: Colors.redAccent, size: 30),
+                                      SizedBox(width: 10),
+                                      Expanded(
+                                        child: Column(
+                                          crossAxisAlignment: CrossAxisAlignment.start,
+                                          children: [
+                                            Text(
+                                              "Your donor profile was rejected.",
+                                              style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+                                            ),
+                                            SizedBox(height: 6),
+                                            Text(
+                                              "Please review and update your details to resubmit.",
+                                              style: TextStyle(fontSize: 14, fontStyle: FontStyle.italic, color: Colors.redAccent),
+                                            ),
+                                          ],
+                                        ),
                                       ),
                                     ],
                                   ),
                                 ),
-                              ],
+                              ),
                             ),
-                          ),
-                        ),
-                      ),
-                    );
-                  } else {
-                    // Show link to complete profile
-                    return Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 10),
-                      child: InkWell(
-                        onTap: () {
-                          Navigator.pushNamed(context, '/donor-registration');
-                        },
-                        borderRadius: BorderRadius.circular(15),
-                        child: Card(
-                          color: Colors.yellow[100],
-                          elevation: 4,
-                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
-                          child: Padding(
-                            padding: const EdgeInsets.all(16.0),
-                            child: Row(
-                              children: [
-                                Icon(Icons.volunteer_activism, color: Colors.redAccent, size: 30),
-                                SizedBox(width: 10),
-                                Expanded(
-                                  child: Text(
-                                    'Complete your donor profile to start saving lives. Tap here to get started!',
-                                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
+                          );
+                        } else if (hasCompletedProfile) {
+                          // If completed profile but not yet verified
+                          return Padding(
+                            padding: const EdgeInsets.symmetric(vertical: 10),
+                            child: InkWell(
+                              onTap: () {
+                                Navigator.pushNamed(context, '/donor-registration');
+                              },
+                              borderRadius: BorderRadius.circular(15),
+                              child: Card(
+                                color: Colors.blue[50],
+                                elevation: 4,
+                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+                                child: Padding(
+                                  padding: const EdgeInsets.all(16),
+                                  child: Row(
+                                    children: [
+                                      Icon(Icons.info_outline, color: Colors.blueAccent, size: 30),
+                                      SizedBox(width: 10),
+                                      Expanded(
+                                        child: Column(
+                                          crossAxisAlignment: CrossAxisAlignment.start,
+                                          children: [
+                                            Text(
+                                              "Your donor profile has been submitted and is awaiting verification.",
+                                              style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
+                                            ),
+                                            SizedBox(height: 6),
+                                            Text(
+                                              "Tap here if you'd like to review or update your details.",
+                                              style: TextStyle(fontSize: 14, fontStyle: FontStyle.italic, color: Colors.blueAccent),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    ],
                                   ),
                                 ),
-                                Icon(Icons.arrow_forward_ios, size: 16, color: Colors.redAccent),
-                              ],
+                              ),
                             ),
-                          ),
-                        ),
-                      ),
+                          );
+                        } else {
+                          // Show link to complete profile
+                          return Padding(
+                            padding: const EdgeInsets.symmetric(vertical: 10),
+                            child: InkWell(
+                              onTap: () {
+                                Navigator.pushNamed(context, '/donor-registration');
+                              },
+                              borderRadius: BorderRadius.circular(15),
+                              child: Card(
+                                color: Colors.yellow[100],
+                                elevation: 4,
+                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+                                child: Padding(
+                                  padding: const EdgeInsets.all(16.0),
+                                  child: Row(
+                                    children: [
+                                      Icon(Icons.volunteer_activism, color: Colors.redAccent, size: 30),
+                                      SizedBox(width: 10),
+                                      Expanded(
+                                        child: Text(
+                                          'Complete your donor profile to start saving lives. Tap here to get started!',
+                                          style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
+                                        ),
+                                      ),
+                                      Icon(Icons.arrow_forward_ios, size: 16, color: Colors.redAccent),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            ),
+                          );
+                        }
+                      },
                     );
                   }
                 },
@@ -443,7 +503,23 @@ class _HomePageState extends State<HomeScreen> {
                   final request = _donationRequests[index];
                   return GestureDetector(
                     onTap: () {
-                      _showRequestConfirmDialog(context, request); // <-- fixed by passing context
+                      if (userProvider.user!.isDonorVerified!) {
+                        _showRequestConfirmDialog(context, request); // <-- fixed by passing context
+                      } else {
+                        if (userProvider.user!.hasCompletedProfile!) {
+                          _showDonorNotVerifiedPopup(
+                            context,
+                            title: "Verification Pending",
+                            message: "Your donor profile is under review. You can accept requests once you are verified."
+                          );
+                        } else {
+                          _showDonorNotVerifiedPopup(
+                            context,
+                            title: "Complete Your Profile",
+                            message: "Please complete your donor profile to start accepting blood donation requests."
+                          );
+                        }
+                      }
                     },
                     child: _donationRequestCard(donationRequest: request),
                   );
@@ -473,6 +549,23 @@ class _HomePageState extends State<HomeScreen> {
             ],
           ),
         ),
+      ),
+    );
+  }
+
+  void _showDonorNotVerifiedPopup(BuildContext context, {required String title, required String message}) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+        title: Text(title),
+        content: Text(message),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text("OK"),
+          ),
+        ],
       ),
     );
   }

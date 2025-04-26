@@ -2,11 +2,13 @@ import 'package:flutter/material.dart';
 
 class LoginButton extends StatelessWidget {
   final String text;
-  final VoidCallback onPressed;
+  final VoidCallback? onPressed;
+  final bool? isLoading;
 
   const LoginButton({
     required this.text,
     required this.onPressed,
+    this.isLoading,
     super.key,
   });
 
@@ -23,14 +25,16 @@ class LoginButton extends StatelessWidget {
           ),
         ),
         onPressed: onPressed,
-        child: Text(
-          text,
-          style: const TextStyle(
-            fontSize: 18,
-            fontWeight: FontWeight.bold,
-            color: Color(0xFFE50F2A),
-          ),
-        ),
+        child: isLoading!
+          ? const Center(child: CircularProgressIndicator())
+          : Text(
+              text,
+              style: const TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+                color: Color(0xFFE50F2A),
+              ),
+            )
       ),
     );
   }

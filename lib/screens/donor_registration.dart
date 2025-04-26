@@ -9,8 +9,10 @@ import 'package:intl/intl.dart';
 import 'package:lifeblood_blood_donation_app/components/custom_main_app_bar.dart';
 import 'package:lifeblood_blood_donation_app/components/login_button.dart';
 import 'package:lifeblood_blood_donation_app/components/text_field.dart';
+import 'package:lifeblood_blood_donation_app/models/medical_report_model.dart';
 import 'package:lifeblood_blood_donation_app/models/user_model.dart';
 import 'package:lifeblood_blood_donation_app/providers/user_provider.dart';
+import 'package:lifeblood_blood_donation_app/services/medical_report_service.dart';
 import 'package:lifeblood_blood_donation_app/utils/formatters.dart';
 import 'package:lifeblood_blood_donation_app/utils/helpers.dart';
 import 'package:provider/provider.dart';
@@ -38,7 +40,10 @@ class _DonorRegistrationState extends State<DonorRegistration> {
   String? selectedCity;
   String? selectedBloodType;
   bool isSelected = false;
-  String? medicalReportBase64;
+  String? medicalReport;
+
+  bool _isLoading = false;
+  bool _isUploaded = false;
 
   final List<String> bloodTypes = ['A+','B+','O+','AB+','A-','B-','O-','AB-'];
 
@@ -100,7 +105,7 @@ class _DonorRegistrationState extends State<DonorRegistration> {
 
           if (signedUrlResponse.isNotEmpty) {
             setState(() {
-              medicalReportBase64 = signedUrlResponse;
+              medicalReport = signedUrlResponse;
             });
           }
         }
@@ -123,51 +128,70 @@ class _DonorRegistrationState extends State<DonorRegistration> {
     _healthConditionController.dispose();
   }
 
-  void _handleFileUploaded(String base64Data) {
+  void _handleFileUploaded(String reportData) {
     setState(() {
-      medicalReportBase64 = base64Data;
+      medicalReport = reportData;
+      _isUploaded = true;
     });
   }
 
-  Future<void> submitDonorDetails() async{
-    if(_formKey.currentState!.validate() && selectedGender != null && selectedProvince != null && selectedCity != null && selectedBloodType != null && _selectedDate != null && medicalReportBase64 != null && isSelected){
-      final user = FirebaseAuth.instance.currentUser?.uid;
-      if(user == null){
+  Future<void> submitDonorDetails() async {
+    setState(() {
+      _isLoading = true;
+    });
+
+    String fullName = _fullNameController.text.trim();
+    String contactNumber = _contactNumberController.text.trim();
+    String nic = _nicController.text.trim();
+    String address = _addressController.text.trim();
+    String healthConditions = _healthConditionController.text.trim();
+
+    if (_formKey.currentState!.validate() && fullName.isNotEmpty && contactNumber.isNotEmpty && nic.isNotEmpty && address.isNotEmpty && healthConditions.isNotEmpty && selectedGender != null &&  selectedProvince != null && selectedCity != null && selectedBloodType != null && _selectedDate != null && medicalReport != null && isSelected) {
+
+      final userId = FirebaseAuth.instance.currentUser?.uid;
+      if (userId == null) {
         Helpers.showError(context, 'User is not logged in.');
+        setState(() {
+          _isLoading = false;
+        });
         return;
       }
 
-      String formattedContact = Formatters.formatPhoneNumber(_contactNumberController.text.trim());
-
-      if(formattedContact.isEmpty){
-        Helpers.showError(context, "Invalid contact number.");
+      if (!RegExp(r'^\d{9}[VXvx]$|^\d{12}$').hasMatch(nic)) {
+        Helpers.showError(context, "Invalid NIC.");
+        setState(() {
+          _isLoading = false;
+        });
         return;
       }
+
+      final userProvider = Provider.of<UserProvider>(context, listen: false);
 
       final userModel = UserModel(
-        fullName: _fullNameController.text.trim(),
+        fullName: fullName,
         dob: _selectedDate,
         gender: selectedGender,
-        nic: _nicController.text.trim(),
+        nic: nic,
         email: FirebaseAuth.instance.currentUser?.email,
-        contactNumber: formattedContact,
-        address: _addressController.text.trim(),
+        contactNumber: Formatters.formatPhoneNumber(contactNumber),
+        address: address,
         city: selectedCity,
         province: selectedProvince,
         bloodType: selectedBloodType,
-        healthConditions: _healthConditionController.text.trim(),
+        healthConditions: healthConditions,
         donationCount: 0,
         isActive: true,
         isDonorVerified: false,
         isDonorPromptShown: true,
-        createdAt: DateTime.now()
+        profileCompletedAt: DateTime.now(),
+        createdAt: userProvider.user!.createdAt,
       );
 
-      try{
-        await FirebaseFirestore.instance.collection('user').doc(user).update(userModel.toFirestore());
+      try {
+        await FirebaseFirestore.instance.collection('user').doc(userId).update(userModel.toFirestore());
 
-        if(medicalReportBase64 != null && medicalReportBase64.toString().isNotEmpty){
-          await uploadMedicalReport(context, medicalReportBase64!, user);
+        if (_isUploaded) {
+          await uploadMedicalReport(context, medicalReport!, userId, fullName);
         }
 
         final userProvider = Provider.of<UserProvider>(context, listen: false);
@@ -176,13 +200,22 @@ class _DonorRegistrationState extends State<DonorRegistration> {
         Helpers.showSucess(context, 'Donor Registration Sucessfully');
         Navigator.pop(context);
         
-      } catch (e){
-        Helpers.showError(context, 'Error : $e');
+      } catch (e) {
+        Helpers.debugPrintWithBorder("Error in donor registration: $e");
+        Helpers.showError(context, 'An unexpected error occurred. Please try again.');
+        setState(() {
+          _isLoading = false;
+        });
       }
+    } else {
+      Helpers.showError(context, 'Please fill in all the fields.');
+      setState(() {
+        _isLoading = false;
+      });
     }
   }
 
-  Future<String?> uploadMedicalReport(BuildContext context,String base64Image, String userId) async {
+  Future<void> uploadMedicalReport(BuildContext context,String base64Image, String userId, String donorName) async {
     try {
       // Delete existing files
       // final storage = Supabase.instance.client.storage.from('medical-reports');
@@ -212,18 +245,22 @@ class _DonorRegistrationState extends State<DonorRegistration> {
           fileBytes,
           fileOptions: const FileOptions(contentType: 'application/pdf'), 
         );
+      
+      final report = MedicalReportModel(
+        reportId: userId, 
+        donorName: donorName, 
+        reportType: "Full body checkup", 
+        status: "Pending", 
+        date: DateTime.now(), 
+        filePath: fileName,
+      );
 
-      final publicUrl = Supabase.instance.client.storage
-        .from('medical-reports')
-        .getPublicUrl(filePath);
-
-      Helpers.debugPrintWithBorder('Medical Report uploaded to: $publicUrl');
-      return publicUrl;
+      final medicalReportService = MedicalReportService();
+      await medicalReportService.addReport(report);
       
     } catch (e) {
-      Helpers.debugPrintWithBorder('Medical Report upload error: $e');
+      Helpers.debugPrintWithBorder('Error uploading medical report: $e');
       Helpers.showError(context, "Error uploading medical report.");
-      return null;
     }
   }
 
@@ -370,7 +407,7 @@ class _DonorRegistrationState extends State<DonorRegistration> {
                   style: TextStyle(fontSize: 16,color: Colors.black,fontWeight: FontWeight.bold),
                 ),
                 SizedBox(height: 15),
-                if (medicalReportBase64 != null && userProvider.user!.hasCompletedProfile!)
+                if (medicalReport != null && userProvider.user!.hasCompletedProfile!)
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -378,7 +415,7 @@ class _DonorRegistrationState extends State<DonorRegistration> {
                       SizedBox(height: 10),
                       GestureDetector(
                         onTap: () {
-                          launchUrl(Uri.parse(medicalReportBase64!));
+                          launchUrl(Uri.parse(medicalReport!));
                         },
                         child: Text(
                           "View Medical Report",
@@ -431,11 +468,12 @@ class _DonorRegistrationState extends State<DonorRegistration> {
                 ),
                 SizedBox(height: 15),
                 LoginButton(
+                  isLoading: _isLoading,
                   text: 'Submit', 
-                  onPressed: (){
-                    submitDonorDetails();
-                  }
-                )
+                  onPressed: _isLoading
+                    ? null
+                    : submitDonorDetails
+                ),
               ],
             ),
           ),
