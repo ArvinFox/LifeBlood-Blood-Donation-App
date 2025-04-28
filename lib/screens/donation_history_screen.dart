@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:lifeblood_blood_donation_app/components/custom_main_app_bar.dart';
 
 class DonationHistoryScreen extends StatefulWidget {
   const DonationHistoryScreen({super.key});
@@ -25,20 +26,7 @@ class _DonationHistoryPageState extends State<DonationHistoryScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
-      appBar: AppBar(
-          backgroundColor: const Color(0xFFE50F2A),
-          title: const Text(
-            'Donation History',
-            style: TextStyle(
-                color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold),
-          ),
-          leading: CupertinoNavigationBarBackButton(
-            color: Colors.white,
-            onPressed: () {
-              Navigator.popAndPushNamed(context, '/profile');
-            },
-          ),
-          leadingWidth: 40),
+      appBar: CustomMainAppbar(title: 'Donation History', showLeading: true),
       body: SingleChildScrollView(
         child: Padding(
           padding: const EdgeInsets.all(10),

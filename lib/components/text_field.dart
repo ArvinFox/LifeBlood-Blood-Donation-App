@@ -4,6 +4,7 @@ import 'package:flutter/services.dart';
 class CustomInputBox extends StatefulWidget {
   final String textName;
   final String hintText;
+  final AutovalidateMode? autovalidateMode;
   final TextEditingController controller;
   final bool hasAstricks;
   final TextInputType? keyboardType;
@@ -17,6 +18,7 @@ class CustomInputBox extends StatefulWidget {
   const CustomInputBox({
     super.key,
     required this.textName,
+    this.autovalidateMode,
     required this.hintText,
     required this.controller,
     this.hasAstricks = false,
@@ -63,6 +65,7 @@ class _CustomInputBoxState extends State<CustomInputBox> {
           inputFormatters: widget.inputFormatters,
           readOnly: widget.NoneedToEdit,
           onChanged: widget.onChanged,
+          autovalidateMode: widget.autovalidateMode,
           validator: (value) {
             if (widget.validator != null) {
               return widget.validator!(value);

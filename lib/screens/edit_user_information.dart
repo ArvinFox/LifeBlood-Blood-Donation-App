@@ -208,7 +208,7 @@ class _EditUserInformationState extends State<EditUserInformation> {
         userProvider.updateStatus(
             userProvider.user!.userId!, 'hasCompletedProfile', true);
 
-        Helpers.showSucess(context, 'Donor Registration Successful');
+        Helpers.showSucess(context, 'Donor Details Updated Successfully');
         Navigator.pop(context);
       } catch (e) {
         Helpers.debugPrintWithBorder("Error in donor registration: $e");
@@ -444,6 +444,14 @@ class _EditUserInformationState extends State<EditUserInformation> {
                         hintText: 'Enter contact number here',
                         controller: _contactNumberController,
                         keyboardType: TextInputType.number,
+                        validator: (value) {
+                          if (value == null || value.trim().isEmpty) {
+                            return 'Required';
+                          } else if (value.trim().length != 10) {
+                            return 'Phone number should contain 10 digits';
+                          }
+                          return null;
+                        },
                         inputFormatters: [
                           FilteringTextInputFormatter.digitsOnly,
                           LengthLimitingTextInputFormatter(10),

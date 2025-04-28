@@ -308,6 +308,14 @@ class _DonorRegistrationState extends State<DonorRegistration> {
                   textName: 'Contact Number', 
                   hintText: 'Enter contact number here', 
                   controller: _contactNumberController,
+                  validator: (value) {
+                    if (value == null || value.trim().isEmpty) {
+                      return 'Required';
+                    } else if (value.trim().length != 10) {
+                      return 'Phone number should contain 10 digits';
+                    }
+                    return null;
+                  },
                   keyboardType: TextInputType.number,
                   inputFormatters: [
                     FilteringTextInputFormatter.digitsOnly,

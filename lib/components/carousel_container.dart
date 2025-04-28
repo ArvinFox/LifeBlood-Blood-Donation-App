@@ -64,7 +64,7 @@ class _CarouselState extends State<CarouselContainer> {
                   mainAxisAlignment: MainAxisAlignment.end,
                   children: [
                     SmallButton(
-                      buttonLabel: "See All",
+                      buttonLabel: "See All Events",
                       buttonHeight: 40,
                       buttonWidth: 80,
                       buttonColor: Colors.white,
