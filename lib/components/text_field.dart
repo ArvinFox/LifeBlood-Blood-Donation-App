@@ -11,7 +11,7 @@ class CustomInputBox extends StatefulWidget {
   final FormFieldValidator<String>? validator;
   final int? multiLines;
   final int? minLines;
-  final bool needToEdit;
+  final bool NoneedToEdit;
   final Function(String)? onChanged;
 
   const CustomInputBox({
@@ -25,8 +25,8 @@ class CustomInputBox extends StatefulWidget {
     this.validator,
     this.multiLines,
     this.minLines,
-    this.needToEdit = false,
-    this.onChanged
+    this.NoneedToEdit = false,
+    this.onChanged,
   });
 
   @override
@@ -41,7 +41,7 @@ class _CustomInputBoxState extends State<CustomInputBox> {
     super.initState();
     _obscureText = widget.hasAstricks;
   }
-  
+
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -58,10 +58,10 @@ class _CustomInputBoxState extends State<CustomInputBox> {
         SizedBox(height: 10),
         TextFormField(
           controller: widget.controller,
-          obscureText: widget.hasAstricks ? _obscureText : false, //password visibility
+          obscureText: widget.hasAstricks ? _obscureText : false, // Password visibility
           keyboardType: widget.keyboardType,
           inputFormatters: widget.inputFormatters,
-          readOnly: widget.needToEdit,
+          readOnly: widget.NoneedToEdit,
           onChanged: widget.onChanged,
           validator: (value) {
             if (widget.validator != null) {
@@ -73,6 +73,8 @@ class _CustomInputBoxState extends State<CustomInputBox> {
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(10),
             ),
+            filled: true,
+            fillColor: widget.NoneedToEdit ? Colors.transparent : Colors.white, // Set background color
             suffixIcon: widget.hasAstricks
                 ? IconButton(
                     icon: Icon(

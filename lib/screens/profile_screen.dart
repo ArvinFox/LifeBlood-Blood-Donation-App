@@ -229,7 +229,7 @@ class _ProfilePageState extends State<ProfileScreen> {
                       'Edit Information',
                       () {
                         if(isDonor){
-                          Navigator.popAndPushNamed(context, "/",arguments: {'screenTitle': 'profilePage'});
+                          Navigator.pushNamed(context, "/edit-donor-information");
                         } else {
                           showAlert(context);
                         }
@@ -241,7 +241,7 @@ class _ProfilePageState extends State<ProfileScreen> {
                       'Change Password',
                       () {
                         if(isDonor){
-                          Navigator.popAndPushNamed(context, '/update-password');
+                          Navigator.pushNamed(context, '/update-password');
                         } else {
                           showAlert(context);
                         }
@@ -253,7 +253,7 @@ class _ProfilePageState extends State<ProfileScreen> {
                       'Donation History',
                       () {
                         if(isDonor){
-                          Navigator.popAndPushNamed(context, "/donation-history");
+                          Navigator.pushNamed(context, "/donation-history");
                         } else {
                           showAlert(context);
                         }
@@ -265,7 +265,7 @@ class _ProfilePageState extends State<ProfileScreen> {
                       'View Rewards',
                       () {
                         if(isDonor){
-                          Navigator.popAndPushNamed(context, "/view-rewards");
+                          Navigator.pushNamed(context, "/view-rewards");
                         } else {
                           showAlert(context);
                         }

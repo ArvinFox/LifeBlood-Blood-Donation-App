@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:lifeblood_blood_donation_app/screens/donor_registration.dart';
 import 'package:lifeblood_blood_donation_app/screens/blood_request_screen.dart';
 import 'package:lifeblood_blood_donation_app/screens/donation_history_screen.dart';
+import 'package:lifeblood_blood_donation_app/screens/edit_user_information.dart';
 import 'package:lifeblood_blood_donation_app/screens/events_screen.dart';
 import 'package:lifeblood_blood_donation_app/screens/feedback_screen.dart';
 import 'package:lifeblood_blood_donation_app/screens/main_layout_screen.dart';
@@ -9,6 +10,7 @@ import 'package:lifeblood_blood_donation_app/screens/notification_screen.dart';
 import 'package:lifeblood_blood_donation_app/screens/profile_screen.dart';
 import 'package:lifeblood_blood_donation_app/screens/request_donors.dart';
 import 'package:lifeblood_blood_donation_app/screens/rewards_screen.dart';
+import 'package:path/path.dart';
 
 class UserRoutes {
   static Map<String, WidgetBuilder> routes = {
@@ -23,5 +25,6 @@ class UserRoutes {
     '/events': (context) => EventsScreen(),
     '/donation-history': (context) => DonationHistoryScreen(),
     '/view-rewards': (context) => RewardsScreen(),
+    '/edit-donor-information': (context) => EditUserInformation(),
   };
 }

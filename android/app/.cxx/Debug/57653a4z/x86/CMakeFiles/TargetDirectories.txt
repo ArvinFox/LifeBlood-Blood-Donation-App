@@ -1,0 +1,2 @@
+C:/Users/Arvin/Desktop/LifeBlood-Blood-Donation-App/android/app/.cxx/Debug/57653a4z/x86/CMakeFiles/edit_cache.dir
+C:/Users/Arvin/Desktop/LifeBlood-Blood-Donation-App/android/app/.cxx/Debug/57653a4z/x86/CMakeFiles/rebuild_cache.dir

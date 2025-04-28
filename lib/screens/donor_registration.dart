@@ -197,7 +197,7 @@ class _DonorRegistrationState extends State<DonorRegistration> {
         final userProvider = Provider.of<UserProvider>(context, listen: false);
         userProvider.updateStatus(userProvider.user!.userId!, 'hasCompletedProfile', true);
 
-        Helpers.showSucess(context, 'Donor Registration Sucessfully');
+        Helpers.showSucess(context, 'Donor Registration Successful');
         Navigator.pop(context);
         
       } catch (e) {
