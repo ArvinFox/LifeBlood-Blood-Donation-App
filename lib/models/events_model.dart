@@ -6,8 +6,8 @@ class DonationEvents {
   final String description;
   final String location;
   final DateTime dateAndTime;
-  DateTime? createdAt;
-  DateTime? updatedAt;
+  final DateTime? createdAt;
+  final DateTime? updatedAt;
 
   DonationEvents({
     this.eventId,

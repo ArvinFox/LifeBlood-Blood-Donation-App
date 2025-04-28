@@ -10,7 +10,6 @@ import 'package:lifeblood_blood_donation_app/screens/notification_screen.dart';
 import 'package:lifeblood_blood_donation_app/screens/profile_screen.dart';
 import 'package:lifeblood_blood_donation_app/screens/request_donors.dart';
 import 'package:lifeblood_blood_donation_app/screens/rewards_screen.dart';
-import 'package:path/path.dart';
 
 class UserRoutes {
   static Map<String, WidgetBuilder> routes = {

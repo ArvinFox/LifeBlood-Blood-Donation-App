@@ -1,6 +1,10 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:lifeblood_blood_donation_app/components/custom_main_app_bar.dart';
+import 'package:lifeblood_blood_donation_app/models/donation_history_model.dart';
+import 'package:lifeblood_blood_donation_app/providers/donation_history_provider.dart';
+import 'package:lifeblood_blood_donation_app/providers/user_provider.dart';
+import 'package:provider/provider.dart';
 
 class DonationHistoryScreen extends StatefulWidget {
   const DonationHistoryScreen({super.key});
@@ -10,18 +14,19 @@ class DonationHistoryScreen extends StatefulWidget {
 }
 
 class _DonationHistoryPageState extends State<DonationHistoryScreen> {
-  final List<Map<String, String>> _donationHistory = [
-    {
-      'place': 'Base Hospital - Homagama',
-      'date': '20 Aug 2024',
-      'time': '09.00 AM',
-    },
-    {
-      'place': 'Base Hospital - Homagama',
-      'date': '20 Nov 2024',
-      'time': '10.00 AM',
-    },
-  ];
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      final userProvider = Provider.of<UserProvider>(context, listen: false);
+      final userId = userProvider.user!.userId;
+
+      Provider.of<DonationHistoryProvider>(context, listen: false)
+        .fetchDonationHistory(userId!);
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -43,17 +48,33 @@ class _DonationHistoryPageState extends State<DonationHistoryScreen> {
               ),
               Image.asset(
                 'assets/images/about_us.png',
-                height: 250, // Change the image size
+                height: 220,
               ),
-              const SizedBox(height: 20),
-              //to grt items form the list
-              ..._donationHistory.map((donation) {
-                return _donationHistoryCard(
-                  place: donation['place']!,
-                  date: donation['date']!,
-                  time: donation['time']!,
-                );
-              }).toList(),
+              
+              Consumer<DonationHistoryProvider>(
+                builder: (context, historyProvider, _) {
+                  if (historyProvider.isLoading) {
+                    return const Center(child: CircularProgressIndicator());
+                  }
+
+                  final List<DonationHistory> donationHistory =
+                      historyProvider.donationHistory;
+
+                  if (donationHistory.isEmpty) {
+                    return const Center(child: Text('No donation history available.'));
+                  }
+
+                  return Column(
+                    children: donationHistory.map((donation) {
+                      return _donationHistoryCard(
+                        place: donation.place,
+                        date: DateFormat('dd MMM yyyy').format(donation.date),
+                        time: DateFormat('hh:mm a').format(donation.time),
+                      );
+                    }).toList(),
+                  );
+                },
+              ),
             ],
           ),
         ),
@@ -61,102 +82,88 @@ class _DonationHistoryPageState extends State<DonationHistoryScreen> {
     );
   }
 
-  Widget _donationHistoryCard({required String place,required String date,required String time}){
+  Widget _donationHistoryCard({
+    required String place,
+    required String date,
+    required String time,
+  }) {
     return Container(
-      height: 100,
-      margin: const EdgeInsets.symmetric(vertical: 10, horizontal: 30),
-      padding: const EdgeInsets.all(16),
+      margin: const EdgeInsets.symmetric(vertical: 12, horizontal: 20),
       decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
+        gradient: const LinearGradient(
+          colors: [Color(0xFFFFF1F1), Color.fromARGB(255, 255, 232, 232)],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
+        borderRadius: BorderRadius.circular(18),
         boxShadow: [
           BoxShadow(
-            color: Colors.grey.withOpacity(0.8),
+            color: Colors.redAccent.withOpacity(0.15),
+            blurRadius: 12,
+            spreadRadius: 3,
+            offset: const Offset(0, 6),
+          ),
+          BoxShadow(
+            color: Colors.black.withOpacity(0.05),
             blurRadius: 6,
-            offset: const Offset(0, 4),
+            spreadRadius: 1,
+            offset: const Offset(0, 3),
           ),
         ],
       ),
-      child: Row(
-        children: [
-          const Icon(
-            Icons.access_time,
+      child: ListTile(
+        contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+        leading: Container(
+          padding: const EdgeInsets.all(10),
+          decoration: BoxDecoration(
+            color: Colors.white.withOpacity(0.7),
+            shape: BoxShape.circle,
+            boxShadow: [
+              BoxShadow(
+                color: Colors.red.withOpacity(0.2),
+                blurRadius: 8,
+                spreadRadius: 2,
+                offset: const Offset(0, 3),
+              ),
+            ],
+          ),
+          child: const Icon(
+            Icons.bloodtype_rounded,
             color: Color(0xFFE50F2A),
+            size: 30,
           ),
-          const SizedBox(width: 25), // Added space between icon and text
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                RichText(
-                  text: TextSpan(
-                    children: [
-                      TextSpan(
-                        text: 'Place: ',
-                        style: TextStyle(
-                          fontSize: 14,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.black,
-                        ),
-                      ),
-                      TextSpan(
-                        text: place,
-                        style: TextStyle(
-                          fontSize: 14,
-                          color: Colors.black,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                const SizedBox(height: 4),
-                RichText(
-                  text: TextSpan(
-                    children: [
-                      TextSpan(
-                        text: 'Date: ',
-                        style: TextStyle(
-                          fontSize: 14,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.black,
-                        ),
-                      ),
-                      TextSpan(
-                        text: date,
-                        style: TextStyle(
-                          fontSize: 14,
-                          color: Colors.black,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                const SizedBox(height: 4),
-                RichText(
-                  text: TextSpan(
-                    children: [
-                      TextSpan(
-                        text: 'Time: ',
-                        style: TextStyle(
-                          fontSize: 14,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.black,
-                        ),
-                      ),
-                      TextSpan(
-                        text: time,
-                        style: TextStyle(
-                          fontSize: 14,
-                          color: Colors.black,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-            ),
+        ),
+        title: Text(
+          place,
+          style: const TextStyle(
+            fontSize: 16,
+            fontWeight: FontWeight.bold,
+            color: Colors.black87,
           ),
-        ],
+        ),
+        subtitle: Padding(
+          padding: const EdgeInsets.only(top: 6),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                "Date: $date",
+                style: const TextStyle(
+                  fontSize: 13,
+                  color: Colors.black54,
+                ),
+              ),
+              const SizedBox(height: 2),
+              Text(
+                "Time: $time",
+                style: const TextStyle(
+                  fontSize: 13,
+                  color: Colors.black54,
+                ),
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }

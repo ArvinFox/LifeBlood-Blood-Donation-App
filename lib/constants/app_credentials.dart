@@ -6,5 +6,5 @@ class AppCredentials {
 
   // Supabase Credentials
   static const String supabaseUrl = "";
-  static const String supabaseAnonKey ="";
+  static const String supabaseAnonKey = "";
 }

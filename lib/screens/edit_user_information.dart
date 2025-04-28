@@ -122,13 +122,13 @@ class _EditUserInformationState extends State<EditUserInformation> {
 
   @override
   void dispose() {
-    super.dispose();
     _fullNameController.dispose();
     _contactNumberController.dispose();
     _nicController.dispose();
     _addressController.dispose();
     _dobController.dispose();
     _healthConditionController.dispose();
+    super.dispose();
   }
 
   Future<void> submitDonorDetails() async {

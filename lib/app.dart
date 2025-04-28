@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:lifeblood_blood_donation_app/providers/donation_history_provider.dart';
 import 'package:lifeblood_blood_donation_app/providers/event_provider.dart';
 import 'package:lifeblood_blood_donation_app/providers/medical_report_provider.dart';
 import 'package:lifeblood_blood_donation_app/providers/notification_provider.dart';
@@ -19,6 +20,7 @@ class LifeBlood extends StatelessWidget {
         ChangeNotifierProvider(create: (_) => EventProvider()),
         ChangeNotifierProvider(create: (_) => NotificationProvider()),
         ChangeNotifierProvider(create: (_) => MedicalReportProvider()),
+        ChangeNotifierProvider(create: (_) => DonationHistoryProvider()),
       ],
       child: MaterialApp(
         title: "LifeBlood",

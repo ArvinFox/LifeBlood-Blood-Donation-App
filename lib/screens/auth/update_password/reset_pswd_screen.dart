@@ -54,7 +54,7 @@ class _ResetPasswordPageState extends State<ResetPasswordScreen> {
       DocumentSnapshot userDoc = user.docs.first;
       String userId = userDoc.id;
 
-      if (userId == null || userId.isEmpty) {
+      if (userId.isEmpty) {
         Helpers.showError(context, "User ID is invalid.");
         setState(() {
           isLoading = false;

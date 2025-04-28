@@ -70,6 +70,7 @@ class _CustomInputBoxState extends State<CustomInputBox> {
             if (widget.validator != null) {
               return widget.validator!(value);
             }
+            return null;
           },
           decoration: InputDecoration(
             hintText: widget.hintText,
