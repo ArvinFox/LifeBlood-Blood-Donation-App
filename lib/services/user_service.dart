@@ -29,7 +29,7 @@ class UserService {
       if(e.code == 'email-already-in-use'){
         Helpers.showError(context, "Email is already registered. Please try a different email or login.");
       } else {
-        Helpers.showError(context, "Signup failed: ${e.message}");
+        Helpers.showError(context, "Signup failed.");
       }
       throw Exception(e);
     } catch (e) {
@@ -137,5 +137,21 @@ class UserService {
     } catch (e){
       throw Exception("Failed to update user: $e");
     }
+  }
+
+  // check user email in user collection
+  Future<bool> doesUserExist(String email) async {
+    try {
+      final querySnapshot = await userCollection.where('email', isEqualTo: email).limit(1).get();
+
+      return querySnapshot.docs.isNotEmpty;
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  /// Send password reset email
+  Future<void> sendPasswordResetEmail(String email) async {
+    await auth.sendPasswordResetEmail(email: email);
   }
 }

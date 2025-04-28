@@ -66,7 +66,7 @@ class _CarouselState extends State<CarouselContainer> {
                     SmallButton(
                       buttonLabel: "See All Events",
                       buttonHeight: 40,
-                      buttonWidth: 80,
+                      buttonWidth: 130,
                       buttonColor: Colors.white,
                       borderColor: Colors.black,
                       labelColor: Colors.black,

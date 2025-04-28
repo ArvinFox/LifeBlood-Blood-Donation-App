@@ -1,7 +1,10 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:lifeblood_blood_donation_app/components/custom_main_app_bar.dart';
+import 'package:lifeblood_blood_donation_app/components/drawer/side_drawer.dart';
 import 'package:lifeblood_blood_donation_app/providers/user_provider.dart';
+import 'package:lifeblood_blood_donation_app/services/user_service.dart';
 import 'package:provider/provider.dart';
 
 class ProfileScreen extends StatefulWidget {
@@ -16,6 +19,7 @@ class ProfileScreen extends StatefulWidget {
 class _ProfilePageState extends State<ProfileScreen> {
   bool isAvailable = true;
   final FirebaseAuth auth = FirebaseAuth.instance;
+  final userService = UserService();
 
   @override
   void initState() {
@@ -47,35 +51,65 @@ class _ProfilePageState extends State<ProfileScreen> {
       )
     );
   }
+  
+  void showLogoutDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: const Text("Are you sure, that you want to logout?",
+              textAlign: TextAlign.center,
+              style: TextStyle(fontSize: 20, fontWeight: FontWeight.w500)),
+          actions: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.red,
+                  ),
+                  onPressed: () async {
+                    Navigator.pop(context);  
+                    await userService.signOut();
+                    Navigator.pushReplacementNamed(context, '/login'); 
+                  },
+                  child: const Text(
+                    "Yes",
+                    style: TextStyle(color: Colors.white),
+                  ),
+                ),
+                const SizedBox(width: 30),
+                OutlinedButton(
+                  style: OutlinedButton.styleFrom(
+                    side:
+                        const BorderSide(color: Color(0xFFE50F2A), width: 1.5),
+                  ),
+                  onPressed: () {
+                    Navigator.pop(context);
+                  },
+                  child: const Text(
+                    "No",
+                    style: TextStyle(color: Color(0xFFE50F2A)),
+                  ),
+                ),
+              ],
+            ),
+          ],
+        );
+      },
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
-      appBar: AppBar(
-        backgroundColor: Color(0xFFE50F2A),
-        title: Text(
-          "Profile",
-          style: TextStyle(
-            color: Colors.white,
-            fontSize: 25,
-            fontWeight: FontWeight.w500,
-          ),
-        ),
-        automaticallyImplyLeading:
-            widget.navigation == ProfilePageNavigation.sideDrawer
-                ? true
-                : false,
-        leading: widget.navigation == ProfilePageNavigation.sideDrawer
-            ? CupertinoNavigationBarBackButton(
-                color: Colors.white,
-                onPressed: () {
-                  Navigator.popAndPushNamed(context, "/home");
-                },
-              )
-            : null,
-        leadingWidth: 40
-      ), 
+      appBar: CustomMainAppbar(
+        title: 'Profile',
+        showLeading: false,
+        automaticallyImplyLeading:false,
+      ),
+      endDrawer: NavDrawer(),
       body: SingleChildScrollView(
         child: Padding(
           padding: EdgeInsets.all(20),
@@ -199,11 +233,8 @@ class _ProfilePageState extends State<ProfileScreen> {
 
                               final currentUser = auth.currentUser;
                               if (currentUser != null) {
-                                final userProvider =
-                                    Provider.of<UserProvider>(context,
-                                        listen: false);
-                                await userProvider.fetchUserAvailability(
-                                    currentUser.uid, value);
+                                final userProvider = Provider.of<UserProvider>(context,listen: false);
+                                await userProvider.fetchUserAvailability(currentUser.uid, value);
                               }
                             }
                           : null,
@@ -272,6 +303,16 @@ class _ProfilePageState extends State<ProfileScreen> {
                       },
                       enable: true
                     ),
+                    SizedBox(height: 30),
+                    _buildProfileOption(
+                      Icons.exit_to_app,
+                      'Logout',
+                      () async {
+                        showLogoutDialog(context);
+                      },
+                      enable: true,
+                      redColor: true, 
+                    ),
                   ],
                 );
               }),
@@ -283,12 +324,12 @@ class _ProfilePageState extends State<ProfileScreen> {
   }
 }
 
-Widget _buildProfileOption(IconData icon, String text, VoidCallback onTap,{bool enable = true}) {
+Widget _buildProfileOption(IconData icon, String text, VoidCallback onTap,{bool enable = true, bool redColor = false}) {
   return Container(
     margin: EdgeInsets.symmetric(vertical: 6, horizontal: 12),
     padding: EdgeInsets.all(6),
     decoration: BoxDecoration(
-      color: Colors.white,
+      color: redColor ? Color(0xFFE50F2A) : Colors.white,
       borderRadius: BorderRadius.circular(15),
       boxShadow: [
         BoxShadow(
@@ -299,10 +340,10 @@ Widget _buildProfileOption(IconData icon, String text, VoidCallback onTap,{bool 
       ],
     ),
     child: ListTile(
-      leading: Icon(icon, color: Color(0xFFE50F2A)),
+      leading: Icon(icon, color: redColor ? Colors.white : Color(0xFFE50F2A)),  
       title: Text(
         text,
-        style: TextStyle(fontSize: 16, fontWeight: FontWeight.w400)
+        style: TextStyle(fontSize: 16, fontWeight: FontWeight.w400,color: redColor ? Colors.white : Colors.black)
       ),
       onTap: onTap,
     ),

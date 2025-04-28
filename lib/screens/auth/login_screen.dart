@@ -33,8 +33,10 @@ class _LoginScreenState extends State<LoginScreen> {
     });
 
     try {
-      await auth.signInWithEmailAndPassword(_emailController.text.trim(), _passwordController.text.trim());
-      Navigator.pushReplacementNamed(context, '/home');
+      if(_formKey.currentState!.validate() && _emailController.text.isNotEmpty && _passwordController.text.isNotEmpty){
+        await auth.signInWithEmailAndPassword(_emailController.text.trim(), _passwordController.text.trim());
+        Navigator.pushReplacementNamed(context, '/home');
+      }
     } catch (e) {
       Helpers.showError(context, "Login failed. Please try again using correct credentials.");
     } finally {
@@ -75,12 +77,17 @@ class _LoginScreenState extends State<LoginScreen> {
                   hintText: 'Enter your Email',
                   controller: _emailController,
                   validator: Helpers.validateEmail,
+                  autovalidateMode: AutovalidateMode.onUserInteraction,
                 ),
                 CustomInputBox(
                   textName: 'Password',
                   hintText: 'Enter your password',
                   controller: _passwordController,
                   hasAstricks: true,
+                  validator: (value) => (value == null || value.trim().isEmpty)
+                      ? '* Required'
+                      : null,
+                  autovalidateMode: AutovalidateMode.onUserInteraction,
                 ),
               ],
             ),

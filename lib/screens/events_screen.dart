@@ -4,110 +4,112 @@ import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
 import 'package:lifeblood_blood_donation_app/components/custom_main_app_bar.dart';
 import 'package:lifeblood_blood_donation_app/models/events_model.dart';
-import 'package:lifeblood_blood_donation_app/providers/event_provider.dart';
 import 'package:lifeblood_blood_donation_app/services/events_service.dart';
 import 'package:lifeblood_blood_donation_app/utils/helpers.dart';
 import 'package:path/path.dart' as path;
 import 'package:path_provider/path_provider.dart';
-import 'package:provider/provider.dart';
 import 'package:share_plus/share_plus.dart';
- 
+
 class EventsScreen extends StatefulWidget {
   const EventsScreen({super.key});
 
   @override
-  State<EventsScreen> createState() => _EventsPageState();
+  State<EventsScreen> createState() => _EventsScreenState();
 }
 
-class _EventsPageState extends State<EventsScreen> {
+class _EventsScreenState extends State<EventsScreen> {
   final EventService _eventService = EventService();
+  late Future<List<EventWithId>> _eventsFuture;
 
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      final eventProvider = Provider.of<EventProvider>(context,listen: false);
-
-      if(eventProvider.events.isEmpty){
-        eventProvider.fetchEvent();
-      }
-    });
+    _eventsFuture = _eventService.getEvents();
   }
 
-  Future<void> shareEvent(DonationEvents event, String imageUrl) async{
+  Future<void> shareEvent(DonationEvents event, String imageUrl) async {
     final date = DateFormat('yyyy-MM-dd').format(event.dateAndTime);
     final time = DateFormat('hh:mm a').format(event.dateAndTime);
 
-    try{
-      // Download the image
+    try {
       final response = await http.get(Uri.parse(imageUrl));
       final bytes = response.bodyBytes;
 
-      // Get temporary directory to store image
-      final temp = await getTemporaryDirectory();
-      final imagePath = path.join(temp.path, 'event_image.jpg');
-
-      // Save image locally
-      final image = File(imagePath);
-      await image.writeAsBytes(bytes);
+      final tempDir = await getTemporaryDirectory();
+      final imagePath = path.join(tempDir.path, 'event_image.jpg');
+      final file = File(imagePath);
+      await file.writeAsBytes(bytes);
 
       final shareText = '''
-🩸 *${event.eventName}*
+🩸 ${event.eventName}
 
-🗓️ *Date:* $date
-⏰ *Time:* $time
-📍 *Location:* ${event.location}
+🗓 Date: $date
+⏰ Time: $time
+📍 Location: ${event.location}
 
-📝 *Details:*
+📝 Details:
 ${event.description}
 
-❤️ Be a Hero. Save Lives. Donate Blood!  
+❤ Be a Hero. Save Lives. Donate Blood!  
 #BloodDonation #SaveLives
 ''';
 
-      Share.shareXFiles([XFile(image.path)], text: shareText);
-
-    }catch (e){
-      Helpers.debugPrintWithBorder('Error : $e');
+      Share.shareXFiles([XFile(file.path)], text: shareText);
+    } catch (e) {
+      Helpers.debugPrintWithBorder('Error sharing event: $e');
     }
   }
 
-  void showJoinDialog(BuildContext context,DonationEvents event, String imageUrl) {
+  void showJoinDialog(DonationEvents event, String imageUrl) {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: Column(
+        titlePadding: EdgeInsets.zero,
+        contentPadding: const EdgeInsets.symmetric(horizontal: 20),
+        actionsPadding: const EdgeInsets.only(bottom: 10),
+        title: Stack(
           children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            Positioned(
+              top: 0,
+              right: 0,
+              child: IconButton(
+                icon: const Icon(Icons.close, color: Colors.black),
+                onPressed: () => Navigator.pop(context),
+              ),
+            ),
+            Column(
               children: [
-                Expanded(
-                  child: Text(
-                    event.eventName,
-                    style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.red,
-                    ),
+                const SizedBox(height: 10),
+                Text(
+                  event.eventName,
+                  textAlign: TextAlign.center,
+                  style: const TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.red,
                   ),
                 ),
-                IconButton(
-                  icon: Icon(Icons.close, color: Colors.black),
-                  onPressed: () => Navigator.pop(context),
-                ),
+                const SizedBox(height: 10),
+                ClipRRect(
+  borderRadius: BorderRadius.circular(10),
+  child: Image.network(
+    imageUrl,
+    fit: BoxFit.cover,
+    errorBuilder: (context, error, stackTrace) {
+      return Container(
+        width: double.infinity,
+        height: 150,
+        color: Colors.grey[300],
+        child: const Icon(Icons.broken_image, size: 80, color: Colors.grey),
+      );
+    },
+  ),
+),
               ],
-            ),
-            SizedBox(height: 10),
-            ClipRRect(
-              borderRadius: BorderRadius.circular(10), 
-              child: Image.network(
-                imageUrl,
-                fit: BoxFit.cover,
-              )
             ),
           ],
         ),
-        content: Text(
+        content: const Text(
           "You are all invited to participate in blood donation events. Join us and help save lives!",
           style: TextStyle(fontWeight: FontWeight.bold),
           textAlign: TextAlign.center,
@@ -118,17 +120,18 @@ ${event.description}
             children: [
               ElevatedButton(
                 onPressed: () {
-                  shareEvent(event,imageUrl);
+                  shareEvent(event, imageUrl);
                   Navigator.pop(context);
                 },
                 style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
-                child: Text("Share", style: TextStyle(color: Colors.white)),
+                child: const Text("Share", style: TextStyle(color: Colors.white)),
               ),
               OutlinedButton(
                 onPressed: () => Navigator.pop(context),
                 style: OutlinedButton.styleFrom(
-                    side: BorderSide(color: Colors.red)),
-                child: Text("Cancel", style: TextStyle(color: Colors.red)),
+                  side: const BorderSide(color: Colors.red),
+                ),
+                child: const Text("Cancel", style: TextStyle(color: Colors.red)),
               ),
             ],
           ),
@@ -140,43 +143,50 @@ ${event.description}
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: CustomMainAppbar(title: 'Events', showLeading: true),
+      appBar: const CustomMainAppbar(title: 'Events', showLeading: true),
       backgroundColor: Colors.white,
-      body: Consumer<EventProvider>(
-      builder: (context, eventProvider, child){
-        if (eventProvider.isLoading) {
-          return const Center(child: CircularProgressIndicator());
-        } else if (eventProvider.events.isEmpty) {
-          return const Center(child: Text("No events found"));
-        }
-      
-        return ListView.builder(
-          padding: const EdgeInsets.all(20),
-          itemCount: eventProvider.events.length,
-          itemBuilder: (context, index) {
-            final event = eventProvider.events[index];
-            final imageUrl = _eventService.getImageUrl(event.eventId ?? '');
-            return _eventContainer(
-              imagePath: imageUrl,
-              onJoin: () => showJoinDialog(context, event, imageUrl),
+      body: FutureBuilder<List<EventWithId>>(
+        future: _eventsFuture,
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const Center(child: CircularProgressIndicator());
+          } else if (snapshot.hasError) {
+            return Center(child: Text('Error: ${snapshot.error}'));
+          } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+            return const Center(child: Text("No events found"));
+          } else {
+            final events = snapshot.data!;
+            return ListView.builder(
+              padding: const EdgeInsets.all(20),
+              itemCount: events.length,
+              itemBuilder: (context, index) {
+                final eventWithId = events[index];
+                final event = eventWithId.event;
+                final imageUrl =
+                    'https://lwifhyarxkcqhewdboby.supabase.co/storage/v1/object/public/events/${eventWithId.id}/${event.image ?? ''}';
+
+                return _eventCard(
+                  imageUrl: imageUrl,
+                  onJoinTap: () => showJoinDialog(event, imageUrl),
+                );
+              },
             );
-          },
-        );
-      },
+          }
+        },
       ),
     );
   }
 
-  Widget _eventContainer({required String imagePath, required VoidCallback onJoin}){
+  Widget _eventCard({required String imageUrl, required VoidCallback onJoinTap}) {
     return Container(
-      margin: const EdgeInsets.symmetric(vertical: 20),
+      margin: const EdgeInsets.symmetric(vertical: 10),
       height: 110,
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(15),
-        boxShadow: [
+        boxShadow: const [
           BoxShadow(
-            color: Colors.black38,
+            color: Colors.black26,
             blurRadius: 6,
             offset: Offset(2, 4),
           ),
@@ -184,31 +194,38 @@ ${event.description}
       ),
       child: Row(
         children: [
-          // Event Image
           ClipRRect(
             borderRadius: const BorderRadius.only(
               topLeft: Radius.circular(15),
               bottomLeft: Radius.circular(15),
             ),
             child: Image.network(
-              imagePath,
-              width: 250, 
-              height: 110, 
-              fit: BoxFit.fill, 
+              imageUrl,
+              width: 250,
+              height: 110,
+              fit: BoxFit.cover,
+              errorBuilder: (context, error, stackTrace) {
+                return Container(
+                  width: 250,
+                  height: 110,
+                  color: Colors.grey[300],
+                  child: const Icon(Icons.broken_image, size: 80, color: Colors.grey),
+                );
+              },
             ),
           ),
-          // Join Event Button
           Expanded(
             child: SizedBox(
               height: 110,
               child: ElevatedButton(
-                onPressed: onJoin,
+                onPressed: onJoinTap,
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: Color.fromARGB(255, 229, 15, 42),
-                  shape: RoundedRectangleBorder(
+                  backgroundColor: const Color(0xFFE50F2A),
+                  shape: const RoundedRectangleBorder(
                     borderRadius: BorderRadius.only(
-                        topRight: Radius.circular(15),
-                        bottomRight: Radius.circular(15)),
+                      topRight: Radius.circular(15),
+                      bottomRight: Radius.circular(15),
+                    ),
                   ),
                 ),
                 child: const Text(

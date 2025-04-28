@@ -1,8 +1,7 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:lifeblood_blood_donation_app/components/custom_button.dart';
 import 'package:lifeblood_blood_donation_app/components/text_field.dart';
+import 'package:lifeblood_blood_donation_app/services/user_service.dart';
 import 'package:lifeblood_blood_donation_app/utils/helpers.dart';
 import '../../../components/custom_container.dart';
 
@@ -18,8 +17,7 @@ class _ForgotPasswordPageState extends State<ForgotPasswordScreen> {
   final TextEditingController _emailController = TextEditingController();
   final _formKey = GlobalKey<FormState>();
   bool isLoading = false;
-  final FirebaseFirestore firestore = FirebaseFirestore.instance;
-  final FirebaseAuth auth = FirebaseAuth.instance;
+  final userService = UserService();
 
   @override
   void dispose() {
@@ -32,10 +30,10 @@ class _ForgotPasswordPageState extends State<ForgotPasswordScreen> {
       isLoading = true;
     });
 
-    try{
+    try {
       final email = _emailController.text.trim();
 
-      if(email.isEmpty){
+      if (email.isEmpty) {
         Helpers.showError(context, "Please enter your email address.");
         setState(() {
           isLoading = false;
@@ -43,16 +41,20 @@ class _ForgotPasswordPageState extends State<ForgotPasswordScreen> {
         return;
       }
 
-      await auth.sendPasswordResetEmail(email: email);
+      final userExists = await userService.doesUserExist(email);
+
+      if (!userExists) {
+        Helpers.showError(context, "No user found with this email address.");
+        setState(() {
+          isLoading = false;
+        });
+        return;
+      }
+
+      await userService.sendPasswordResetEmail(email);
       Helpers.showSucess(context, "Password reset email sent successfully to $email.");
       Navigator.pushNamed(context, '/login');
 
-    } on FirebaseAuthException catch (e){
-      if (e.code == 'user-not-found') {
-      Helpers.showError(context, "No user found with this email address.");
-    } else {
-      Helpers.showError(context, "An error occurred: ${e.message}");
-    }
     } catch (e) {
       Helpers.showError(context, "An unexpected error occurred: $e");
     } finally {

@@ -5,7 +5,7 @@ class Helpers {
   //for validate email
   static String? validateEmail(String? value) {
     if (value == null || value.isEmpty) {
-      return 'Please enter your email here';
+      return '* Required';
     }
     const emailRegex = r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$';
     if (!RegExp(emailRegex).hasMatch(value.trim())) {

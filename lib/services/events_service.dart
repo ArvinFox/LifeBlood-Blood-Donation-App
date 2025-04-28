@@ -1,22 +1,38 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:lifeblood_blood_donation_app/constants/app_credentials.dart';
 import 'package:lifeblood_blood_donation_app/models/events_model.dart';
+
+class EventWithId {
+  final String id;
+  final DonationEvents event;
+
+  EventWithId({required this.id, required this.event});
+}
 
 class EventService {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
-  // Fetch all events from Firestore
-  Future<List<DonationEvents>> getEvents() async {
-    try{
-      final snapshot = await _firestore.collection('events').get();
-      return snapshot.docs.map((doc) => DonationEvents.fromFirestore(doc.id, doc.data())).toList();
-    } catch (e){
-      throw Exception('Error fetching events : $e');
-    }
-  }
+  Future<List<EventWithId>> getEvents() async {
+    try {
+      // Get current date and time
+      final currentDate = DateTime.now();
 
-  //get image URL from supabase
-  String getImageUrl(String eventId) {
-    return '${AppCredentials.supabaseUrl}/storage/v1/object/public/events/$eventId/event_image_$eventId.jpg';
+      QuerySnapshot querySnapshot = await _firestore
+          .collection('events')
+          .where('date_and_time',
+              isGreaterThan: currentDate) // Filter for future events
+          .orderBy('date_and_time',
+              descending: false)
+          .get();
+
+      return querySnapshot.docs.map((doc) {
+        return EventWithId(
+          id: doc.id,
+          event: DonationEvents.fromFirestore(doc),
+        );
+      }).toList();
+    } catch (e) {
+      print('Error fetching events: $e');
+      return [];
+    }
   }
 }

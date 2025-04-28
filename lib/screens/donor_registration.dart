@@ -282,7 +282,11 @@ class _DonorRegistrationState extends State<DonorRegistration> {
                 CustomInputBox(
                   textName: 'Full Name', 
                   hintText: 'Enter full name here', 
-                  controller: _fullNameController
+                  controller: _fullNameController,
+                  validator: (value) => (value == null || value.trim().isEmpty)
+                      ? 'Required'
+                      : null,
+                  autovalidateMode: AutovalidateMode.onUserInteraction,
                 ),
                 _buildDatePicker(
                   'Date Of Birth',
@@ -316,6 +320,7 @@ class _DonorRegistrationState extends State<DonorRegistration> {
                     }
                     return null;
                   },
+                  autovalidateMode: AutovalidateMode.onUserInteraction,
                   keyboardType: TextInputType.number,
                   inputFormatters: [
                     FilteringTextInputFormatter.digitsOnly,
@@ -325,12 +330,20 @@ class _DonorRegistrationState extends State<DonorRegistration> {
                 CustomInputBox(
                   textName: 'NIC', 
                   hintText: 'Enter NIC here', 
-                  controller: _nicController
+                  controller: _nicController,
+                  validator: (value) => (value == null || value.trim().isEmpty)
+                      ? 'Required'
+                      : null,
+                  autovalidateMode: AutovalidateMode.onUserInteraction,
                 ),
                 CustomInputBox(
                   textName: 'Address', 
                   hintText: 'Enter address here', 
-                  controller: _addressController
+                  controller: _addressController,
+                  validator: (value) => (value == null || value.trim().isEmpty)
+                      ? 'Required'
+                      : null,
+                  autovalidateMode: AutovalidateMode.onUserInteraction,
                 ),
                 _inputBox(
                   _buildDropdown(
@@ -456,6 +469,7 @@ class _DonorRegistrationState extends State<DonorRegistration> {
                   validator: (value) {
                     return Helpers.validateInputFields(value, 'Please enter your health conditions');
                   },
+                  autovalidateMode: AutovalidateMode.onUserInteraction,
                   decoration: InputDecoration(
                     hintText: 'Enter your health conditions',
                     border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
@@ -543,6 +557,8 @@ class _DonorRegistrationState extends State<DonorRegistration> {
       decoration: InputDecoration(
         border: OutlineInputBorder(borderRadius: BorderRadius.circular(15)),
       ),
+      validator: (value) => value == null ? 'Required' : null,
+      autovalidateMode: AutovalidateMode.onUserInteraction,
     );
   }
 
@@ -570,6 +586,7 @@ class _DonorRegistrationState extends State<DonorRegistration> {
             contentPadding: const EdgeInsets.symmetric(horizontal: 16,vertical: 14),
             border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
           ),
+          autovalidateMode: AutovalidateMode.onUserInteraction,
           items:
             items
               .map(

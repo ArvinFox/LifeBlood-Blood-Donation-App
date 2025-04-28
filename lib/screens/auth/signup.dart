@@ -34,10 +34,12 @@ class _SignupScreenState extends State<SignupScreen> {
     });
 
     try {
-      await auth.createUser(context,_emailController.text.trim(), _passwordController.text.trim());
-      Helpers.showSucess(context, 'Signup sucessfully');
-      auth.signOut();
-      Navigator.pushNamed(context, '/login');
+      if(_formKey.currentState!.validate() && _emailController.text.isNotEmpty && _passwordController.text.isNotEmpty){
+        await auth.createUser(context,_emailController.text.trim(), _passwordController.text.trim());
+        Helpers.showSucess(context, 'Signup sucessfully');
+        auth.signOut();
+        Navigator.pushNamed(context, '/login');
+      } 
     } finally {
       setState(() {
         isLoading = false;
@@ -76,6 +78,7 @@ class _SignupScreenState extends State<SignupScreen> {
                   hintText: 'Enter your Email',
                   controller: _emailController,
                   validator: Helpers.validateEmail,
+                  autovalidateMode: AutovalidateMode.onUserInteraction,
                 ),
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -90,9 +93,10 @@ class _SignupScreenState extends State<SignupScreen> {
                           passwordStrength = Helpers.checkPasswordStrength(value);
                         });
                       },
-                      validator: (value) {
-                        return Helpers.validateInputFields(value, 'Please enter your password here');
-                      },
+                      validator: (value) => (value == null || value.trim().isEmpty)
+                      ? '* Required'
+                      : null,
+                      autovalidateMode: AutovalidateMode.onUserInteraction,
                     ),
                     if (_passwordController.text.isNotEmpty)
                       Text(
