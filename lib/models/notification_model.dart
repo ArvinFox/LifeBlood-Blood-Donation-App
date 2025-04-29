@@ -3,16 +3,16 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 class NotificationModel {
   final String? notificationId;
   final String userId;
-  final String requestId;
-  final String type;  // new_request, status_update
+  final String? requestId;
+  final String type;  // new_request, verification_status
   bool isRead;
   final DateTime timestamp;
-  final String? status; // accepted, cancelled
+  final String? status; // approved, rejected
 
   NotificationModel({
     this.notificationId,
     required this.userId,
-    required this.requestId,
+    this.requestId,
     required this.type,
     this.isRead = false,
     required this.timestamp,

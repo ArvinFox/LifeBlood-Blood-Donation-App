@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:lifeblood_blood_donation_app/models/donation_request_model.dart';
 import 'package:lifeblood_blood_donation_app/models/notification_model.dart';
 import 'package:lifeblood_blood_donation_app/providers/current_activity_provider.dart';
@@ -100,8 +101,8 @@ class _NotificationScreenState extends State<NotificationScreen> {
                 if (snapshot.connectionState == ConnectionState.waiting) {
                   return const Center(child: CircularProgressIndicator());
                 } else if (snapshot.hasError) {
-                  return Center(child: Text('Error loading notifications: ${snapshot.error}'));
-                  // return Center(child: Text('Error loading notifications. Please check back later.'));
+                  Helpers.debugPrintWithBorder("Error loading notifications: ${snapshot.error}");
+                  return Center(child: Text('Error loading notifications. Please check back later.'));
                 } else if (snapshot.hasData) {
                   return SingleChildScrollView(
                     child: Column(
@@ -120,7 +121,10 @@ class _NotificationScreenState extends State<NotificationScreen> {
   }
 
   Future<Widget> _buildNotificationCard(NotificationModel notification) async {
-    final request = await _notificationService.getDonationRequestDetailsId(notification.requestId);
+    BloodRequest? request;
+    if (notification.type == 'new_request') {
+      request = await _notificationService.getDonationRequestDetailsId(notification.requestId!);
+    }
 
     return GestureDetector(
       onTap: () {
@@ -130,146 +134,181 @@ class _NotificationScreenState extends State<NotificationScreen> {
         }
       },
       child: Padding(
-        padding: EdgeInsets.all(10),
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
         child: Card(
-          color: Colors.grey[200],
-          elevation: notification.isRead ? 1 : 5,
+          color: const Color.fromARGB(255, 255, 247, 247),
+          elevation: notification.isRead ? 1 : 4,
           shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
             side: BorderSide(
-              color: notification.isRead ? Colors.transparent : const Color.fromARGB(255, 255, 200, 200),
-              width: 2.0,
+              color: notification.isRead
+                ? Colors.transparent
+                : (notification.type == 'verification_status' && notification.status == 'approved')
+                    ? Colors.green.shade200
+                    : const Color.fromARGB(255, 255, 204, 204),
+              width: 1.5,
             ),
-            borderRadius: BorderRadius.circular(4.0),
           ),
-          child: Container(
-            width: double.infinity,
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(20),
-            ),
-            child: Padding(
-              padding: const EdgeInsets.all(15),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    notification.type == 'status_update'
-                      ? (notification.status == 'accepted'
-                        ? "Request Accepted"
-                        : "Request Cancelled")
-                      : "Lifesaving Alert: Donate Blood Now!",
-                    style: TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.red,
-                    ),
+          child: Padding(
+            padding: const EdgeInsets.all(16),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  notification.type == 'verification_status'
+                    ? (notification.status == 'approved'
+                        ? "Profile Verified"
+                        : "Profile Rejected")
+                    : "Lifesaving Alert: Donate Blood Now!",
+                  style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                    color: notification.type == 'verification_status' && notification.status == 'approved'
+                        ? Colors.green
+                        : Colors.red,
                   ),
-                  SizedBox(height: 5),
-      
+                ),
+                SizedBox(height: 8),
+                
+                Row(
+                  children: [
+                    Icon(Icons.access_time, size: 26, color: Colors.grey[600],),
+                    SizedBox(width: 6),
+                    Text(
+                      _formatNotificationTime(notification.timestamp),
+                      style: TextStyle(
+                        fontSize: 12,
+                        color: Colors.grey[700],
+                      ),
+                    ),
+                  ],
+                ),
+                SizedBox(height: 12),
+                
+                if (notification.type == 'new_request' && request != null) ...[
                   Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Icon(Icons.alarm, size: 20),
-                      SizedBox(width: 10),
-                      Text(
-                        "${notification.timestamp.hour}:${notification.timestamp.minute.toString().padLeft(2, '0')} ${notification.timestamp.hour < 12 ? 'AM' : 'PM'}",
-                        style: TextStyle(
-                          fontSize: 12,
-                          fontWeight: FontWeight.bold,
+                      ClipRRect(
+                        borderRadius: BorderRadius.circular(8),
+                        child: Image.asset(
+                          "assets/images/emergency.jpg",
+                          width: 100,
+                          height: 100,
+                          fit: BoxFit.cover,
+                        ),
+                      ),
+                      const SizedBox(width: 14),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            _infoText("Blood Type", request.requestBloodType),
+                            _infoText("Urgency", request.urgencyLevel),
+                            _infoText("Location", "${request.hospitalName} - ${request.city}",
+                                maxLines: 2),
+                          ],
                         ),
                       ),
                     ],
                   ),
-                  SizedBox(height: 10),
-      
-                  if (notification.type == 'new_request' && request != null) ...[
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                      children: [
-                        Image.asset(
-                          "assets/images/emergency.jpg",
-                          width: 150,
-                          height: 140,
+                  Align(
+                    alignment: Alignment.centerRight,
+                    child: TextButton(
+                      onPressed: () {
+                        showConfirmationPopup(
+                          context, 
+                          request!.requestBloodType, 
+                          request.urgencyLevel, 
+                          request.hospitalName, 
+                          request.city, 
+                          notification.requestId!,
+                        );
+                        if (!notification.isRead) {
+                          Provider.of<NotificationProvider>(context, listen: false)
+                              .markAsRead(notification.notificationId!);
+                        }
+                      },
+                      child: Text(
+                        "Read More...",
+                        style: TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.grey[700],
                         ),
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              "Blood Type : ${request.requestBloodType}",
-                              style: TextStyle(
-                                fontSize: 12,
-                                fontWeight: FontWeight.bold,
-                              ),
+                      ),
+                    ),
+                  ),
+                ] else if (notification.type == 'verification_status') ...[
+                  Container(
+                    padding: const EdgeInsets.all(12),
+                    decoration: BoxDecoration(
+                      color: notification.status == 'approved'
+                        ? Colors.green.withOpacity(0.1)
+                        : Colors.red.withOpacity(0.1),
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    child: Row(
+                      children: [
+                        Icon(
+                          notification.status == 'approved' ? Icons.check_circle : Icons.cancel,
+                          color: notification.status == 'approved' ? Colors.green : Colors.red,
+                        ),
+                        const SizedBox(width: 10),
+                        Expanded(
+                          child: Text(
+                            notification.status == 'approved'
+                                ? "Congratulations! Your donor profile is now verified."
+                                : "Your donor profile was not approved. Please review the details and try again.",
+                            style: TextStyle(
+                              fontSize: 14, 
+                              fontWeight: FontWeight.w500,
                             ),
-                            Text(
-                              "Urgency Level : ${request.urgencyLevel}",
-                              style: TextStyle(
-                                fontSize: 12,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                            Text(
-                              "Location : ${request.hospitalName} - \n${request.city}",
-                              style: TextStyle(
-                                fontSize: 12,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                          ],
+                          ),
                         ),
                       ],
                     ),
-                    SizedBox(height: 10),
-                    Align(
-                      alignment: Alignment.centerRight,
-                      child: GestureDetector(
-                        onTap: () {
-                          showConfirmationPopup(context, request.requestBloodType, request.urgencyLevel, request.hospitalName, request.city, notification.requestId);
-                          if (!notification.isRead) {
-                            Provider.of<NotificationProvider>(context, listen: false)
-                            .markAsRead(notification.notificationId!);
-                          }
-                        },
-                        child: Text(
-                          "Read More.....",
-                          style: TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                      ),
-                    ),
-                  ] else if (notification.type == 'status_update') ...[
-                    Container(
-                      padding: const EdgeInsets.all(10),
-                      decoration: BoxDecoration(
-                        color: notification.status == 'accepted'
-                          ? Colors.green.withOpacity(0.1)
-                          : Colors.red.withOpacity(0.1),
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                      child: Row(
-                        children: [
-                          Icon(
-                            notification.status == 'accepted' ? Icons.check_circle : Icons.cancel,
-                            color: notification.status == 'accepted' ? Colors.green : Colors.red,
-                          ),
-                          SizedBox(width: 10),
-                          Expanded(
-                            child: Text(
-                              "Your donation request has been ${notification.status}.",
-                              style: TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
+                  ),
                 ],
-              ),
+              ],
             ),
           ),
         ),
       ),
     );
+  }
+
+  Widget _infoText(String label, String value, {int maxLines = 1}) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 4),
+      child: Text(
+        "$label: $value",
+        maxLines: maxLines,
+        overflow: TextOverflow.ellipsis,
+        softWrap: true,
+        style: TextStyle(
+          fontSize: 13,
+          fontWeight: FontWeight.w500,
+        ),
+      ),
+    );
+  }
+
+  String _formatNotificationTime(DateTime timestamp) {
+    final now = DateTime.now();
+    final today = DateTime(now.year, now.month, now.day);
+    final yesterday = today.subtract(Duration(days: 1));
+    final notificationDate = DateTime(timestamp.year, timestamp.month, timestamp.day);
+
+    if (notificationDate == today) {
+      return DateFormat.jm().format(timestamp);
+    } else if (notificationDate == yesterday) {
+      return "Yesterday";
+    } else if (timestamp.year != now.year) {
+      return DateFormat('MMM d, yyyy').format(timestamp);
+    } else {
+      return DateFormat('MMM d').format(timestamp);
+    }
   }
 
   void showConfirmationPopup(BuildContext context, String bloodType,String urgencyLevel, String hospital, String city, String requestId) {
@@ -322,7 +361,7 @@ class _NotificationScreenState extends State<NotificationScreen> {
                         ),
                       ),
                       Text(
-                        "Location : $hospital  \n$city",
+                        "Location : $hospital - $city",
                         style: TextStyle(
                           fontSize: 12,
                           fontWeight: FontWeight.bold,

@@ -166,7 +166,7 @@ ${event.description}
                 final eventWithId = events[index];
                 final event = eventWithId.event;
                 final imageUrl =
-                    'https://lwifhyarxkcqhewdboby.supabase.co/storage/v1/object/public/events/${eventWithId.id}/${event.image ?? ''}';
+                    'https://lwifhyarxkcqhewdboby.supabase.co/storage/v1/object/public/events/${eventWithId.id}/${event.image}';
 
                 return _eventCard(
                   imageUrl: imageUrl,
