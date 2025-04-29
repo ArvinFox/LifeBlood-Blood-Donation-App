@@ -77,35 +77,38 @@ ${event.description}
                 onPressed: () => Navigator.pop(context),
               ),
             ),
-            Column(
-              children: [
-                const SizedBox(height: 10),
-                Text(
-                  event.eventName,
-                  textAlign: TextAlign.center,
-                  style: const TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.red,
+            Padding(
+              padding: const EdgeInsets.all(12),
+              child: Column(
+                children: [
+                  const SizedBox(height: 10),
+                  Text(
+                    event.eventName,
+                    textAlign: TextAlign.center,
+                    style: const TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.red,
+                    ),
                   ),
-                ),
-                const SizedBox(height: 10),
-                ClipRRect(
-  borderRadius: BorderRadius.circular(10),
-  child: Image.network(
-    imageUrl,
-    fit: BoxFit.cover,
-    errorBuilder: (context, error, stackTrace) {
-      return Container(
-        width: double.infinity,
-        height: 150,
-        color: Colors.grey[300],
-        child: const Icon(Icons.broken_image, size: 80, color: Colors.grey),
-      );
-    },
-  ),
-),
-              ],
+                  const SizedBox(height: 10),
+                  ClipRRect(
+                    borderRadius: BorderRadius.circular(10),
+                    child: Image.network(
+                      imageUrl,
+                      fit: BoxFit.cover,
+                      errorBuilder: (context, error, stackTrace) {
+                        return Container(
+                          width: double.infinity,
+                          height: 150,
+                          color: Colors.grey[300],
+                          child: const Icon(Icons.broken_image, size: 80, color: Colors.grey),
+                        );
+                      },
+                    ),
+                  ),
+                ],
+              ),
             ),
           ],
         ),

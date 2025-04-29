@@ -68,7 +68,7 @@ class _DonorRegistrationState extends State<DonorRegistration> {
 
       if (user != null && user.hasCompletedProfile == true) {
         _fullNameController.text = user.fullName ?? '';
-        _contactNumberController.text = user.contactNumber ?? '';
+        _contactNumberController.text = Formatters.formatPhoneNumber(user.contactNumber ?? '');
         _nicController.text = user.nic ?? '';
         _addressController.text = user.address ?? '';
         _healthConditionController.text = user.healthConditions ?? '';

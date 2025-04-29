@@ -22,6 +22,7 @@ class _ResetPasswordPageState extends State<ResetPasswordScreen> {
   final TextEditingController _verifyPasswordController = TextEditingController();
   final _formKey = GlobalKey<FormState>();
   bool isLoading = false;
+  String passwordStrength = '';
   
   void resetPassword() async {
     final FirebaseFirestore firestore = FirebaseFirestore.instance;
@@ -117,25 +118,60 @@ class _ResetPasswordPageState extends State<ResetPasswordScreen> {
             Form(
               key: _formKey,
               child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   CustomInputBox(
                     textName: 'Password',
                     hintText: 'Enter your new password',
                     controller: _newPasswordController,
                     hasAstricks: true,
+                    onChanged: (value){
+                      setState(() {
+                        passwordStrength = Helpers.checkPasswordStrength(value);
+                      });
+                    },
                     validator: (value) {
                       return Helpers.validateInputFields(value, 'Please enter your password here');
                     },
                   ),
+                  if (_newPasswordController.text.isNotEmpty)
+                    Text(
+                      'Password Strength: ${passwordStrength == 'Weak Password' ? 'Password is too weak. Try using a mix of letters, numbers, and symbols.' : passwordStrength}',
+                      style: TextStyle(
+                        color: passwordStrength == 'Strong Password'
+                            ? Colors.green
+                            : passwordStrength == 'Medium Password'
+                                ? Colors.orange
+                                : Colors.red,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
                   CustomInputBox(
                     textName: 'Verify Password',
                     hintText: 'Re-enter your new password',
                     controller: _verifyPasswordController,
                     hasAstricks: true,
+                    onChanged: (value){
+                      setState(() {
+                        passwordStrength = Helpers.checkPasswordStrength(value);
+                      });
+                    },
                     validator: (value) {
                       return Helpers.validateInputFields(value, 'Please re-enter your password here');
                     }
                   ),
+                  if (_verifyPasswordController.text.isNotEmpty)
+                    Text(
+                      'Password Strength: ${passwordStrength == 'Weak Password' ? 'Password is too weak. Try using a mix of letters, numbers, and symbols.' : passwordStrength}',
+                      style: TextStyle(
+                        color: passwordStrength == 'Strong Password'
+                            ? Colors.green
+                            : passwordStrength == 'Medium Password'
+                                ? Colors.orange
+                                : Colors.red,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
                 ],
               ),
             ),

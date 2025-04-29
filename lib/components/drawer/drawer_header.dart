@@ -47,13 +47,13 @@ class _HeaderDrawerState extends State<HeaderDrawer> {
           ],
           TextButton(
             onPressed: () {
-              Navigator.pushReplacementNamed(context, '/profile');
+              Navigator.pushNamed(context, '/home_profile');
             },
             child: const Text(
               "View Profile",
               style: TextStyle(
-                color: Colors.black54,
                 fontSize: 16,
+                color: Colors.white,
               ),
             ),
           )
