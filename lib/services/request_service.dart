@@ -7,4 +7,21 @@ class RequestService {
     DocumentReference docRef = await requests.add(request.toFirestore());
     return docRef.id;
   }
+
+  // Fetch blood requests
+  Future<List<BloodRequest>> getBloodRequests() async {
+    try {
+      QuerySnapshot snapshot = await FirebaseFirestore.instance
+          .collection('requests')
+          .orderBy('createdAt', descending: true)
+          .get();
+
+      return snapshot.docs
+          .map((doc) => BloodRequest.fromFirestore(doc))
+          .toList();
+
+    } catch (e) {
+      throw Exception("Failed to get blood requests: $e");
+    }
+  }
 }
