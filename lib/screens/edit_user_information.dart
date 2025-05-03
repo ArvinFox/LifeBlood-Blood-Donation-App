@@ -7,7 +7,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 import 'package:lifeblood_blood_donation_app/components/custom_main_app_bar.dart';
-import 'package:lifeblood_blood_donation_app/components/login_button.dart';
 import 'package:lifeblood_blood_donation_app/components/text_field.dart';
 import 'package:lifeblood_blood_donation_app/models/medical_report_model.dart';
 import 'package:lifeblood_blood_donation_app/models/user_model.dart';
@@ -45,6 +44,13 @@ class _EditUserInformationState extends State<EditUserInformation> {
   bool _isLoading = false;
   bool _isUploaded = false;
 
+  late String initialContactNumber;
+  late String initialAddress;
+  late String initialProvince;
+  late String initialCity;
+  late String initialHealthCondition;
+  bool hasChanged = false;
+
   int? donationCount;
 
   final Map<String, List<String>> provinceCities = {
@@ -58,6 +64,20 @@ class _EditUserInformationState extends State<EditUserInformation> {
     'Uva': ['Badulla', 'Monaragala'],
     'Sabaragamuwa': ['Ratnapura', 'Kegalle'],
   };
+
+  void _checkIfFormChanged() {
+    bool changed = _contactNumberController.text != initialContactNumber ||
+      _addressController.text != initialAddress ||
+      (selectedProvince ?? '') != initialProvince ||
+      (selectedCity ?? '') != initialCity ||
+      _healthConditionController.text != initialHealthCondition;
+
+    if (changed != hasChanged) {
+      setState(() {
+        hasChanged = changed;
+      });
+    }
+  }
 
   @override
   void initState() {
@@ -80,6 +100,16 @@ class _EditUserInformationState extends State<EditUserInformation> {
         selectedCity = user.city;
         selectedBloodType = user.bloodType;
         donationCount = user.donationCount;
+
+        initialContactNumber = _contactNumberController.text;
+        initialAddress = _addressController.text;
+        initialProvince = selectedProvince ?? '';
+        initialCity = selectedCity ?? '';
+        initialHealthCondition = _healthConditionController.text;
+
+        _contactNumberController.addListener(_checkIfFormChanged);
+        _addressController.addListener(_checkIfFormChanged);
+        _healthConditionController.addListener(_checkIfFormChanged);
 
         if (user.dob != null) {
           _selectedDate = user.dob;
@@ -470,6 +500,7 @@ class _EditUserInformationState extends State<EditUserInformation> {
                             setState(() {
                               selectedProvince = val;
                               selectedCity = null;
+                              _checkIfFormChanged();
                             });
                           },
                         ),
@@ -484,6 +515,7 @@ class _EditUserInformationState extends State<EditUserInformation> {
                             onChanged: (val) {
                               setState(() {
                                 selectedCity = val;
+                                _checkIfFormChanged();
                               });
                             },
                           ),
@@ -515,10 +547,32 @@ class _EditUserInformationState extends State<EditUserInformation> {
                         ),
                       ),
                       SizedBox(height: 15),
-                      LoginButton(
-                          isLoading: _isLoading,
-                          text: 'Submit',
-                          onPressed: _isLoading ? null : submitDonorDetails),
+                      SizedBox(
+                        width: double.infinity,
+                        child: ElevatedButton(
+                          onPressed: (!_isLoading && hasChanged) ? submitDonorDetails : null,
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: (!_isLoading && hasChanged) ? const Color.fromARGB(255, 255, 67, 67) : Colors.grey[400],
+                            foregroundColor: Colors.white,
+                            textStyle: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                            elevation: (!_isLoading && hasChanged) ? 2 : 0,
+                            padding: const EdgeInsets.symmetric(vertical: 14),
+                          ),
+                          child: _isLoading
+                            ? const SizedBox(
+                                width: 24,
+                                height: 24,
+                                child: CircularProgressIndicator(
+                                  color: Colors.white,
+                                  strokeWidth: 2,
+                                ),
+                              )
+                            : const Text("Update Information"),
+                        ),
+                      ),
                     ],
                   ),
                 ),

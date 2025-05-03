@@ -4,6 +4,7 @@ import 'package:lifeblood_blood_donation_app/components/custom_main_app_bar.dart
 import 'package:lifeblood_blood_donation_app/components/drawer/side_drawer.dart';
 import 'package:lifeblood_blood_donation_app/providers/user_provider.dart';
 import 'package:lifeblood_blood_donation_app/services/user_service.dart';
+import 'package:lifeblood_blood_donation_app/utils/formatters.dart';
 import 'package:provider/provider.dart';
 
 class ProfileScreen extends StatefulWidget {
@@ -56,13 +57,27 @@ class _ProfilePageState extends State<ProfileScreen> {
       context: context,
       builder: (context) {
         return AlertDialog(
-          title: const Text("Are you sure, that you want to logout?",
+          title: const Text("Are you sure you want to logout?",
               textAlign: TextAlign.center,
               style: TextStyle(fontSize: 20, fontWeight: FontWeight.w500)),
           actions: [
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
+                OutlinedButton(
+                  style: OutlinedButton.styleFrom(
+                    side:
+                        const BorderSide(color: Color(0xFFE50F2A), width: 1.5),
+                  ),
+                  onPressed: () {
+                    Navigator.pop(context);
+                  },
+                  child: const Text(
+                    "No",
+                    style: TextStyle(color: Color(0xFFE50F2A)),
+                  ),
+                ),
+                const SizedBox(width: 30),
                 ElevatedButton(
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.red,
@@ -75,20 +90,6 @@ class _ProfilePageState extends State<ProfileScreen> {
                   child: const Text(
                     "Yes",
                     style: TextStyle(color: Colors.white),
-                  ),
-                ),
-                const SizedBox(width: 30),
-                OutlinedButton(
-                  style: OutlinedButton.styleFrom(
-                    side:
-                        const BorderSide(color: Color(0xFFE50F2A), width: 1.5),
-                  ),
-                  onPressed: () {
-                    Navigator.pop(context);
-                  },
-                  child: const Text(
-                    "No",
-                    style: TextStyle(color: Color(0xFFE50F2A)),
                   ),
                 ),
               ],
@@ -145,7 +146,7 @@ class _ProfilePageState extends State<ProfileScreen> {
                         ),
                         SizedBox(height: 8),
                         Text(
-                          user.contactNumber!,
+                          Formatters.formatPhoneNumber(user.contactNumber!),
                           style: TextStyle(fontSize: 16)
                         ),
                         SizedBox(height: 30),

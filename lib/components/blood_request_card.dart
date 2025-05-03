@@ -18,7 +18,7 @@ class BloodRequestCard extends StatelessWidget {
       builder: (context) {
         return AlertDialog(
           title: const Text(
-            "Are you sure, that you want to confirm?",
+            "Are you sure you want to confirm?",
             textAlign: TextAlign.center,
             style: TextStyle(fontSize: 20, fontWeight: FontWeight.w500),
           ),

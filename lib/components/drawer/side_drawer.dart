@@ -196,26 +196,13 @@ class _NavDrawerState extends State<NavDrawer> {
       context: context,
       builder: (context) {
         return AlertDialog(
-          title: const Text("Are you sure, that you want to logout?",
+          title: const Text("Are you sure you want to logout?",
               textAlign: TextAlign.center,
               style: TextStyle(fontSize: 20, fontWeight: FontWeight.w500)),
           actions: [
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.red,
-                  ),
-                  onPressed: () async {
-                    logoutUser(context);
-                  },
-                  child: const Text(
-                    "Yes",
-                    style: TextStyle(color: Colors.white),
-                  ),
-                ),
-                const SizedBox(width: 30),
                 OutlinedButton(
                   style: OutlinedButton.styleFrom(
                     side:
@@ -227,6 +214,19 @@ class _NavDrawerState extends State<NavDrawer> {
                   child: const Text(
                     "No",
                     style: TextStyle(color: Color(0xFFE50F2A)),
+                  ),
+                ),
+                const SizedBox(width: 30),
+                ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.red,
+                  ),
+                  onPressed: () async {
+                    logoutUser(context);
+                  },
+                  child: const Text(
+                    "Yes",
+                    style: TextStyle(color: Colors.white),
                   ),
                 ),
               ],

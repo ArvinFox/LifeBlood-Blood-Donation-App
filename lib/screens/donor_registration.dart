@@ -7,7 +7,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 import 'package:lifeblood_blood_donation_app/components/custom_main_app_bar.dart';
-import 'package:lifeblood_blood_donation_app/components/login_button.dart';
 import 'package:lifeblood_blood_donation_app/components/text_field.dart';
 import 'package:lifeblood_blood_donation_app/models/medical_report_model.dart';
 import 'package:lifeblood_blood_donation_app/models/user_model.dart';
@@ -45,6 +44,19 @@ class _DonorRegistrationState extends State<DonorRegistration> {
   bool _isLoading = false;
   bool _isUploaded = false;
 
+  bool isEditing = false;
+  String? initialFullName;
+  String? initialDob;
+  String? initialGender;
+  String? initialContactNumber;
+  String? initialNic;
+  String? initialAddress;
+  String? initialBloodType;
+  String? initialProvince;
+  String? initialCity;
+  String? initialHealthCondition;
+  bool hasChanged = false;
+
   final List<String> bloodTypes = ['A+','B+','O+','AB+','A-','B-','O-','AB-'];
 
   final Map<String, List<String>> provinceCities = {
@@ -58,6 +70,27 @@ class _DonorRegistrationState extends State<DonorRegistration> {
     'Uva': ['Badulla', 'Monaragala'],
     'Sabaragamuwa': ['Ratnapura', 'Kegalle'],
   };
+
+  void _checkIfFormChanged() {
+  bool changed =
+      _fullNameController.text != initialFullName ||
+      _dobController.text != initialDob ||
+      selectedGender != initialGender ||
+      _contactNumberController.text != initialContactNumber ||
+      _nicController.text != initialNic ||
+      _addressController.text != initialAddress ||
+      selectedBloodType != initialBloodType ||
+      (selectedProvince ?? '') != initialProvince ||
+      (selectedCity ?? '') != initialCity ||
+      _healthConditionController.text != initialHealthCondition ||
+      _isUploaded;
+
+  if (changed != hasChanged) {
+    setState(() {
+      hasChanged = changed;
+    });
+  }
+}
 
   @override
   void initState() {
@@ -83,6 +116,24 @@ class _DonorRegistrationState extends State<DonorRegistration> {
           final DateFormat formatter = DateFormat('d-M-yyyy');
           _dobController.text = formatter.format(user.dob!);
         }
+
+        initialFullName = _fullNameController.text;
+        initialDob = _dobController.text;
+        initialGender = selectedGender;
+        initialContactNumber = _contactNumberController.text;
+        initialNic = _nicController.text;
+        initialAddress = _addressController.text;
+        initialBloodType = selectedBloodType;
+        initialProvince = selectedProvince ?? '';
+        initialCity = selectedCity ?? '';
+        initialHealthCondition = _healthConditionController.text;
+
+        _fullNameController.addListener(_checkIfFormChanged);
+        _dobController.addListener(_checkIfFormChanged);
+        _contactNumberController.addListener(_checkIfFormChanged);
+        _nicController.addListener(_checkIfFormChanged);
+        _addressController.addListener(_checkIfFormChanged);
+        _healthConditionController.addListener(_checkIfFormChanged);
 
         final supabase = Supabase.instance.client;
         final userId = user.userId;
@@ -112,6 +163,7 @@ class _DonorRegistrationState extends State<DonorRegistration> {
 
         setState(() {
           isSelected = true;
+          isEditing = true;
         });
       }
     });
@@ -354,6 +406,7 @@ class _DonorRegistrationState extends State<DonorRegistration> {
                       setState(() {
                         selectedProvince = val;
                         selectedCity = null;
+                        _checkIfFormChanged();
                       });
                     },
                   ),
@@ -368,6 +421,7 @@ class _DonorRegistrationState extends State<DonorRegistration> {
                       onChanged: (val) {
                         setState(() {
                           selectedCity = val;
+                          _checkIfFormChanged();
                         });
                       },
                     ),
@@ -385,7 +439,10 @@ class _DonorRegistrationState extends State<DonorRegistration> {
                   children: bloodTypes.map((type) {
                     final selected = selectedBloodType == type;
                     return GestureDetector(
-                      onTap:() => setState(() => selectedBloodType = type),
+                      onTap: () {
+                        setState(() => selectedBloodType = type);
+                        _checkIfFormChanged();
+                      },
                       child: AnimatedContainer(
                         duration: const Duration(milliseconds: 300),
                         width: 100,
@@ -489,12 +546,35 @@ class _DonorRegistrationState extends State<DonorRegistration> {
                   ],
                 ),
                 SizedBox(height: 15),
-                LoginButton(
-                  isLoading: _isLoading,
-                  text: 'Submit', 
-                  onPressed: _isLoading
-                    ? null
-                    : submitDonorDetails
+                SizedBox(
+                  width: double.infinity,
+                  child: ElevatedButton(
+                    onPressed: (!_isLoading && (isEditing ? hasChanged : true))
+                      ? submitDonorDetails
+                      : null,
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: (!_isLoading && (isEditing ? hasChanged : true))
+                        ? const Color.fromARGB(255, 255, 67, 67)
+                        : Colors.grey[400],
+                      foregroundColor: Colors.white,
+                      textStyle: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      elevation: (!_isLoading && (isEditing ? hasChanged : true)) ? 2 : 0,
+                      padding: const EdgeInsets.symmetric(vertical: 14),
+                    ),
+                    child: _isLoading
+                      ? const SizedBox(
+                          width: 24,
+                          height: 24,
+                          child: CircularProgressIndicator(
+                            color: Colors.white,
+                            strokeWidth: 2,
+                          ),
+                        )
+                      : Text(isEditing ? "Update Information" : "Submit Information"),
+                  ),
                 ),
               ],
             ),
@@ -553,6 +633,7 @@ class _DonorRegistrationState extends State<DonorRegistration> {
         .toList(),
       onChanged: (value) {
         setState(() => selectedGender = value.toString());
+        _checkIfFormChanged();
       },
       decoration: InputDecoration(
         border: OutlineInputBorder(borderRadius: BorderRadius.circular(15)),
