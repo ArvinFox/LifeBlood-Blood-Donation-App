@@ -5,7 +5,6 @@ import 'package:lifeblood_blood_donation_app/components/custom_button.dart';
 import 'package:lifeblood_blood_donation_app/components/text_field.dart';
 import 'package:lifeblood_blood_donation_app/services/otp_service.dart';
 import 'package:lifeblood_blood_donation_app/utils/helpers.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import '../../../components/custom_container.dart';
 
 class EnterOtpScreen extends StatefulWidget {
@@ -25,51 +24,54 @@ class EnterOtpScreen extends StatefulWidget {
 class _EnterOtpPageState extends State<EnterOtpScreen> {
   final TextEditingController _otpController = TextEditingController();
   final _formKey = GlobalKey<FormState>();
-  OtpService otpService = OtpService();
+  OtpService _otpService = OtpService();
+
   bool _isLoading = false;
-  bool _isOtpSent = false;
+  bool _isOtpSent = true;
   int _remainingTime = 30;
   Timer? _timer;
-  String _currentOtp = '';
+  String? _generatedOtp;
+  DateTime? _otpExpiryTime;
 
   @override
   void initState() {
     super.initState();
-    if(widget.otp.isNotEmpty){
-     setState(() {
-        _isOtpSent = true;
-        _currentOtp = widget.otp;
-     });
-     _startTimer();
+
+    if (widget.otp.isNotEmpty) {
+      setState(() {
+        _generatedOtp = widget.otp;
+        _otpExpiryTime = DateTime.now().add(Duration(minutes: 3));
+      });
+
+      _startTimer();
     }
   }
 
-  void verifyOtp() {
-    setState(() {
-      _isLoading = true;
-    });
-
-    String enteredOtp = _otpController.text.trim();
-
-    if(_remainingTime <=0){
-      Helpers.showError(context, "OTP has expired. Please request a new one.");
-      setState(() {
-        _isLoading = false;
-      });
+  Future<void> _resendOtp() async {
+    if (_isOtpSent) {
+      Helpers.showError(context, "Please wait $_remainingTime seconds before requesting another OTP.");
       return;
     }
 
-    if (enteredOtp == _currentOtp) {
-      Helpers.showSucess(context, "OTP verified sucessfully");
-      Navigator.pushNamed(context, '/new-password', arguments: {
-        'contactNumber': widget.contactNumber,
-      });
-    } else {
-      Helpers.showError(context, "Invalid OTP. Please try again");
+    String otp = Helpers.generateOtp();
+    bool isSuccess = await _otpService.sendSMSOtp(widget.contactNumber, otp);
+
+    if (isSuccess) {
       setState(() {
         _isLoading = false;
+        _isOtpSent = true;
+        _otpExpiryTime = DateTime.now().add(Duration(minutes: 3));
+        _remainingTime = 30;
+        _generatedOtp = otp;
       });
-      return;
+
+      _startTimer();
+
+      Helpers.showSucess(context, "OTP sent to ${widget.contactNumber}");
+
+    } else {
+      await Future.delayed(Duration(milliseconds: 250));
+      Helpers.showError(context, "Failed to resend OTP. Please try again.");
     }
   }
 
@@ -85,47 +87,64 @@ class _EnterOtpPageState extends State<EnterOtpScreen> {
         setState(() {
           _isOtpSent = false;
         });
-
-        SharedPreferences.getInstance().then((prefs) {
-          prefs.setBool('isOtpSent', false);
-          prefs.setInt('remainingTime', 0);
-        });
       }
     });
   }
 
-  Future<void> _reSendOtp({bool isResend = false}) async {
-    if (isResend && _isOtpSent) {
-      Helpers.showError(context, "Please wait $_remainingTime seconds before requesting another OTP.");
-      return;
+  Future<bool> _verifyOtp(String enteredOtp) async {
+    if (enteredOtp.isEmpty) {
+      Helpers.showError(context, "Please enter OTP.");
+      return false;
     }
 
-    String otp = Helpers.generateOtp();
-    bool isSuccess = await otpService.sendSMSOtp(widget.contactNumber, otp);
+    if (_generatedOtp == null || _otpExpiryTime == null) {
+      await Future.delayed(Duration(seconds: 1));
+      Helpers.showError(context, "OTP has expired. Please request a new one.");
+      return false;
+    }
 
-    if (isSuccess) {
-      setState(() {
-        _isLoading = false;
-        _isOtpSent = true;
-        _remainingTime = 30;
-        _currentOtp = otp;
-      });
+    if (DateTime.now().isAfter(_otpExpiryTime!)) {
+      await Future.delayed(Duration(seconds: 1));
+      Helpers.showError(context, "OTP has expired. Please request a new one.");
+      return false;
+    }
 
-      _startTimer();
+    if (enteredOtp != _generatedOtp) {
+      await Future.delayed(Duration(seconds: 1));
+      Helpers.showError(context, "Invalid OTP. Please try again.");
+      return false;
+    }
 
-      Helpers.showSucess(context, "OTP sent again to ${widget.contactNumber}");
+    setState(() {
+      _generatedOtp = null;
+      _otpExpiryTime = null;
+    });
+    
+    await Future.delayed(Duration(seconds: 2));
+    return true;
+  }
 
-    } else if (isResend) {
-      await Future.delayed(Duration(milliseconds: 250));
-      Helpers.showError(context, "Failed to resend OTP. Please try again.");;
+  Future<void> _handleOtpVerification() async {
+    setState(() => _isLoading = true);
+    bool isCorrectOtp = await _verifyOtp(_otpController.text);
+    setState(() => _isLoading = false);
+
+    if (isCorrectOtp) {
+      Navigator.pushNamed(
+        context, 
+        '/new-password', 
+        arguments: {
+          'contactNumber': widget.contactNumber,
+        },
+      );
     }
   }
 
   @override
   void dispose() {
-    super.dispose();
     _timer?.cancel();
     _otpController.dispose();
+    super.dispose();
   }
 
   @override
@@ -163,26 +182,22 @@ class _EnterOtpPageState extends State<EnterOtpScreen> {
             Align(
               alignment: Alignment.centerRight,
               child: GestureDetector(
-                onTap: () async {
-                  if(!_isOtpSent){
-                    _reSendOtp(isResend: true);
-                  }
-                },
+                onTap: () => _resendOtp(),
                 child: Text(
                   _isOtpSent
                       ? "Resend OTP in $_remainingTime seconds"
                       : "Resend OTP",
-                  style: TextStyle(color: Colors.red),
+                  style: TextStyle(
+                    color: _isOtpSent ? Colors.grey : Colors.red,
+                  ),
                 ),
               ),
             ),
             SizedBox(height: 40),
             CustomButton(
               onPressed: _isLoading
-                  ? null
-                  : () {
-                      verifyOtp();
-                    },
+                ? null
+                : () => _handleOtpVerification(),
               btnLabel: 'Continue',
               buttonChild: _isLoading
                   ? SizedBox(

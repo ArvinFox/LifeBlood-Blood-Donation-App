@@ -1,11 +1,12 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:lifeblood_blood_donation_app/components/custom_button.dart';
 import 'package:lifeblood_blood_donation_app/components/text_field.dart';
+import 'package:lifeblood_blood_donation_app/providers/user_provider.dart';
 import 'package:lifeblood_blood_donation_app/services/otp_service.dart';
+import 'package:lifeblood_blood_donation_app/services/user_service.dart';
 import 'package:lifeblood_blood_donation_app/utils/helpers.dart';
+import 'package:provider/provider.dart';
 import '../../../components/custom_container.dart';
 
 class EnterMobileNumber extends StatefulWidget {
@@ -19,9 +20,10 @@ class EnterMobileNumber extends StatefulWidget {
 class _EnterMobileNumberState extends State<EnterMobileNumber> {
   final TextEditingController _contactNumberController = TextEditingController();
   final _formKey = GlobalKey<FormState>();
+  final OtpService _otpService = OtpService();
+  final UserService _userService = UserService();
+
   bool isLoading = false;
-  final FirebaseFirestore firestore = FirebaseFirestore.instance;
-  final FirebaseAuth auth = FirebaseAuth.instance;
 
   @override
   void dispose() {
@@ -29,9 +31,8 @@ class _EnterMobileNumberState extends State<EnterMobileNumber> {
     _contactNumberController.dispose();
   }
 
-  void _checkAndSendOtp() async {
+  void _checkAndSendOtp(String userId) async {
     String contactNumber = _contactNumberController.text.trim();
-    OtpService otpService = OtpService();
 
     if (contactNumber.startsWith('0')) {
       // ignore: prefer_interpolation_to_compose_strings
@@ -48,32 +49,37 @@ class _EnterMobileNumberState extends State<EnterMobileNumber> {
     });
 
     try {
-      QuerySnapshot query = await firestore
-          .collection('user')
-          .where('contactNumber', isEqualTo: contactNumber)
-          .get();
+      final user = await _userService.getUserById(userId);
 
-      if (query.docs.isNotEmpty) {
-        //send Otp
+      if (user != null && user.contactNumber == contactNumber) {
         String otp = Helpers.generateOtp();
-        bool isOtpSent = await otpService.sendSMSOtp(contactNumber, otp);
+        bool isOtpSent = await _otpService.sendSMSOtp(contactNumber, otp);
 
         if (isOtpSent) {
           Helpers.showSucess(context, "OTP sent sucessfully to $contactNumber");
 
-          Navigator.pushNamed(context, '/enter-otp', arguments: {
-            'contactNumber': contactNumber,
-            'otp': otp
-          });
+          Navigator.pushNamed(
+            context, 
+            '/enter-otp', 
+            arguments: {
+              'contactNumber': contactNumber,
+              'otp': otp
+            },
+          );
         } else {
           Helpers.showError(context, "Failed to send OTP");
         }
       } else {
         Helpers.showError(
-            context, "Contact Number not found.Please try again later.");
+          context, 
+          "Contact Number not found. Please enter your registered contact number.",
+        );
       }
+
     } catch (e) {
-      Helpers.showError(context, "An error occured");
+      Helpers.debugPrintWithBorder("Error sending OTP: $e");
+      Helpers.showError(context, "An unexpected error occured. Please try again later.");
+
     } finally {
       setState(() {
         isLoading = false;
@@ -83,6 +89,8 @@ class _EnterMobileNumberState extends State<EnterMobileNumber> {
 
   @override
   Widget build(BuildContext context) {
+    final userProvider = Provider.of<UserProvider>(context, listen: false);
+
     return Scaffold(
       body: CustomContainer(
         child: Column(
@@ -125,7 +133,7 @@ class _EnterMobileNumberState extends State<EnterMobileNumber> {
               alignment: Alignment.centerRight,
               child: GestureDetector(
                 onTap: () {
-                  Navigator.popAndPushNamed(context, '/home_profile');
+                  Navigator.pop(context);
                 },
                 child: Text(
                   'Back to Profile',
@@ -137,9 +145,7 @@ class _EnterMobileNumberState extends State<EnterMobileNumber> {
             CustomButton(
               onPressed: isLoading
                   ? null
-                  : () {
-                      _checkAndSendOtp();
-                    },
+                  : () => _checkAndSendOtp(userProvider.user!.userId!),
               btnLabel: 'Continue',
               buttonChild: isLoading
                   ? SizedBox(

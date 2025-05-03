@@ -17,7 +17,7 @@ class OtpService{
     try {
       await twilio.sendSMS(
         toNumber: phoneNumber,
-        messageBody: "LifeBlood OTP: $otp. Valid for 30 seconds. Do not share this code with anyone."
+        messageBody: "LifeBlood OTP: $otp. Valid for 3 minutes. Do not share this code with anyone."
       );
       Helpers.debugPrintWithBorder("OTP sent successfully via SMS ($phoneNumber)");
       return true;
