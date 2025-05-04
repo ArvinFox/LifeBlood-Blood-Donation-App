@@ -2,7 +2,6 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:lifeblood_blood_donation_app/components/custom_main_app_bar.dart';
-import 'package:lifeblood_blood_donation_app/components/drawer/side_drawer.dart';
 import 'package:lifeblood_blood_donation_app/components/login_button.dart';
 import 'package:lifeblood_blood_donation_app/components/text_field.dart';
 import 'package:lifeblood_blood_donation_app/models/donation_request_model.dart';
@@ -15,11 +14,9 @@ import 'package:lifeblood_blood_donation_app/utils/helpers.dart';
 import 'package:provider/provider.dart';
 
 class RequestDonors extends StatefulWidget {
-  final NavigationPage navigation;
 
   const RequestDonors({
     super.key,
-    required this.navigation,
   });
 
   @override
@@ -268,12 +265,9 @@ class _RequestDonorsState extends State<RequestDonors> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: CustomMainAppbar(
-        title: 'Request Donor',
-        showLeading: widget.navigation != NavigationPage.bottomNavigation,
-        automaticallyImplyLeading:
-            widget.navigation == NavigationPage.sideDrawer,
+        title: 'Request a Donor',
+        showLeading: true,
       ),
-      endDrawer: NavDrawer(),
       backgroundColor: Colors.white,
       body: SingleChildScrollView(
         child: Padding(
@@ -486,5 +480,3 @@ class _RequestDonorsState extends State<RequestDonors> {
     );
   }
 }
-
-enum NavigationPage { bottomNavigation, sideDrawer }

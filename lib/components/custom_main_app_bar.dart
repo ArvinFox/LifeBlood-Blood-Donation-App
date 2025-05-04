@@ -12,7 +12,7 @@ class CustomMainAppbar extends StatelessWidget implements PreferredSizeWidget {
   Widget build(BuildContext context) {
     return AppBar(
       foregroundColor: Colors.white,
-      backgroundColor: Color(0xFFE50F2A),
+      backgroundColor: Color(0xFFe5142b),
       title: Text(
         title,
         style: TextStyle(

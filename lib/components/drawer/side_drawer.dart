@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:lifeblood_blood_donation_app/providers/user_provider.dart';
-import 'package:lifeblood_blood_donation_app/screens/request_donors.dart';
+import 'package:lifeblood_blood_donation_app/screens/donate_blood_screen.dart';
+import 'package:lifeblood_blood_donation_app/screens/request_donors_screen.dart';
 import 'package:lifeblood_blood_donation_app/screens/static/about_us_screen.dart';
 import 'package:lifeblood_blood_donation_app/screens/feedback_screen.dart';
 import 'package:lifeblood_blood_donation_app/screens/home_screen.dart';
@@ -170,8 +171,8 @@ class _NavDrawerState extends State<NavDrawer> {
       userProvider.resetUser(); // Reset user after logged out
       Navigator.pop(context);
       Navigator.pushNamedAndRemoveUntil(
-        context, 
-        '/login', 
+        context,
+        '/login',
         (route) => false,
       );
       // Navigator.pushReplacementNamed(context, '/login');
@@ -265,14 +266,15 @@ class _NavDrawerState extends State<NavDrawer> {
         children: [
           //list of menu drawer
           menuItem(1, "Home", Icons.home),
-          menuItem(2, "Find Donors", Icons.search),
-          menuItem(3, "Settings", Icons.settings),
-          menuItem(4, "Notifications", Icons.notifications),
-          menuItem(5, "Feedbacks", Icons.message),
-          menuItem(6, "Privacy policy", Icons.security),
-          menuItem(7, "Help", Icons.help),
-          menuItem(8, "About Us", Icons.info),
-          menuItem(9, "Logout", Icons.logout),
+          menuItem(2, "Request a Donor", Icons.search),
+          menuItem(3, "Donate Blood", Icons.bloodtype),
+          menuItem(4, "Settings", Icons.settings),
+          menuItem(5, "Notifications", Icons.notifications),
+          menuItem(6, "Feedbacks", Icons.message),
+          menuItem(7, "Privacy policy", Icons.security),
+          menuItem(8, "Help", Icons.help),
+          menuItem(9, "About Us", Icons.info),
+          menuItem(10, "Logout", Icons.logout),
         ],
       ),
     );
@@ -288,18 +290,21 @@ class _NavDrawerState extends State<NavDrawer> {
               // to navigate home page
               navigatePage(context, DrawerSelection.home);
             } else if (id == 2) {
-              // to navigate find donors page
+              // to navigate Request donors page
               navigatePage(context, DrawerSelection.search);
             } else if (id == 3) {
+              // to navigate Find donors page
+              navigatePage(context, DrawerSelection.request);
+            } else if (id == 4) {
               Navigator.pop(context);
               showSettingsDialog(context);
-            } else if (id == 4) {
+            } else if (id == 5) {
               // to navigate notification page
               navigatePage(context, DrawerSelection.notifications);
-            } else if (id == 5) {
+            } else if (id == 6) {
               // to navigate feedback page
               navigatePage(context, DrawerSelection.feedbacks);
-            } else if (id == 6) {
+            } else if (id == 7) {
               // to navigate privacy policy page
               navigatePage(context, DrawerSelection.privacyPolicy);
             } //else if (id == 7) {
@@ -309,7 +314,7 @@ class _NavDrawerState extends State<NavDrawer> {
             else if (id == 8) {
               //to navigate home page
               navigatePage(context, DrawerSelection.aboutUs);
-            } else if (id == 9) {
+            } else if (id == 10) {
               Navigator.pop(context);
               showLogoutDialog(context);
             }
@@ -359,9 +364,11 @@ class _NavDrawerState extends State<NavDrawer> {
               case DrawerSelection.home:
                 return MainLayoutScreen(selectIndex: 0);
               case DrawerSelection.search:
-                return RequestDonors(navigation: NavigationPage.sideDrawer);
+                return RequestDonors();
               case DrawerSelection.settings:
                 return HomeScreen();
+              case DrawerSelection.request:
+                return BloodRequestScreen();
               case DrawerSelection.notifications:
                 return NotificationScreen(
                     navigation: NotificationPageNavigation.sideDrawer);
@@ -386,6 +393,7 @@ class _NavDrawerState extends State<NavDrawer> {
 enum DrawerSelection {
   home,
   search,
+  request,
   settings,
   notifications,
   feedbacks,

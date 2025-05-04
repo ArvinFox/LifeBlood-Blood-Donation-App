@@ -20,6 +20,7 @@ class UserModel {
   final bool isDonorPromptShown;
   final DateTime? createdAt;
   final DateTime? profileCompletedAt;
+  final String? profilePicture;
 
   UserModel({
     this.userId,
@@ -41,6 +42,7 @@ class UserModel {
     required this.isDonorPromptShown,
     this.createdAt,
     this.profileCompletedAt,
+    this.profilePicture,
   });
 
   Map<String, dynamic> toFirestore() {
@@ -56,13 +58,14 @@ class UserModel {
       'province': province,
       'bloodType': bloodType,
       'healthConditions': healthConditions,
-      'donationCount':donationCount,
+      'donationCount': donationCount,
       'isActive': isActive,
       'isDonorVerified': isDonorVerified,
       'hasCompletedProfile': hasCompletedProfile,
       'isDonorPromptShown': isDonorPromptShown,
       'createdAt': createdAt != null ? Timestamp.fromDate(createdAt!) : null,
       'profileCompletedAt': profileCompletedAt != null ? Timestamp.fromDate(profileCompletedAt!) : null,
+      'profilePicture': profilePicture,
     };
   }
 
@@ -87,6 +90,7 @@ class UserModel {
       isDonorPromptShown: data['isDonorPromptShown'] as bool? ?? false,
       createdAt: data['createdAt'] != null ? (data['createdAt'] as Timestamp).toDate() : null,
       profileCompletedAt: data['profileCompletedAt'] != null ? (data['profileCompletedAt'] as Timestamp).toDate() : null,
+      profilePicture: data['profilePicture'],
     );
   }
 }

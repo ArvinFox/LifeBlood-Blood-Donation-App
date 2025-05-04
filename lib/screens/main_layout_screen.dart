@@ -1,9 +1,9 @@
 import 'package:curved_navigation_bar/curved_navigation_bar.dart';
 import 'package:flutter/material.dart';
+import 'package:lifeblood_blood_donation_app/screens/chooseAction.dart';
 import 'package:lifeblood_blood_donation_app/screens/home_screen.dart';
 import 'package:lifeblood_blood_donation_app/screens/notification_screen.dart';
 import 'package:lifeblood_blood_donation_app/screens/profile_screen.dart';
-import 'package:lifeblood_blood_donation_app/screens/request_donors.dart';
 
 class MainLayoutScreen extends StatefulWidget {
   final int selectIndex;
@@ -29,7 +29,7 @@ class _MainLayoutScreenState extends State<MainLayoutScreen> {
 
   final List<Widget> pages = [
     HomeScreen(),
-    RequestDonors(navigation: NavigationPage.bottomNavigation),
+    ChooseActionPage(navigation: ChooseActionPageNavigation.bottomNavigation),
     NotificationScreen(navigation: NotificationPageNavigation.bottomNavigation),
     ProfileScreen(navigation: ProfilePageNavigation.bottomNavigation),
   ];
@@ -61,7 +61,7 @@ class _MainLayoutScreenState extends State<MainLayoutScreen> {
             ),
             child: CurvedNavigationBar(
               backgroundColor: Colors.transparent,
-              color: Color(0xFFE50F2A),
+              color: Color(0xFFe5142b),
               items: items,
               index: _currentIndex,
               onTap: _onItemTapped,

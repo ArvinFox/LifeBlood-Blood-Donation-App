@@ -50,7 +50,7 @@ class _NotificationScreenState extends State<NotificationScreen> {
           style: TextStyle(
             color: Colors.white,
             fontSize: 25,
-            fontWeight: FontWeight.w500,
+            fontWeight: FontWeight.bold,
           ),
         ),
         automaticallyImplyLeading:

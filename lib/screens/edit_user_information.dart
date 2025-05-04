@@ -67,10 +67,10 @@ class _EditUserInformationState extends State<EditUserInformation> {
 
   void _checkIfFormChanged() {
     bool changed = _contactNumberController.text != initialContactNumber ||
-      _addressController.text != initialAddress ||
-      (selectedProvince ?? '') != initialProvince ||
-      (selectedCity ?? '') != initialCity ||
-      _healthConditionController.text != initialHealthCondition;
+        _addressController.text != initialAddress ||
+        (selectedProvince ?? '') != initialProvince ||
+        (selectedCity ?? '') != initialCity ||
+        _healthConditionController.text != initialHealthCondition;
 
     if (changed != hasChanged) {
       setState(() {
@@ -82,6 +82,7 @@ class _EditUserInformationState extends State<EditUserInformation> {
   @override
   void initState() {
     super.initState();
+    _isLoading = true;
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       final userProvider = Provider.of<UserProvider>(context, listen: false);
       final user = userProvider.user;
@@ -145,6 +146,7 @@ class _EditUserInformationState extends State<EditUserInformation> {
 
         setState(() {
           isSelected = true;
+          _isLoading = false;
         });
       }
     });
@@ -297,290 +299,306 @@ class _EditUserInformationState extends State<EditUserInformation> {
     return Scaffold(
       appBar: CustomMainAppbar(title: 'Edit Donor Info', showLeading: true),
       backgroundColor: Colors.white,
-      body: SingleChildScrollView(
-        child: Padding(
-          padding: const EdgeInsets.all(20),
-          child: Form(
-            key: _formKey,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                // Non-Editable Information Section
-                Container(
-                  padding: const EdgeInsets.all(16),
-                  decoration: BoxDecoration(
-                    color: Colors.grey[100], // Light grey background
-                    borderRadius: BorderRadius.circular(12), // Rounded corners
-                    border:
-                        Border.all(color: Colors.grey[300]!), // Border color
-                  ),
+      body: _isLoading
+          ? const Center(
+              child: CircularProgressIndicator(
+                color: Colors.red, // Red spinner
+              ),
+            )
+          : SingleChildScrollView(
+              child: Padding(
+                padding: const EdgeInsets.all(20),
+                child: Form(
+                  key: _formKey,
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const Text(
-                        "Non-Editable Information",
-                        style: TextStyle(
-                            fontSize: 22,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.black),
-                      ),
-                      const SizedBox(height: 15),
-                      CustomInputBox(
-                        textName: 'Full Name',
-                        hintText: 'Enter full name here',
-                        controller: _fullNameController,
-                        NoneedToEdit: true,
-                      ),
-                      _buildDatePicker(
-                          'Date Of Birth', _dobController, _selectedDate,
-                          (picked) {
-                        setState(() {
-                          _selectedDate = picked;
-                          _dobController.text =
-                              '${picked.day}-${picked.month}-${picked.year}';
-                        });
-                      }, 'dd-mm-yyyy'),
-                      const SizedBox(height: 15),
-                      Text(
-                        "Gender",
-                        style: TextStyle(
-                            fontSize: 16,
-                            color: Colors.black,
-                            fontWeight: FontWeight.bold),
-                      ),
-                      SizedBox(height: 5),
-                      _buildGenderSelector(),
-                      const SizedBox(height: 15),
-                      CustomInputBox(
-                        textName: 'NIC',
-                        hintText: 'Enter NIC here',
-                        controller: _nicController,
-                        NoneedToEdit: true,
-                      ),
-                      const SizedBox(height: 16),
-                      Text(
-                        "Your uploaded report:",
-                        style: TextStyle(
-                            fontSize: 16,
-                            color: Colors.black,
-                            fontWeight: FontWeight.bold),
-                      ),
-                      if (medicalReport != null &&
-                          userProvider.user!.hasCompletedProfile!)
-                        Column(
+                      // Non-Editable Information Section
+                      Container(
+                        padding: const EdgeInsets.all(16),
+                        decoration: BoxDecoration(
+                          color: Colors.grey[100], // Light grey background
+                          borderRadius:
+                              BorderRadius.circular(12), // Rounded corners
+                          border: Border.all(
+                              color: Colors.grey[300]!), // Border color
+                        ),
+                        child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            GestureDetector(
-                              onTap: () {
-                                launchUrl(Uri.parse(medicalReport!));
-                              },
-                              child: Text(
-                                "View Medical Report",
-                                style: TextStyle(
-                                  color: Colors.blue,
-                                  decoration: TextDecoration.underline,
-                                ),
-                              ),
+                            const Text(
+                              "Non-Editable Information",
+                              style: TextStyle(
+                                  fontSize: 22,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.black),
                             ),
-                            SizedBox(height: 20),
+                            const SizedBox(height: 15),
+                            CustomInputBox(
+                              textName: 'Full Name',
+                              hintText: 'Enter full name here',
+                              controller: _fullNameController,
+                              NoneedToEdit: true,
+                            ),
+                            _buildDatePicker(
+                                'Date Of Birth', _dobController, _selectedDate,
+                                (picked) {
+                              setState(() {
+                                _selectedDate = picked;
+                                _dobController.text =
+                                    '${picked.day}-${picked.month}-${picked.year}';
+                              });
+                            }, 'dd-mm-yyyy'),
+                            const SizedBox(height: 15),
+                            Text(
+                              "Gender",
+                              style: TextStyle(
+                                  fontSize: 16,
+                                  color: Colors.black,
+                                  fontWeight: FontWeight.bold),
+                            ),
+                            SizedBox(height: 5),
+                            _buildGenderSelector(),
+                            const SizedBox(height: 15),
+                            CustomInputBox(
+                              textName: 'NIC',
+                              hintText: 'Enter NIC here',
+                              controller: _nicController,
+                              NoneedToEdit: true,
+                            ),
+                            const SizedBox(height: 16),
+                            Text(
+                              "Your uploaded report:",
+                              style: TextStyle(
+                                  fontSize: 16,
+                                  color: Colors.black,
+                                  fontWeight: FontWeight.bold),
+                            ),
+                            if (medicalReport != null &&
+                                userProvider.user!.hasCompletedProfile!)
+                              Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  GestureDetector(
+                                    onTap: () {
+                                      launchUrl(Uri.parse(medicalReport!));
+                                    },
+                                    child: Text(
+                                      "View Medical Report",
+                                      style: TextStyle(
+                                        color: Colors.blue,
+                                        decoration: TextDecoration.underline,
+                                      ),
+                                    ),
+                                  ),
+                                  SizedBox(height: 20),
+                                ],
+                              ),
+                            SizedBox(height: 15),
+                            const Text(
+                              "Blood Type",
+                              style: TextStyle(
+                                  fontSize: 16,
+                                  color: Colors.black,
+                                  fontWeight: FontWeight.bold),
+                            ),
+                            const SizedBox(height: 16),
+                            Wrap(
+                              spacing: 20,
+                              runSpacing: 20,
+                              children: [
+                                Container(
+                                  width: 100,
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 20, vertical: 12),
+                                  decoration: BoxDecoration(
+                                    color: selectedBloodType != null
+                                        ? Colors
+                                            .redAccent // Background color when selected
+                                        : Colors
+                                            .white, // Default background color if no selection
+                                    borderRadius: BorderRadius.circular(20),
+                                    border: Border.all(
+                                      color: selectedBloodType != null
+                                          ? Colors
+                                              .red // Border color when selected
+                                          : Colors.grey, // Default border color
+                                      width: 2,
+                                    ),
+                                    boxShadow: selectedBloodType != null
+                                        ? [
+                                            BoxShadow(
+                                              color: Colors.redAccent
+                                                  .withOpacity(0.6),
+                                              blurRadius: 10,
+                                              offset: const Offset(0, 4),
+                                            ),
+                                          ]
+                                        : [], // Add shadow if selected
+                                  ),
+                                  child: Center(
+                                    child: Text(
+                                      selectedBloodType ??
+                                          '', // Display selected blood type or empty
+                                      style: TextStyle(
+                                        fontSize: 18,
+                                        color: selectedBloodType != null
+                                            ? Colors
+                                                .white // White text color when selected
+                                            : Colors
+                                                .black, // Default text color if no selection
+                                        fontWeight: FontWeight.w600,
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            )
                           ],
                         ),
-                      SizedBox(height: 15),
-                      const Text(
-                        "Blood Type",
-                        style: TextStyle(
-                            fontSize: 16,
-                            color: Colors.black,
-                            fontWeight: FontWeight.bold),
                       ),
-                      const SizedBox(height: 16),
-                      Wrap(
-                        spacing: 20,
-                        runSpacing: 20,
-                        children: [
-                          Container(
-                            width: 100,
-                            padding: const EdgeInsets.symmetric(
-                                horizontal: 20, vertical: 12),
-                            decoration: BoxDecoration(
-                              color: selectedBloodType != null
-                                  ? Colors
-                                      .redAccent // Background color when selected
-                                  : Colors
-                                      .white, // Default background color if no selection
-                              borderRadius: BorderRadius.circular(20),
-                              border: Border.all(
-                                color: selectedBloodType != null
-                                    ? Colors.red // Border color when selected
-                                    : Colors.grey, // Default border color
-                                width: 2,
-                              ),
-                              boxShadow: selectedBloodType != null
-                                  ? [
-                                      BoxShadow(
-                                        color:
-                                            Colors.redAccent.withOpacity(0.6),
-                                        blurRadius: 10,
-                                        offset: const Offset(0, 4),
-                                      ),
-                                    ]
-                                  : [], // Add shadow if selected
+
+                      const SizedBox(height: 22),
+
+                      // Editable Information Section
+                      Container(
+                        padding: const EdgeInsets.all(16),
+                        decoration: BoxDecoration(
+                          color: Colors.grey[100],
+                          borderRadius: BorderRadius.circular(12),
+                          border: Border.all(color: Colors.grey[300]!),
+                        ),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            const Text(
+                              "Editable Information",
+                              style: TextStyle(
+                                  fontSize: 22,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.black),
                             ),
-                            child: Center(
-                              child: Text(
-                                selectedBloodType ??
-                                    '', // Display selected blood type or empty
-                                style: TextStyle(
-                                  fontSize: 18,
-                                  color: selectedBloodType != null
-                                      ? Colors
-                                          .white // White text color when selected
-                                      : Colors
-                                          .black, // Default text color if no selection
-                                  fontWeight: FontWeight.w600,
+                            const SizedBox(height: 15),
+                            CustomInputBox(
+                              textName: 'Contact Number',
+                              hintText: 'Enter contact number here',
+                              controller: _contactNumberController,
+                              keyboardType: TextInputType.number,
+                              validator: (value) {
+                                if (value == null || value.trim().isEmpty) {
+                                  return 'Required';
+                                } else if (value.trim().length != 10) {
+                                  return 'Phone number should contain 10 digits';
+                                }
+                                return null;
+                              },
+                              inputFormatters: [
+                                FilteringTextInputFormatter.digitsOnly,
+                                LengthLimitingTextInputFormatter(10),
+                              ],
+                            ),
+                            CustomInputBox(
+                                textName: 'Address',
+                                hintText: 'Enter address here',
+                                controller: _addressController),
+                            _inputBox(
+                              _buildDropdown(
+                                label: "Province",
+                                items: provinceCities.keys.toList(),
+                                value: selectedProvince,
+                                onChanged: (val) {
+                                  setState(() {
+                                    selectedProvince = val;
+                                    selectedCity = null;
+                                    _checkIfFormChanged();
+                                  });
+                                },
+                              ),
+                            ),
+                            const SizedBox(height: 15),
+                            if (selectedProvince != null)
+                              _inputBox(
+                                _buildDropdown(
+                                  label: "City",
+                                  items: provinceCities[selectedProvince]!,
+                                  value: selectedCity,
+                                  onChanged: (val) {
+                                    setState(() {
+                                      selectedCity = val;
+                                      _checkIfFormChanged();
+                                    });
+                                  },
                                 ),
                               ),
+                            const SizedBox(height: 15),
+                            Text(
+                              "Health Conditions",
+                              style: TextStyle(
+                                  fontSize: 16,
+                                  color: Colors.black,
+                                  fontWeight: FontWeight.bold),
                             ),
-                          ),
-                        ],
-                      )
-                    ],
-                  ),
-                ),
-
-                const SizedBox(height: 22),
-
-                // Editable Information Section
-                Container(
-                  padding: const EdgeInsets.all(16),
-                  decoration: BoxDecoration(
-                    color: Colors.grey[100],
-                    borderRadius: BorderRadius.circular(12),
-                    border: Border.all(color: Colors.grey[300]!),
-                  ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      const Text(
-                        "Editable Information",
-                        style: TextStyle(
-                            fontSize: 22,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.black),
-                      ),
-                      const SizedBox(height: 15),
-                      CustomInputBox(
-                        textName: 'Contact Number',
-                        hintText: 'Enter contact number here',
-                        controller: _contactNumberController,
-                        keyboardType: TextInputType.number,
-                        validator: (value) {
-                          if (value == null || value.trim().isEmpty) {
-                            return 'Required';
-                          } else if (value.trim().length != 10) {
-                            return 'Phone number should contain 10 digits';
-                          }
-                          return null;
-                        },
-                        inputFormatters: [
-                          FilteringTextInputFormatter.digitsOnly,
-                          LengthLimitingTextInputFormatter(10),
-                        ],
-                      ),
-                      CustomInputBox(
-                          textName: 'Address',
-                          hintText: 'Enter address here',
-                          controller: _addressController),
-                      _inputBox(
-                        _buildDropdown(
-                          label: "Province",
-                          items: provinceCities.keys.toList(),
-                          value: selectedProvince,
-                          onChanged: (val) {
-                            setState(() {
-                              selectedProvince = val;
-                              selectedCity = null;
-                              _checkIfFormChanged();
-                            });
-                          },
-                        ),
-                      ),
-                      const SizedBox(height: 15),
-                      if (selectedProvince != null)
-                        _inputBox(
-                          _buildDropdown(
-                            label: "City",
-                            items: provinceCities[selectedProvince]!,
-                            value: selectedCity,
-                            onChanged: (val) {
-                              setState(() {
-                                selectedCity = val;
-                                _checkIfFormChanged();
-                              });
-                            },
-                          ),
-                        ),
-                      const SizedBox(height: 15),
-                      Text(
-                        "Health Conditions",
-                        style: TextStyle(
-                            fontSize: 16,
-                            color: Colors.black,
-                            fontWeight: FontWeight.bold),
-                      ),
-                      SizedBox(height: 15),
-                      TextFormField(
-                        controller: _healthConditionController,
-                        maxLines: 20,
-                        minLines: 1,
-                        validator: (value) {
-                          return Helpers.validateInputFields(
-                              value, 'Please enter your health conditions');
-                        },
-                        decoration: InputDecoration(
-                          hintText: 'Enter your health conditions',
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(10),
-                          ),
-                          filled: true,
-                          fillColor: Colors.white,
-                        ),
-                      ),
-                      SizedBox(height: 15),
-                      SizedBox(
-                        width: double.infinity,
-                        child: ElevatedButton(
-                          onPressed: (!_isLoading && hasChanged) ? submitDonorDetails : null,
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: (!_isLoading && hasChanged) ? const Color.fromARGB(255, 255, 67, 67) : Colors.grey[400],
-                            foregroundColor: Colors.white,
-                            textStyle: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(10),
-                            ),
-                            elevation: (!_isLoading && hasChanged) ? 2 : 0,
-                            padding: const EdgeInsets.symmetric(vertical: 14),
-                          ),
-                          child: _isLoading
-                            ? const SizedBox(
-                                width: 24,
-                                height: 24,
-                                child: CircularProgressIndicator(
-                                  color: Colors.white,
-                                  strokeWidth: 2,
+                            SizedBox(height: 15),
+                            TextFormField(
+                              controller: _healthConditionController,
+                              maxLines: 20,
+                              minLines: 1,
+                              validator: (value) {
+                                return Helpers.validateInputFields(value,
+                                    'Please enter your health conditions');
+                              },
+                              decoration: InputDecoration(
+                                hintText: 'Enter your health conditions',
+                                border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(10),
                                 ),
-                              )
-                            : const Text("Update Information"),
+                                filled: true,
+                                fillColor: Colors.white,
+                              ),
+                            ),
+                            SizedBox(height: 15),
+                            SizedBox(
+                              width: double.infinity,
+                              child: ElevatedButton(
+                                onPressed: (!_isLoading && hasChanged)
+                                    ? submitDonorDetails
+                                    : null,
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: (!_isLoading && hasChanged)
+                                      ? const Color.fromARGB(255, 255, 67, 67)
+                                      : Colors.grey[400],
+                                  foregroundColor: Colors.white,
+                                  textStyle: const TextStyle(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.bold),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(10),
+                                  ),
+                                  elevation:
+                                      (!_isLoading && hasChanged) ? 2 : 0,
+                                  padding:
+                                      const EdgeInsets.symmetric(vertical: 14),
+                                ),
+                                child: _isLoading
+                                    ? const SizedBox(
+                                        width: 24,
+                                        height: 24,
+                                        child: CircularProgressIndicator(
+                                          color: Colors.white,
+                                          strokeWidth: 2,
+                                        ),
+                                      )
+                                    : const Text("Update Information"),
+                              ),
+                            ),
+                          ],
                         ),
                       ),
                     ],
                   ),
                 ),
-              ],
+              ),
             ),
-          ),
-        ),
-      ),
     );
   }
 

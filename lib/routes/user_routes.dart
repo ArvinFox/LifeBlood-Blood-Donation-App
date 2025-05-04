@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:lifeblood_blood_donation_app/screens/chooseAction.dart';
 import 'package:lifeblood_blood_donation_app/screens/donor_registration.dart';
-import 'package:lifeblood_blood_donation_app/screens/blood_request_screen.dart';
+import 'package:lifeblood_blood_donation_app/screens/donate_blood_screen.dart';
 import 'package:lifeblood_blood_donation_app/screens/donation_history_screen.dart';
 import 'package:lifeblood_blood_donation_app/screens/edit_user_information.dart';
 import 'package:lifeblood_blood_donation_app/screens/events_screen.dart';
@@ -8,15 +9,16 @@ import 'package:lifeblood_blood_donation_app/screens/feedback_screen.dart';
 import 'package:lifeblood_blood_donation_app/screens/main_layout_screen.dart';
 import 'package:lifeblood_blood_donation_app/screens/notification_screen.dart';
 import 'package:lifeblood_blood_donation_app/screens/profile_screen.dart';
-import 'package:lifeblood_blood_donation_app/screens/request_donors.dart';
+import 'package:lifeblood_blood_donation_app/screens/request_donors_screen.dart';
 import 'package:lifeblood_blood_donation_app/screens/rewards_screen.dart';
 
 class UserRoutes {
   static Map<String, WidgetBuilder> routes = {
     '/home': (context) => MainLayoutScreen(selectIndex: 0,),
+    'chooseAction': (context) => ChooseActionPage(navigation: ChooseActionPageNavigation.sideDrawer,),
     '/home_profile': (context) => MainLayoutScreen(selectIndex: 3),
     '/donor-registration': (context) => DonorRegistration(),
-    '/find-donor': (context) => RequestDonors(navigation: NavigationPage.sideDrawer,),
+    '/find-donor': (context) => RequestDonors(),
     '/notifications': (context) => NotificationScreen(navigation: NotificationPageNavigation.sideDrawer,),
     '/profile': (context) => ProfileScreen(navigation: ProfilePageNavigation.sideDrawer,),
     '/feedback': (context) => FeedbackScreen(),
