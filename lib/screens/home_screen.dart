@@ -528,17 +528,26 @@ class _HomePageState extends State<HomeScreen> {
                 crossAxisAlignment: CrossAxisAlignment.end,
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: [
-                  SmallButton(
-                    buttonLabel: "See More Donation Requests",
-                    buttonHeight: 40,
-                    buttonWidth: 240,
-                    buttonColor: Colors.white,
-                    borderColor: Colors.black,
-                    labelColor: Colors.black,
-                    onTap: () {
-                      Navigator.pushNamed(context, '/donation-request');
-                    },
-                  ),
+                  Consumer<UserProvider>(
+                      builder: (context, userProvider, child) {
+                    final isDonor = userProvider.user?.isDonorVerified ?? false;
+                    return SmallButton(
+                      buttonLabel: "See More Donation Requests",
+                      buttonHeight: 40,
+                      buttonWidth: 240,
+                      buttonColor: Colors.white,
+                      borderColor: Colors.black,
+                      labelColor: Colors.black,
+                      onTap: () {
+                        if (isDonor) {
+                          Navigator.pushNamed(context, '/donation-request');
+                        }
+                        else {
+                          showAlertNotRegistered(context);
+                          }
+                      },
+                    );
+                  })
                 ],
               ),
               SizedBox(height: 5),
@@ -578,6 +587,19 @@ class _HomePageState extends State<HomeScreen> {
         ),
       ),
     );
+  }
+  void showAlertNotRegistered(BuildContext context) {
+    showDialog(
+        context: context,
+        builder: (context) => AlertDialog(
+              title: Text('Access Restricted'),
+              content:
+                  Text('This feature is only accessible for verified users.'),
+              actions: [
+                TextButton(
+                    onPressed: () => Navigator.pop(context), child: Text('Ok'))
+              ],
+            ));
   }
 
   void _showDonorNotVerifiedPopup(BuildContext context,

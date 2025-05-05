@@ -15,14 +15,16 @@ class SignupScreen extends StatefulWidget {
 class _SignupScreenState extends State<SignupScreen> {
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
+  final _confirmPasswordController = TextEditingController();
   final _formKey = GlobalKey<FormState>();
   bool isLoading = false;
   String passwordStrength = '';
 
   @override
   void dispose() {
-    _emailController.clear();
-    _passwordController.clear();
+    _emailController.dispose();
+    _passwordController.dispose();
+    _confirmPasswordController.dispose();
     super.dispose();
   }
 
@@ -34,12 +36,17 @@ class _SignupScreenState extends State<SignupScreen> {
     });
 
     try {
-      if(_formKey.currentState!.validate() && _emailController.text.isNotEmpty && _passwordController.text.isNotEmpty){
-        await auth.createUser(context,_emailController.text.trim(), _passwordController.text.trim());
-        Helpers.showSucess(context, 'Signup sucessfully');
+      if (_formKey.currentState!.validate() &&
+          _emailController.text.isNotEmpty &&
+          _passwordController.text.isNotEmpty &&
+          _confirmPasswordController.text.isNotEmpty &&
+          _passwordController.text == _confirmPasswordController.text) {
+
+        await auth.createUser(context, _emailController.text.trim(), _passwordController.text.trim());
+        Helpers.showSucess(context, 'Signup successfully');
         auth.signOut();
         Navigator.pushNamed(context, '/login');
-      } 
+      }
     } finally {
       setState(() {
         isLoading = false;
@@ -88,14 +95,14 @@ class _SignupScreenState extends State<SignupScreen> {
                       hintText: 'Enter your password',
                       controller: _passwordController,
                       hasAstricks: true,
-                      onChanged: (value){
+                      onChanged: (value) {
                         setState(() {
                           passwordStrength = Helpers.checkPasswordStrength(value);
                         });
                       },
                       validator: (value) => (value == null || value.trim().isEmpty)
-                      ? '* Required'
-                      : null,
+                          ? '* Required'
+                          : null,
                       autovalidateMode: AutovalidateMode.onUserInteraction,
                     ),
                     if (_passwordController.text.isNotEmpty)
@@ -110,48 +117,56 @@ class _SignupScreenState extends State<SignupScreen> {
                           fontWeight: FontWeight.w500,
                         ),
                       ),
-                    SizedBox(height: 4)
+                    const SizedBox(height: 4),
+                    CustomInputBox(
+                      textName: 'Confirm Password',
+                      hintText: 'Re-enter your password',
+                      controller: _confirmPasswordController,
+                      hasAstricks: true,
+                      validator: (value) {
+                        if (value == null || value.isEmpty) return '* Required';
+                        if (value != _passwordController.text) return 'Passwords do not match';
+                        return null;
+                      },
+                      autovalidateMode: AutovalidateMode.onUserInteraction,
+                    ),
                   ],
                 ),
               ],
             ),
           ),
-
-          // back to login link
           Align(
             alignment: Alignment.centerRight,
             child: GestureDetector(
               onTap: () {
                 Navigator.pushNamed(context, '/login');
               },
-              child: Text(
+              child: const Text(
                 'Back to login',
                 style: TextStyle(color: Colors.red),
               ),
             ),
           ),
           const SizedBox(height: 25),
-
-          // signup button
           CustomButton(
-            onPressed: isLoading ? null : () {
-              signupUser();
-            },
+            onPressed: isLoading ? null : () => signupUser(),
             btnLabel: 'Sign Up',
-            buttonChild: isLoading ? SizedBox(
-              width: 20,
-              height: 20,
-              child: CircularProgressIndicator(
-                strokeWidth: 2.0,
-                color: Colors.red,
-              ),
-            ) : null,
+            buttonChild: isLoading
+                ? const SizedBox(
+                    width: 20,
+                    height: 20,
+                    child: CircularProgressIndicator(
+                      strokeWidth: 2.0,
+                      color: Colors.red,
+                    ),
+                  )
+                : null,
             cornerRadius: 15,
             btnColor: isLoading ? Colors.grey : Colors.white,
-            btnBorderColor: Color(0xFFE50F2A),
-            labelColor: isLoading ? Colors.grey :Color(0xFFE50F2A) ,
+            btnBorderColor: const Color(0xFFE50F2A),
+            labelColor: isLoading ? Colors.grey : const Color(0xFFE50F2A),
           ),
-          SizedBox(height: 20),
+          const SizedBox(height: 20),
         ],
       ),
     );

@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:lifeblood_blood_donation_app/components/custom_main_app_bar.dart';
 import 'package:lifeblood_blood_donation_app/components/drawer/side_drawer.dart';
+import 'package:lifeblood_blood_donation_app/providers/user_provider.dart';
+import 'package:provider/provider.dart';
 
 class ChooseActionPage extends StatefulWidget {
   final ChooseActionPageNavigation navigation;
@@ -20,7 +22,8 @@ class _ChooseActionPageState extends State<ChooseActionPage> {
     return Scaffold(
       appBar: CustomMainAppbar(
         title: 'Choose Your Preference',
-        showLeading: widget.navigation != ChooseActionPageNavigation.bottomNavigation,
+        showLeading:
+            widget.navigation != ChooseActionPageNavigation.bottomNavigation,
         automaticallyImplyLeading:
             widget.navigation == ChooseActionPageNavigation.sideDrawer,
       ),
@@ -29,7 +32,11 @@ class _ChooseActionPageState extends State<ChooseActionPage> {
         width: double.infinity,
         decoration: const BoxDecoration(
           gradient: LinearGradient(
-            colors: [Colors.white, Color.fromARGB(255, 247, 167, 178), Colors.white],
+            colors: [
+              Colors.white,
+              Color.fromARGB(255, 247, 167, 178),
+              Colors.white
+            ],
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
           ),
@@ -44,12 +51,23 @@ class _ChooseActionPageState extends State<ChooseActionPage> {
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        _actionButton(
-                          context: context,
-                          title: "Donate Blood",
-                          icon: Icons.volunteer_activism,
-                          onTap: () {
-                            Navigator.pushNamed(context, '/donation-request');
+                        Consumer<UserProvider>(
+                          builder: (context, userProvider, child) {
+                            final isDonor =
+                                userProvider.user?.isDonorVerified ?? false;
+                            return _actionButton(
+                              context: context,
+                              title: "Donate Blood",
+                              icon: Icons.volunteer_activism,
+                              onTap: () {
+                                if (isDonor) {
+                                  Navigator.pushNamed(
+                                      context, '/donation-request');
+                                } else {
+                                  showAlert(context);
+                                }
+                              },
+                            );
                           },
                         ),
                         const SizedBox(height: 40),
@@ -71,6 +89,20 @@ class _ChooseActionPageState extends State<ChooseActionPage> {
         ),
       ),
     );
+  }
+
+  void showAlert(BuildContext context) {
+    showDialog(
+        context: context,
+        builder: (context) => AlertDialog(
+              title: Text('Access Restricted'),
+              content:
+                  Text('This feature is only accessible for verified users.'),
+              actions: [
+                TextButton(
+                    onPressed: () => Navigator.pop(context), child: Text('Ok'))
+              ],
+            ));
   }
 
   Widget _actionButton({

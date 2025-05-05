@@ -36,22 +36,51 @@ class _ProfilePageState extends State<ProfileScreen> {
     });
   }
 
-  void showAlert(BuildContext context){
+  void showAlert(BuildContext context) {
     showDialog(
-      context: context, 
-      builder: (context) => AlertDialog(
-        title: Text('Access Restricted'),
-        content: Text('This feature is only accessible for verified users.'),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context), 
-            child: Text('Ok')
-          )
-        ],
-      )
-    );
+        context: context,
+        builder: (context) => AlertDialog(
+              title: Text('Access Restricted'),
+              content:
+                  Text('This feature is only accessible for verified users.'),
+              actions: [
+                TextButton(
+                    onPressed: () => Navigator.pop(context), child: Text('Ok'))
+              ],
+            ));
   }
-  
+
+  //Logout functionality
+  void logoutUser(BuildContext context) async {
+    final auth = UserService();
+    final userProvider = Provider.of<UserProvider>(context, listen: false);
+
+    try {
+      await auth.signOut();
+      userProvider.resetUser(); // Reset user after logged out
+      Navigator.pop(context);
+      Navigator.pushNamedAndRemoveUntil(
+        context,
+        '/login',
+        (route) => false,
+      );
+      // Navigator.pushReplacementNamed(context, '/login');
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            "Logout failed. Please try again.",
+            style: TextStyle(
+              color: Colors.white,
+            ),
+          ),
+          backgroundColor: Colors.black.withOpacity(0.3),
+        ),
+      );
+    }
+  }
+
+  // Logout Dialog Box
   void showLogoutDialog(BuildContext context) {
     showDialog(
       context: context,
@@ -83,9 +112,7 @@ class _ProfilePageState extends State<ProfileScreen> {
                     backgroundColor: Colors.red,
                   ),
                   onPressed: () async {
-                    Navigator.pop(context);  
-                    await userService.signOut();
-                    Navigator.pushReplacementNamed(context, '/login'); 
+                    logoutUser(context);
                   },
                   child: const Text(
                     "Yes",
@@ -107,7 +134,7 @@ class _ProfilePageState extends State<ProfileScreen> {
       appBar: CustomMainAppbar(
         title: 'Profile',
         showLeading: false,
-        automaticallyImplyLeading:false,
+        automaticallyImplyLeading: false,
       ),
       endDrawer: NavDrawer(),
       body: SingleChildScrollView(
@@ -132,7 +159,8 @@ class _ProfilePageState extends State<ProfileScreen> {
                     return Column(
                       children: [
                         Center(
-                          child: Text(user?.email ?? 'No email available.',style: TextStyle(fontSize: 16)),
+                          child: Text(user?.email ?? 'No email available.',
+                              style: TextStyle(fontSize: 16)),
                         ),
                         SizedBox(height: 30),
                       ],
@@ -140,15 +168,12 @@ class _ProfilePageState extends State<ProfileScreen> {
                   } else if (user.isDonorVerified == true) {
                     return Column(
                       children: [
-                        Text(
-                          user.fullName!,
-                          style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)
-                        ),
+                        Text(user.fullName!,
+                            style: TextStyle(
+                                fontSize: 18, fontWeight: FontWeight.bold)),
                         SizedBox(height: 8),
-                        Text(
-                          Formatters.formatPhoneNumber(user.contactNumber!),
-                          style: TextStyle(fontSize: 16)
-                        ),
+                        Text(Formatters.formatPhoneNumber(user.contactNumber!),
+                            style: TextStyle(fontSize: 16)),
                         SizedBox(height: 30),
                       ],
                     );
@@ -169,22 +194,24 @@ class _ProfilePageState extends State<ProfileScreen> {
                         borderRadius: BorderRadius.circular(8),
                       ),
                       child: Consumer<UserProvider>(
-                        builder: (context, userProvider, child) {
-                          final user = userProvider.user;
-                          if (user!.isDonorVerified == true) {
-                            return Text(
-                              "Donation Count\n${user.donationCount.toString()}",
-                              style: TextStyle(color: Colors.white,fontWeight: FontWeight.bold),
-                              textAlign: TextAlign.center,
-                            );
-                          }
+                          builder: (context, userProvider, child) {
+                        final user = userProvider.user;
+                        if (user!.isDonorVerified == true) {
                           return Text(
-                            "No Donations",
-                            style: TextStyle(color: Colors.white,fontWeight: FontWeight.bold),
+                            "Donation Count\n${user.donationCount.toString()}",
+                            style: TextStyle(
+                                color: Colors.white,
+                                fontWeight: FontWeight.bold),
                             textAlign: TextAlign.center,
                           );
                         }
-                      ),
+                        return Text(
+                          "No Donations",
+                          style: TextStyle(
+                              color: Colors.white, fontWeight: FontWeight.bold),
+                          textAlign: TextAlign.center,
+                        );
+                      }),
                     ),
                   ),
                   Expanded(
@@ -197,7 +224,8 @@ class _ProfilePageState extends State<ProfileScreen> {
                       ),
                       child: Text(
                         "Next Donation Date\nAfter 3 months",
-                        style: TextStyle(color: Colors.white,fontWeight: FontWeight.bold),
+                        style: TextStyle(
+                            color: Colors.white, fontWeight: FontWeight.bold),
                         textAlign: TextAlign.center,
                       ),
                     ),
@@ -215,7 +243,8 @@ class _ProfilePageState extends State<ProfileScreen> {
                     padding: const EdgeInsets.only(left: 15),
                     child: Text(
                       "Availability Status",
-                      style:TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                      style:
+                          TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                     ),
                   ),
                   Consumer<UserProvider>(
@@ -225,19 +254,23 @@ class _ProfilePageState extends State<ProfileScreen> {
                       return Switch(
                         padding: EdgeInsets.only(right: 20),
                         value: isAvailable,
-                        onChanged: (user != null && user.isDonorVerified == true)
-                          ? (value) async {
-                              setState(() {
-                                isAvailable = value;
-                              });
+                        onChanged:
+                            (user != null && user.isDonorVerified == true)
+                                ? (value) async {
+                                    setState(() {
+                                      isAvailable = value;
+                                    });
 
-                              final currentUser = auth.currentUser;
-                              if (currentUser != null) {
-                                final userProvider = Provider.of<UserProvider>(context,listen: false);
-                                await userProvider.fetchUserAvailability(currentUser.uid, value);
-                              }
-                            }
-                          : null,
+                                    final currentUser = auth.currentUser;
+                                    if (currentUser != null) {
+                                      final userProvider =
+                                          Provider.of<UserProvider>(context,
+                                              listen: false);
+                                      await userProvider.fetchUserAvailability(
+                                          currentUser.uid, value);
+                                    }
+                                  }
+                                : null,
                         activeColor: Color(0xFFE50F2A),
                       );
                     },
@@ -255,54 +288,36 @@ class _ProfilePageState extends State<ProfileScreen> {
 
                 return Column(
                   children: [
-                    _buildProfileOption(
-                      Icons.edit,
-                      'Edit Information',
-                      () {
-                        if(isDonor){
-                          Navigator.pushNamed(context, "/edit-donor-information");
-                        } else {
-                          showAlert(context);
-                        }
-                      } ,
-                      enable: isDonor
-                    ),
-                    _buildProfileOption(
-                      Icons.vpn_key,
-                      'Change Password',
-                      () {
-                        if(isDonor){
-                          Navigator.pushNamed(context, '/update-password');
-                        } else {
-                          showAlert(context);
-                        }
-                      },
-                      enable: true
-                    ),
-                    _buildProfileOption(
-                      Icons.access_time,
-                      'Donation History',
-                      () {
-                        if(isDonor){
-                          Navigator.pushNamed(context, "/donation-history");
-                        } else {
-                          showAlert(context);
-                        }
-                      },
-                      enable: true
-                    ),
-                    _buildProfileOption(
-                      Icons.card_giftcard,
-                      'View Rewards',
-                      () {
-                        if(isDonor){
-                          Navigator.pushNamed(context, "/view-rewards");
-                        } else {
-                          showAlert(context);
-                        }
-                      },
-                      enable: true
-                    ),
+                    _buildProfileOption(Icons.edit, 'Edit Information', () {
+                      if (isDonor) {
+                        Navigator.pushNamed(context, "/edit-donor-information");
+                      } else {
+                        showAlert(context);
+                      }
+                    }, enable: isDonor),
+                    _buildProfileOption(Icons.vpn_key, 'Change Password', () {
+                      if (isDonor) {
+                        Navigator.pushNamed(context, '/update-password');
+                      } else {
+                        showAlert(context);
+                      }
+                    }, enable: true),
+                    _buildProfileOption(Icons.access_time, 'Donation History',
+                        () {
+                      if (isDonor) {
+                        Navigator.pushNamed(context, "/donation-history");
+                      } else {
+                        showAlert(context);
+                      }
+                    }, enable: true),
+                    _buildProfileOption(Icons.card_giftcard, 'View Rewards',
+                        () {
+                      if (isDonor) {
+                        Navigator.pushNamed(context, "/view-rewards");
+                      } else {
+                        showAlert(context);
+                      }
+                    }, enable: true),
                     SizedBox(height: 30),
                     _buildProfileOption(
                       Icons.exit_to_app,
@@ -311,7 +326,7 @@ class _ProfilePageState extends State<ProfileScreen> {
                         showLogoutDialog(context);
                       },
                       enable: true,
-                      redColor: true, 
+                      redColor: true,
                     ),
                   ],
                 );
@@ -324,7 +339,8 @@ class _ProfilePageState extends State<ProfileScreen> {
   }
 }
 
-Widget _buildProfileOption(IconData icon, String text, VoidCallback onTap,{bool enable = true, bool redColor = false}) {
+Widget _buildProfileOption(IconData icon, String text, VoidCallback onTap,
+    {bool enable = true, bool redColor = false}) {
   return Container(
     margin: EdgeInsets.symmetric(vertical: 6, horizontal: 12),
     padding: EdgeInsets.all(6),
@@ -340,11 +356,12 @@ Widget _buildProfileOption(IconData icon, String text, VoidCallback onTap,{bool 
       ],
     ),
     child: ListTile(
-      leading: Icon(icon, color: redColor ? Colors.white : Color(0xFFE50F2A)),  
-      title: Text(
-        text,
-        style: TextStyle(fontSize: 16, fontWeight: FontWeight.w400,color: redColor ? Colors.white : Colors.black)
-      ),
+      leading: Icon(icon, color: redColor ? Colors.white : Color(0xFFE50F2A)),
+      title: Text(text,
+          style: TextStyle(
+              fontSize: 16,
+              fontWeight: FontWeight.w400,
+              color: redColor ? Colors.white : Colors.black)),
       onTap: onTap,
     ),
   );

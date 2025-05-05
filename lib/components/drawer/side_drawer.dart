@@ -272,8 +272,8 @@ class _NavDrawerState extends State<NavDrawer> {
           menuItem(5, "Notifications", Icons.notifications),
           menuItem(6, "Feedbacks", Icons.message),
           menuItem(7, "Privacy policy", Icons.security),
-          menuItem(8, "Help", Icons.help),
-          menuItem(9, "About Us", Icons.info),
+          menuItem(8, "About Us", Icons.info),
+          menuItem(9, "Help", Icons.help),
           menuItem(10, "Logout", Icons.logout),
         ],
       ),
@@ -293,8 +293,15 @@ class _NavDrawerState extends State<NavDrawer> {
               // to navigate Request donors page
               navigatePage(context, DrawerSelection.search);
             } else if (id == 3) {
-              // to navigate Find donors page
-              navigatePage(context, DrawerSelection.request);
+              final userProvider =
+                  Provider.of<UserProvider>(context, listen: false);
+              final isDonor = userProvider.user?.isDonorVerified ?? false;
+
+              if (isDonor) {
+                navigatePage(context, DrawerSelection.request);
+              } else {
+                showAlert(context);
+              }
             } else if (id == 4) {
               Navigator.pop(context);
               showSettingsDialog(context);
@@ -349,6 +356,20 @@ class _NavDrawerState extends State<NavDrawer> {
         ),
       ),
     );
+  }
+
+  void showAlert(BuildContext context) {
+    showDialog(
+        context: context,
+        builder: (context) => AlertDialog(
+              title: Text('Access Restricted'),
+              content:
+                  Text('This feature is only accessible for verified users.'),
+              actions: [
+                TextButton(
+                    onPressed: () => Navigator.pop(context), child: Text('Ok'))
+              ],
+            ));
   }
 
   void navigatePage(BuildContext context, DrawerSelection selection) {
