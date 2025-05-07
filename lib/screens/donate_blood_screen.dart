@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:lifeblood_blood_donation_app/components/blood_request_card.dart';
 import 'package:lifeblood_blood_donation_app/components/custom_main_app_bar.dart';
 import 'package:lifeblood_blood_donation_app/models/donation_request_model.dart';
-import 'package:lifeblood_blood_donation_app/providers/current_activity_provider.dart';
 import 'package:lifeblood_blood_donation_app/providers/user_provider.dart';
 import 'package:lifeblood_blood_donation_app/services/request_service.dart';
 import 'package:lifeblood_blood_donation_app/utils/helpers.dart';
@@ -60,7 +59,9 @@ class _BloodRequestScreenState extends State<BloodRequestScreen> {
       });
 
       final userProvider = Provider.of<UserProvider>(context, listen: false);
-      if (userProvider.user != null) {
+      final user = userProvider.user;
+
+      if (user != null && user.hasCompletedProfile!) {
         _selectedProvince = userProvider.user!.province;
         _selectedCity = userProvider.user!.city;
 
@@ -74,6 +75,11 @@ class _BloodRequestScreenState extends State<BloodRequestScreen> {
   Future<void> _fetchBloodRequests() async {
     try {
       List<BloodRequest> fetchedRequests = await _requestService.getBloodRequests();
+
+      final userProvider = Provider.of<UserProvider>(context, listen: false);
+      final currentActivityId = userProvider.currentActivityId;
+
+      fetchedRequests.removeWhere((request) => request.requestId == currentActivityId);
 
       setState(() {
         bloodRequests = fetchedRequests;
@@ -145,32 +151,6 @@ class _BloodRequestScreenState extends State<BloodRequestScreen> {
       _canFilter = isFilterChanged && isAnyFilterActive;
       _canReset = isAnyFilterActive;
     });
-  }
-
-  void _addToCurrentActivities(BloodRequest request) {
-    final provider =
-        Provider.of<CurrentActivitiesProvider>(context, listen: false);
-
-    // Check if the request is already in current activities
-    if (provider.currentActivities.contains(request)) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: const Text(
-              "This Request is already Added to your Current Activities. Check it out under Current Activities Section."),
-          backgroundColor: Colors.redAccent,
-        ),
-      );
-    } else {
-      provider
-          .addActivity(request); // Add the request to the current activities
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: const Text(
-              "Blood Donation Confirmed and Added to Current Activities!"),
-          backgroundColor: Colors.green,
-        ),
-      );
-    }
   }
 
   @override
@@ -302,13 +282,7 @@ class _BloodRequestScreenState extends State<BloodRequestScreen> {
                   physics: const NeverScrollableScrollPhysics(),
                   itemCount: displayedRequests.length,
                   itemBuilder: (context, index) {
-                    return BloodRequestCard(
-                      bloodRequestDetails: displayedRequests[index],
-                      onConfirm: () {
-                        // When 'Yes' is clicked in the dialog, add to current activities
-                        _addToCurrentActivities(displayedRequests[index]);
-                      },
-                    );
+                    return BloodRequestCard(request: displayedRequests[index]);
                   },
                 ),
 

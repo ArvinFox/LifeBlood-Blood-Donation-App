@@ -116,7 +116,7 @@ class UserService {
     try {
       await userCollection.doc(userId).update({property: value});
     } catch (e) {
-      throw Exception("Failed to update status [$property]: $e");
+      throw Exception("Failed to update status of user [$property]: $e");
     }
   }
 

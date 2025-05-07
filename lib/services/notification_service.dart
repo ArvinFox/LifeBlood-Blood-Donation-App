@@ -1,5 +1,4 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:lifeblood_blood_donation_app/models/donation_request_model.dart';
 import 'package:lifeblood_blood_donation_app/models/notification_model.dart';
 
 class NotificationService {
@@ -65,18 +64,6 @@ class NotificationService {
       return snapshot.docs.map((doc) => NotificationModel.fromFirestore(doc)).toList();
     } catch (e) {
       throw Exception("Failed to get user notifications: $e");
-    }
-  }
-
-  // Get donation request details from ID
-  Future<BloodRequest?> getDonationRequestDetailsId(String requestId) async {
-    try {
-      DocumentSnapshot doc = await _db.collection("requests").doc(requestId).get();
-      if (!doc.exists) return null;
-
-      return BloodRequest.fromFirestore(doc);
-    } catch (e) {
-      throw Exception("Failed to get donation request details by ID: $e");
     }
   }
 }

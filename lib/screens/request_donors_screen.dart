@@ -215,6 +215,7 @@ class _RequestDonorsState extends State<RequestDonors> {
       city: selectedCity!,
       hospitalName: selectedHospital!,
       createdAt: DateTime.now(),
+      status: 'pending',
     );
 
     try {

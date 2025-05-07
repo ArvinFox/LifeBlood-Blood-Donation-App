@@ -3,10 +3,9 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:lifeblood_blood_donation_app/models/donation_request_model.dart';
 import 'package:lifeblood_blood_donation_app/models/notification_model.dart';
-import 'package:lifeblood_blood_donation_app/providers/current_activity_provider.dart';
 import 'package:lifeblood_blood_donation_app/providers/notification_provider.dart';
 import 'package:lifeblood_blood_donation_app/providers/user_provider.dart';
-import 'package:lifeblood_blood_donation_app/services/notification_service.dart';
+import 'package:lifeblood_blood_donation_app/services/request_service.dart';
 import 'package:lifeblood_blood_donation_app/utils/helpers.dart';
 import 'package:provider/provider.dart';
 
@@ -24,7 +23,7 @@ class NotificationScreen extends StatefulWidget {
 
 class _NotificationScreenState extends State<NotificationScreen> {
   BloodRequest? latestRequest;
-  final NotificationService _notificationService = NotificationService();
+  final RequestService _requestService = RequestService();
 
   @override
   void initState() {
@@ -123,7 +122,7 @@ class _NotificationScreenState extends State<NotificationScreen> {
   Future<Widget> _buildNotificationCard(NotificationModel notification) async {
     BloodRequest? request;
     if (notification.type == 'new_request') {
-      request = await _notificationService.getDonationRequestDetailsId(notification.requestId!);
+      request = await _requestService.getRequestById(notification.requestId!);
     }
 
     return GestureDetector(
@@ -312,6 +311,8 @@ class _NotificationScreenState extends State<NotificationScreen> {
   }
 
   void showConfirmationPopup(BuildContext context, String bloodType,String urgencyLevel, String hospital, String city, String requestId) {
+    final userProvider = Provider.of<UserProvider>(context, listen: false);
+
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
@@ -393,16 +394,20 @@ class _NotificationScreenState extends State<NotificationScreen> {
               ),
               ElevatedButton(
                 onPressed: () async {
-                  final request = await _notificationService.getDonationRequestDetailsId(requestId);
-                  final currentActivityProvider = Provider.of<CurrentActivitiesProvider>(context, listen: false);
+                  await userProvider.saveCurrentActivity(requestId);
 
-                  if (currentActivityProvider.currentActivities.contains(request)) {
-                    Helpers.showError(context, "The request has already been confirmed and added to your activities. Please view it there.");
-                    return;
-                  }
-                  
-                  currentActivityProvider..addActivity(request!);
-                  Helpers.showSucess(context, "Blood donation request confirmed and added to your activities.");
+                  final user = userProvider.user;
+                  await userProvider.updateStatus(user!.userId!, 'isDonating', true);
+                  await _requestService.updateConfirmedDonors(requestId, user.userId!, 'confirmed');
+
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text(
+                        'Donation confirmed! The request has been added to your Current Activity.'),
+                      backgroundColor: Colors.green[600],
+                    ),
+                  );
+
                   Navigator.pop(context);
                 },
                 style: ElevatedButton.styleFrom(backgroundColor: Colors.red),

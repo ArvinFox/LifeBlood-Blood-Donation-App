@@ -1,202 +1,199 @@
 import 'package:flutter/material.dart';
 import 'package:lifeblood_blood_donation_app/models/donation_request_model.dart';
+import 'package:lifeblood_blood_donation_app/providers/user_provider.dart';
+import 'package:lifeblood_blood_donation_app/services/request_service.dart';
+import 'package:provider/provider.dart';
 
 class BloodRequestCard extends StatelessWidget {
-  final BloodRequest bloodRequestDetails;
-  final Function onConfirm; // Add the onConfirm callback
+  final BloodRequest request;
 
-  const BloodRequestCard({
+  BloodRequestCard({
     super.key,
-    required this.bloodRequestDetails,
-    required this.onConfirm, // Accept the onConfirm callback
+    required this.request,
   });
 
-  // Confirm Dialog Box
-  void showConfirmDialog(BuildContext context) {
-    showDialog(
-      context: context,
-      builder: (context) {
-        return AlertDialog(
-          title: const Text(
-            "Are you sure you want to confirm?",
-            textAlign: TextAlign.center,
-            style: TextStyle(fontSize: 20, fontWeight: FontWeight.w500),
-          ),
-          actions: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                OutlinedButton(
-                  style: OutlinedButton.styleFrom(
-                    side:
-                        const BorderSide(color: Color(0xFFE50F2A), width: 1.5),
-                  ),
-                  onPressed: () {
-                    Navigator.pop(context); // Just close the dialog
-                  },
-                  child: const Text(
-                    "No",
-                    style: TextStyle(color: Color(0xFFE50F2A)),
-                  ),
-                ),
-                const SizedBox(width: 30),
-                ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.red,
-                  ),
-                  onPressed: () {
-                    Navigator.pop(context); // Close the dialog
-                    onConfirm(); // Call the confirm function
-                  },
-                  child: const Text(
-                    "Yes",
-                    style: TextStyle(color: Colors.white),
-                  ),
-                ),
-              ],
-            ),
-          ],
-        );
-      },
-    );
-  }
+  final RequestService _requestService = RequestService();
 
   @override
   Widget build(BuildContext context) {
-    return Card(
-      child: Container(
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(12),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black26,
-              blurRadius: 6,
-              offset: Offset(0, 4),
-            ),
-          ],
+    final userProvider = Provider.of<UserProvider>(context, listen: false);
+
+    return GestureDetector(
+      onTap: () {
+        if (userProvider.user!.isDonorVerified!) {
+          if (userProvider.user!.isDonating) {
+            _showInvalidActionPopup(
+              context,
+              title: "Donation in Progress",
+              message: "You are currently fulfilling a donation request. Please complete your current donation before accepting a new one. ",
+            );
+          } else {
+            _showRequestConfirmDialog(context, request);
+          }
+        } else {
+          if (userProvider.user!.hasCompletedProfile!) {
+            _showInvalidActionPopup(
+              context,
+              title: "Verification Pending",
+              message:
+                "Your donor profile is under review. You can accept requests once you are verified.",
+            );
+          } else {
+            _showInvalidActionPopup(
+              context,
+              title: "Complete Your Profile",
+              message:
+                "Please complete your donor profile to start accepting blood donation requests.",
+            );
+          }
+        }
+      },
+      child: Card(
+        elevation: 2,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        child: Container(
+          width: double.infinity,
+          padding: const EdgeInsets.all(16),
+          decoration: BoxDecoration(
+          color: Colors.red.shade50.withOpacity(0.15),
+          borderRadius: BorderRadius.circular(20),
         ),
-        child: Padding(
-          padding: const EdgeInsets.all(18),
-          child: Column(
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  // Circular Blood Type Indicator
-                  Container(
-                    width: 60,
-                    height: 55,
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      border: Border.all(color: Color(0xFFE50F2A), width: 2),
-                    ),
-                    alignment: Alignment.center,
-                    child: Text(
-                      bloodRequestDetails
-                          .requestBloodType, // Blood Type from Firestore
-                      style: const TextStyle(
-                          color: Color(0xFFE50F2A),
-                          fontWeight: FontWeight.bold),
-                    ),
-                  ),
-                  const SizedBox(width: 15),
-
-                  // Expanded to prevent overflow
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        RichText(
-                          text: TextSpan(
-                            style: const TextStyle(
-                                color: Colors.black, fontSize: 13),
-                            children: [
-                              const TextSpan(
-                                  text: "Blood Type: ",
-                                  style:
-                                      TextStyle(fontWeight: FontWeight.bold)),
-                              TextSpan(
-                                  text: bloodRequestDetails.requestBloodType),
-                            ],
-                          ),
-                        ),
-                        const SizedBox(height: 2),
-                        RichText(
-                          text: TextSpan(
-                            style: const TextStyle(
-                                color: Colors.black, fontSize: 13),
-                            children: [
-                              const TextSpan(
-                                  text: "Urgency Level: ",
-                                  style:
-                                      TextStyle(fontWeight: FontWeight.bold)),
-                              TextSpan(text: bloodRequestDetails.urgencyLevel),
-                            ],
-                          ),
-                        ),
-                        const SizedBox(height: 2),
-                        RichText(
-                          text: TextSpan(
-                            style: const TextStyle(
-                                color: Colors.black, fontSize: 13),
-                            children: [
-                              const TextSpan(
-                                  text: "Location: ",
-                                  style:
-                                      TextStyle(fontWeight: FontWeight.bold)),
-                              TextSpan(
-                                text: bloodRequestDetails.hospitalName,
-                                style: const TextStyle(
-                                    overflow: TextOverflow.ellipsis),
-                              ),
-                            ],
-                          ),
-                          softWrap: false, // Prevents breaking into two lines
-                        ),
-                        const SizedBox(height: 2),
-                        RichText(
-                          text: TextSpan(
-                            style: const TextStyle(
-                                color: Colors.black, fontSize: 13),
-                            children: [
-                              const TextSpan(
-                                  text: "Contact: ",
-                                  style:
-                                      TextStyle(fontWeight: FontWeight.bold)),
-                              TextSpan(text: bloodRequestDetails.contactNumber),
-                            ],
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 14),
-
-              // Confirm Button
-              ElevatedButton(
-                onPressed: () {
-                  showConfirmDialog(context);
-                },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFFE50F2A),
-                  padding: const EdgeInsets.symmetric(horizontal: 40),
-                  shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(20)),
-                ),
-                child: const Text(
-                  "Confirm",
-                  style: TextStyle(
+              CircleAvatar(
+                backgroundColor: const Color(0xFFE50F2A),
+                radius: 30,
+                child: Text(
+                  request.requestBloodType,
+                  style: const TextStyle(
                     color: Colors.white,
-                    fontSize: 14,
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
                   ),
+                ),
+              ),
+              const SizedBox(width: 16),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    _buildRichText('Urgency Level: ', request.urgencyLevel),
+                    const SizedBox(height: 6),
+                    _buildRichText('Location: ', request.hospitalName),
+                    const SizedBox(height: 4),
+                    _buildRichText('City: ', request.city),
+                  ],
                 ),
               ),
             ],
           ),
         ),
+      ),
+    );
+  }
+
+  Widget _buildRichText(String title, String value) {
+    return RichText(
+      text: TextSpan(
+        children: [
+          TextSpan(
+            text: title,
+            style: const TextStyle(
+              fontWeight: FontWeight.bold,
+              fontSize: 18,
+              color: Colors.black,
+            ),
+          ),
+          TextSpan(
+            text: value,
+            style: const TextStyle(
+              fontWeight: FontWeight.normal,
+              fontSize: 18,
+              color: Colors.black,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _showRequestConfirmDialog(BuildContext context, BloodRequest request) {
+    final userProvider = Provider.of<UserProvider>(context, listen: false);
+
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        backgroundColor: const Color.fromARGB(255, 255, 238, 238),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        title: Row(
+          children: [
+            Icon(Icons.bloodtype, color: Colors.redAccent),
+            SizedBox(width: 8),
+            Text(
+              'Confirm Donation',
+              style: TextStyle(fontWeight: FontWeight.bold),
+            ),
+          ],
+        ),
+        content: Text(
+          'Are you sure you want to donate blood for this request?',
+          style: TextStyle(fontSize: 16),
+        ),
+        actions: [
+          OutlinedButton.icon(
+            icon: Icon(Icons.cancel, color: Colors.grey),
+            onPressed: () => Navigator.pop(context),
+            label: Text('Cancel', style: TextStyle(color: Colors.grey[600])),
+            style: OutlinedButton.styleFrom(
+              side: BorderSide(color: Colors.grey),
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+            ),
+          ),
+          SizedBox(width: 8),
+          ElevatedButton.icon(
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.redAccent,
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+            ),
+            icon: Icon(Icons.check, color: Colors.white),
+            label: Text('Confirm', style: TextStyle(color: Colors.white)),
+            onPressed: () async {
+              Navigator.pop(context);
+              
+              await userProvider.saveCurrentActivity(request.requestId!);
+
+              final user = userProvider.user;
+              await userProvider.updateStatus(user!.userId!, 'isDonating', true);
+              await _requestService.updateConfirmedDonors(request.requestId!, user.userId!, 'confirmed');
+
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text(
+                    'Donation confirmed! The request has been added to your Current Activity.'),
+                  backgroundColor: Colors.green[600],
+                ),
+              );
+            },
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _showInvalidActionPopup(BuildContext context, {required String title, required String message}) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+        title: Text(title),
+        content: Text(message),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text("OK"),
+          ),
+        ],
       ),
     );
   }

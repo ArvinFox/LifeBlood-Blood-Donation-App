@@ -53,19 +53,12 @@ class _ChooseActionPageState extends State<ChooseActionPage> {
                       children: [
                         Consumer<UserProvider>(
                           builder: (context, userProvider, child) {
-                            final isDonor =
-                                userProvider.user?.isDonorVerified ?? false;
                             return _actionButton(
                               context: context,
                               title: "Donate Blood",
                               icon: Icons.volunteer_activism,
                               onTap: () {
-                                if (isDonor) {
-                                  Navigator.pushNamed(
-                                      context, '/donation-request');
-                                } else {
-                                  showAlert(context);
-                                }
+                                Navigator.pushNamed(context, '/donation-request');
                               },
                             );
                           },
@@ -89,20 +82,6 @@ class _ChooseActionPageState extends State<ChooseActionPage> {
         ),
       ),
     );
-  }
-
-  void showAlert(BuildContext context) {
-    showDialog(
-        context: context,
-        builder: (context) => AlertDialog(
-              title: Text('Access Restricted'),
-              content:
-                  Text('This feature is only accessible for verified users.'),
-              actions: [
-                TextButton(
-                    onPressed: () => Navigator.pop(context), child: Text('Ok'))
-              ],
-            ));
   }
 
   Widget _actionButton({

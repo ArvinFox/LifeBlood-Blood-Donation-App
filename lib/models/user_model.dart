@@ -21,6 +21,8 @@ class UserModel {
   final DateTime? createdAt;
   final DateTime? profileCompletedAt;
   final String? profilePicture;
+  final bool isDonating;
+  final DateTime? lastDonatedAt;
 
   UserModel({
     this.userId,
@@ -43,6 +45,8 @@ class UserModel {
     this.createdAt,
     this.profileCompletedAt,
     this.profilePicture,
+    this.isDonating = false,
+    this.lastDonatedAt,
   });
 
   Map<String, dynamic> toFirestore() {
@@ -66,6 +70,8 @@ class UserModel {
       'createdAt': createdAt != null ? Timestamp.fromDate(createdAt!) : null,
       'profileCompletedAt': profileCompletedAt != null ? Timestamp.fromDate(profileCompletedAt!) : null,
       'profilePicture': profilePicture,
+      'isDonating': false,
+      'lastDonatedAt': lastDonatedAt != null ? Timestamp.fromDate(lastDonatedAt!) : null,
     };
   }
 
@@ -91,6 +97,8 @@ class UserModel {
       createdAt: data['createdAt'] != null ? (data['createdAt'] as Timestamp).toDate() : null,
       profileCompletedAt: data['profileCompletedAt'] != null ? (data['profileCompletedAt'] as Timestamp).toDate() : null,
       profilePicture: data['profilePicture'],
+      isDonating: data['isDonating'] ?? false,
+      lastDonatedAt: data['lastDonatedAt'] != null ? (data['lastDonatedAt'] as Timestamp).toDate() : null,
     );
   }
 }

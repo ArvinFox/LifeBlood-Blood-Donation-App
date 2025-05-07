@@ -1,17 +1,19 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 class BloodRequest {
-  String? requestId;
-  String patientName;
-  String requestedBy;
-  String requestBloodType;
-  String urgencyLevel;
-  String requestQuantity;
-  String province;
-  String city;
-  String hospitalName;
-  String contactNumber; 
-  DateTime createdAt;
+  final String? requestId;
+  final String patientName;
+  final String requestedBy;
+  final String requestBloodType;
+  final String urgencyLevel;
+  final String requestQuantity;
+  final String province;
+  final String city;
+  final String hospitalName;
+  final String contactNumber; 
+  final DateTime createdAt;
+  final String status;
+  final List<Map<String, dynamic>>? confirmedDonors;
 
   BloodRequest({
     this.requestId,
@@ -25,6 +27,8 @@ class BloodRequest {
     required this.hospitalName,
     required this.contactNumber,
     required this.createdAt,
+    required this.status,
+    this.confirmedDonors,
   });
 
   // Convert a BloodRequest to a Map for Firestore
@@ -40,6 +44,8 @@ class BloodRequest {
       'hospitalName': hospitalName,
       'contactNumber': contactNumber,
       'createdAt': createdAt,
+      'status': status,
+      'confirmedDonors': confirmedDonors!.map((item) => item).toList(),
     };
   }
 
@@ -48,6 +54,7 @@ class BloodRequest {
     final data = doc.data() as Map<String, dynamic>;
 
     return BloodRequest(
+      requestId: doc.id,
       patientName: data['patientName'] ?? '',
       requestedBy: data['requestedBy'] ?? '',
       requestBloodType: data['requestBloodType'] ?? '',
@@ -58,6 +65,8 @@ class BloodRequest {
       hospitalName: data['hospitalName'] ?? '',
       contactNumber: data['contactNumber'] ?? '',
       createdAt: (data['createdAt'] as Timestamp).toDate(),
+      status: data['status'] ?? 'pending',
+      confirmedDonors: List<Map<String, dynamic>>.from(data['confirmedDonors']?.map((item) => item as Map<String, dynamic>) ?? []),
     );
   }
 }
