@@ -49,32 +49,6 @@ class UserModel {
     this.lastDonatedAt,
   });
 
-  Map<String, dynamic> toFirestore() {
-    return {
-      'fullName': fullName,
-      'dob': dob != null ? Timestamp.fromDate(dob!) : null,
-      'gender': gender,
-      'nic': nic,
-      'email': email,
-      'contactNumber': contactNumber,
-      'address': address,
-      'city': city,
-      'province': province,
-      'bloodType': bloodType,
-      'healthConditions': healthConditions,
-      'donationCount': donationCount,
-      'isActive': isActive,
-      'isDonorVerified': isDonorVerified,
-      'hasCompletedProfile': hasCompletedProfile,
-      'isDonorPromptShown': isDonorPromptShown,
-      'createdAt': createdAt != null ? Timestamp.fromDate(createdAt!) : null,
-      'profileCompletedAt': profileCompletedAt != null ? Timestamp.fromDate(profileCompletedAt!) : null,
-      'profilePicture': profilePicture,
-      'isDonating': false,
-      'lastDonatedAt': lastDonatedAt != null ? Timestamp.fromDate(lastDonatedAt!) : null,
-    };
-  }
-
   factory UserModel.fromFirestore(Map<String, dynamic> data, String userId) {
     return UserModel(
       userId: userId,
@@ -100,5 +74,31 @@ class UserModel {
       isDonating: data['isDonating'] ?? false,
       lastDonatedAt: data['lastDonatedAt'] != null ? (data['lastDonatedAt'] as Timestamp).toDate() : null,
     );
+  }
+
+  Map<String, dynamic> toFirestore() {
+    return {
+      'fullName': fullName,
+      'dob': dob != null ? Timestamp.fromDate(dob!) : null,
+      'gender': gender,
+      'nic': nic,
+      'email': email,
+      'contactNumber': contactNumber,
+      'address': address,
+      'city': city,
+      'province': province,
+      'bloodType': bloodType,
+      'healthConditions': healthConditions,
+      'donationCount': donationCount,
+      'isActive': isActive,
+      'isDonorVerified': isDonorVerified,
+      'hasCompletedProfile': hasCompletedProfile,
+      'isDonorPromptShown': isDonorPromptShown,
+      'createdAt': createdAt != null ? Timestamp.fromDate(createdAt!) : null,
+      'profileCompletedAt': profileCompletedAt != null ? Timestamp.fromDate(profileCompletedAt!) : null,
+      'profilePicture': profilePicture,
+      'isDonating': false,
+      'lastDonatedAt': lastDonatedAt != null ? Timestamp.fromDate(lastDonatedAt!) : null,
+    };
   }
 }

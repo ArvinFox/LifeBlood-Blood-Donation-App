@@ -21,8 +21,8 @@ class _ForgotPasswordPageState extends State<ForgotPasswordScreen> {
 
   @override
   void dispose() {
-    super.dispose();
     _emailController.dispose();
+    super.dispose();    
   }
 
   void _checkAndSendEmail() async {
@@ -56,7 +56,9 @@ class _ForgotPasswordPageState extends State<ForgotPasswordScreen> {
       Navigator.pushNamed(context, '/login');
 
     } catch (e) {
-      Helpers.showError(context, "An unexpected error occurred: $e");
+      Helpers.debugPrintWithBorder("Error sending reset email: $e");
+      Helpers.showError(context, "An unexpected error occurred. Please try again later.");
+
     } finally {
       setState(() {
         isLoading = false;
@@ -71,24 +73,27 @@ class _ForgotPasswordPageState extends State<ForgotPasswordScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            SizedBox(height: 20),
-            Text(
+            const SizedBox(height: 20),
+            const Text(
               'Forgot Password?',
               style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold),
               textAlign: TextAlign.center,
             ),
-            SizedBox(height: 10),
+            const SizedBox(height: 10),
+
             Image.asset(
               'assets/images/forgot_pswd.png',
               height: 240,
             ),
-            SizedBox(height: 10),
-            Text(
+            const SizedBox(height: 10),
+
+            const Text(
               'Please enter your registered email address here. You will receive a link to create a new password via email.',
               textAlign: TextAlign.center,
               style: TextStyle(fontSize: 16),
             ),
-            SizedBox(height: 30),
+            const SizedBox(height: 30),
+
             Form(
               key: _formKey,
               child: CustomInputBox(
@@ -106,22 +111,21 @@ class _ForgotPasswordPageState extends State<ForgotPasswordScreen> {
                 onTap: () {
                   Navigator.pop(context);
                 },
-                child: Text(
+                child: const Text(
                   'Back to Login',
                   style: TextStyle(color: Colors.red),
                 ),
               ),
             ),
-            SizedBox(height: 20),
+            const SizedBox(height: 20),
+
             CustomButton(
               onPressed: isLoading
-                  ? null
-                  : () {
-                      _checkAndSendEmail();
-                    },
+                ? null
+                : () => _checkAndSendEmail(),
               btnLabel: 'Continue',
               buttonChild: isLoading
-                  ? SizedBox(
+                  ? const SizedBox(
                       width: 20,
                       height: 20,
                       child: CircularProgressIndicator(
@@ -131,11 +135,11 @@ class _ForgotPasswordPageState extends State<ForgotPasswordScreen> {
                     )
                   : null,
               cornerRadius: 15,
-              btnColor: isLoading ? Color(0xFFE50F2A) : Colors.white,
-              btnBorderColor: Color(0xFFE50F2A),
-              labelColor: isLoading ? Colors.white : Color(0xFFE50F2A),
+              btnColor: isLoading ? const Color(0xFFE50F2A) : Colors.white,
+              btnBorderColor: const Color(0xFFE50F2A),
+              labelColor: isLoading ? Colors.white : const Color(0xFFE50F2A),
             ),
-            SizedBox(height: 20),
+            const SizedBox(height: 20),
           ],
         ),
       ),

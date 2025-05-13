@@ -43,7 +43,7 @@ class _SignupScreenState extends State<SignupScreen> {
           _passwordController.text == _confirmPasswordController.text) {
 
         await auth.createUser(context, _emailController.text.trim(), _passwordController.text.trim());
-        Helpers.showSucess(context, 'Signup successfully');
+        Helpers.showSucess(context, 'Signup successful');
         auth.signOut();
         Navigator.pushNamed(context, '/login');
       }
@@ -70,12 +70,14 @@ class _SignupScreenState extends State<SignupScreen> {
               ),
             ),
           ),
+
           Center(
             child: Image.asset(
               'assets/images/signup.png',
               height: 250,
             ),
           ),
+
           Form(
             key: _formKey,
             child: Column(
@@ -110,14 +112,15 @@ class _SignupScreenState extends State<SignupScreen> {
                         'Password Strength: ${passwordStrength == 'Weak Password' ? 'Password is too weak. Try using a mix of letters, numbers, and symbols.' : passwordStrength}',
                         style: TextStyle(
                           color: passwordStrength == 'Strong Password'
-                              ? Colors.green
-                              : passwordStrength == 'Medium Password'
-                                  ? Colors.orange
-                                  : Colors.red,
+                            ? Colors.green
+                            : passwordStrength == 'Medium Password'
+                                ? Colors.orange
+                                : Colors.red,
                           fontWeight: FontWeight.w500,
                         ),
                       ),
                     const SizedBox(height: 4),
+
                     CustomInputBox(
                       textName: 'Confirm Password',
                       hintText: 'Re-enter your password',
@@ -135,6 +138,7 @@ class _SignupScreenState extends State<SignupScreen> {
               ],
             ),
           ),
+
           Align(
             alignment: Alignment.centerRight,
             child: GestureDetector(
@@ -148,19 +152,20 @@ class _SignupScreenState extends State<SignupScreen> {
             ),
           ),
           const SizedBox(height: 25),
+          
           CustomButton(
             onPressed: isLoading ? null : () => signupUser(),
             btnLabel: 'Sign Up',
             buttonChild: isLoading
-                ? const SizedBox(
-                    width: 20,
-                    height: 20,
-                    child: CircularProgressIndicator(
-                      strokeWidth: 2.0,
-                      color: Colors.red,
-                    ),
-                  )
-                : null,
+              ? const SizedBox(
+                  width: 20,
+                  height: 20,
+                  child: CircularProgressIndicator(
+                    strokeWidth: 2.0,
+                    color: Colors.red,
+                  ),
+                )
+              : null,
             cornerRadius: 15,
             btnColor: isLoading ? Colors.grey : Colors.white,
             btnBorderColor: const Color(0xFFE50F2A),

@@ -96,9 +96,9 @@ class _ResetPasswordPageState extends State<ResetPasswordScreen> {
 
   @override
   void dispose() {
-    super.dispose();
     _newPasswordController.dispose();
     _verifyPasswordController.dispose();
+    super.dispose();
   }
 
   @override
@@ -119,19 +119,22 @@ class _ResetPasswordPageState extends State<ResetPasswordScreen> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
-              SizedBox(height: 20),
-              Text(
+              const SizedBox(height: 20),
+              const Text(
                 'Need to Change Password ?',
                 style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold),
                 textAlign: TextAlign.center,
               ),
+              
               Image.asset('assets/images/reset_pswd.png', height: 230),
-              SizedBox(height: 15),
-              Text(
+              const SizedBox(height: 15),
+
+              const Text(
                 'Enter your new password below...',
                 style: TextStyle(fontSize: 16),
               ),
-              SizedBox(height: 15),
+              const SizedBox(height: 15),
+              
               Form(
                 key: _formKey,
                 child: Column(
@@ -163,6 +166,7 @@ class _ResetPasswordPageState extends State<ResetPasswordScreen> {
                           fontWeight: FontWeight.w500,
                         ),
                       ),
+
                     CustomInputBox(
                       textName: 'Verify Password',
                       hintText: 'Re-enter your new password',
@@ -175,14 +179,15 @@ class _ResetPasswordPageState extends State<ResetPasswordScreen> {
                   ],
                 ),
               ),
-              SizedBox(height: 20),
+              const SizedBox(height: 20),
+
               CustomButton(
                 onPressed: isLoading
                   ? null
                   : () => resetPassword(userProvider.user!.userId!),
                 btnLabel: 'Reset Password',
                 buttonChild: isLoading
-                  ? SizedBox(
+                  ? const SizedBox(
                       width: 20,
                       height: 20,
                       child: CircularProgressIndicator(
@@ -193,10 +198,10 @@ class _ResetPasswordPageState extends State<ResetPasswordScreen> {
                   : null,
                 cornerRadius: 15,
                 btnColor: isLoading ? Colors.grey : Colors.white,
-                btnBorderColor: Color(0xFFE50F2A),
-                labelColor: isLoading ? Colors.grey : Color(0xFFE50F2A),
+                btnBorderColor: const Color(0xFFE50F2A),
+                labelColor: isLoading ? Colors.grey : const Color(0xFFE50F2A),
               ),
-              SizedBox(height: 20),
+              const SizedBox(height: 20),
             ],
           ),
         ),

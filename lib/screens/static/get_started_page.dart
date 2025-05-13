@@ -10,7 +10,7 @@ class GetStartedPage extends StatelessWidget {
       body: SafeArea(
         child: SingleChildScrollView(
           child: Container(
-            decoration: BoxDecoration(
+            decoration: const BoxDecoration(
               gradient: LinearGradient(
                 colors: [Color(0xFFFCF1F5), Color(0xFFFAE1E6)],
                 begin: Alignment.topLeft,
@@ -24,7 +24,7 @@ class GetStartedPage extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
                   RichText(
-                    text: TextSpan(
+                    text: const TextSpan(
                       style: TextStyle(
                         fontSize: 28,
                         fontWeight: FontWeight.bold,
@@ -46,6 +46,7 @@ class GetStartedPage extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(height: 20),
+                  
                   ClipRRect(
                     borderRadius: BorderRadius.circular(30),
                     child: Image.asset(
@@ -56,12 +57,13 @@ class GetStartedPage extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(height: 30),
+                  
                   Container(
                     padding: const EdgeInsets.all(15),
                     decoration: BoxDecoration(
                       color: Colors.white.withOpacity(0.8),
                       borderRadius: BorderRadius.circular(15),
-                      boxShadow: [
+                      boxShadow: const [
                         BoxShadow(
                           color: Colors.black12,
                           blurRadius: 10,
@@ -85,13 +87,14 @@ class GetStartedPage extends StatelessWidget {
                       ),
                     ),
                   ),
+                  
                   Container(
                     padding: const EdgeInsets.all(15),
                     margin: const EdgeInsets.only(top: 30),
                     decoration: BoxDecoration(
                       color: Colors.white.withOpacity(0.9),
                       borderRadius: BorderRadius.circular(15),
-                      boxShadow: [
+                      boxShadow: const [
                         BoxShadow(
                           color: Colors.black12,
                           blurRadius: 10,
@@ -101,7 +104,7 @@ class GetStartedPage extends StatelessWidget {
                     ),
                     child: Column(
                       children: [
-                        Text(
+                        const Text(
                           "Why Donate Blood?",
                           style: TextStyle(
                             fontSize: 22,
@@ -123,13 +126,14 @@ class GetStartedPage extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(height: 40),
+
                   CustomButton(
                     btnLabel: 'Get Started',
                     cornerRadius: 50,
                     onPressed: () {
                       Navigator.pushNamed(context, "/login");
                     },
-                    btnColor: Color(0xFFE50F2A),
+                    btnColor: const Color(0xFFE50F2A),
                     btnBorderColor: Colors.transparent,
                     labelColor: Colors.white,
                   ),

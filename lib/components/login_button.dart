@@ -26,7 +26,7 @@ class LoginButton extends StatelessWidget {
         ),
         onPressed: onPressed,
         child: isLoading!
-          ? const Center(child: CircularProgressIndicator())
+          ? const Center(child: CircularProgressIndicator(color: Colors.red))
           : Text(
               text,
               style: const TextStyle(

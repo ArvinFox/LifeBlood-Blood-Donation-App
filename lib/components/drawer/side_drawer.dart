@@ -127,23 +127,9 @@ class _NavDrawerState extends State<NavDrawer> {
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.red,
-                  ),
-                  onPressed: () {
-                    deleteUser(context);
-                  },
-                  child: const Text(
-                    "Delete",
-                    style: TextStyle(color: Colors.white),
-                  ),
-                ),
-                const SizedBox(width: 30),
                 OutlinedButton(
                   style: OutlinedButton.styleFrom(
-                    side:
-                        const BorderSide(color: Color(0xFFE50F2A), width: 1.5),
+                    side: const BorderSide(color: Color(0xFFE50F2A), width: 1.5),
                   ),
                   onPressed: () {
                     Navigator.pop(context);
@@ -151,6 +137,17 @@ class _NavDrawerState extends State<NavDrawer> {
                   child: const Text(
                     "Cancel",
                     style: TextStyle(color: Color(0xFFE50F2A)),
+                  ),
+                ),
+                const SizedBox(width: 30),
+                ElevatedButton(
+                  style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
+                  onPressed: () {
+                    deleteUser(context);
+                  },
+                  child: const Text(
+                    "Delete",
+                    style: TextStyle(color: Colors.white),
                   ),
                 ),
               ],

@@ -31,7 +31,7 @@ class _DonationHistoryPageState extends State<DonationHistoryScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
-      appBar: CustomMainAppbar(title: 'Donation History', showLeading: true),
+      appBar: const CustomMainAppbar(title: 'Donation History', showLeading: true),
       body: SingleChildScrollView(
         child: Padding(
           padding: const EdgeInsets.all(10),
@@ -46,6 +46,7 @@ class _DonationHistoryPageState extends State<DonationHistoryScreen> {
                 ),
                 textAlign: TextAlign.center,
               ),
+
               Image.asset(
                 'assets/images/about_us.png',
                 height: 220,
@@ -54,11 +55,10 @@ class _DonationHistoryPageState extends State<DonationHistoryScreen> {
               Consumer<DonationHistoryProvider>(
                 builder: (context, historyProvider, _) {
                   if (historyProvider.isLoading) {
-                    return const Center(child: CircularProgressIndicator());
+                    return const Center(child: CircularProgressIndicator(color: Colors.red));
                   }
 
-                  final List<DonationHistory> donationHistory =
-                      historyProvider.donationHistory;
+                  final List<DonationHistory> donationHistory = historyProvider.donationHistory;
 
                   if (donationHistory.isEmpty) {
                     return const Center(child: Text('No donation history available.'));

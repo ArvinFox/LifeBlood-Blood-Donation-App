@@ -19,6 +19,11 @@ class _FeedbackPageState extends State<FeedbackScreen> {
   final UserService userService = UserService();
   int ratingCount = 0;
 
+  void dispose() {
+    commentController.dispose();
+    super.dispose();
+  }
+
   void showFeedbackDialog(BuildContext context){
     showDialog(
       context: context,
@@ -39,10 +44,12 @@ class _FeedbackPageState extends State<FeedbackScreen> {
                       style: TextStyle(fontSize: 14, color: Colors.black87),
                     ),
                     const SizedBox(height: 16),
+
                     _ratingStars(
                       (rating) => setState(() => ratingCount = rating),
                     ),
                     const SizedBox(height: 10),
+                    
                     TextField(
                       controller: commentController,
                       decoration: InputDecoration(
@@ -54,6 +61,7 @@ class _FeedbackPageState extends State<FeedbackScreen> {
                       maxLines: 3,
                     ),
                     const SizedBox(height: 20),
+                    
                     _buildCustomButton(
                       () async {
                         if (ratingCount > 0 && commentController.text.isNotEmpty) {
@@ -100,7 +108,7 @@ class _FeedbackPageState extends State<FeedbackScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
-      appBar: CustomMainAppbar(title: 'Feedback', showLeading: true),
+      appBar: const CustomMainAppbar(title: 'Feedback', showLeading: true),
       body: Stack(
         children: [
           Positioned(
@@ -113,17 +121,20 @@ class _FeedbackPageState extends State<FeedbackScreen> {
               "Add Feedback"
             ),
           ),
+
           Padding(
             padding: const EdgeInsets.only(top: 70), 
             child: StreamBuilder<List<UserFeedback>>(
               stream: _feedbackService.getFeedbackStream(),
               builder: (context, snapshot) {
                 if (snapshot.connectionState == ConnectionState.waiting) {
-                  return const Center(child: CircularProgressIndicator());
+                  return const Center(child: CircularProgressIndicator(color: Colors.red));
                 }
+
                 if (!snapshot.hasData || snapshot.data!.isEmpty) {
                   return const Center(child: Text("No feedback available"));
                 }
+
                 return ListView.builder(
                   itemCount: snapshot.data!.length,
                   itemBuilder: (context, index) {
@@ -166,6 +177,7 @@ class _FeedbackPageState extends State<FeedbackScreen> {
             textAlign: TextAlign.center,
           ),
           const SizedBox(height: 8),
+
           Text(
             '-  ${feedback.userName}  -',
             style: const TextStyle(
@@ -176,6 +188,7 @@ class _FeedbackPageState extends State<FeedbackScreen> {
             textAlign: TextAlign.center,
           ),
           const SizedBox(height: 8),
+
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: List.generate(
@@ -196,9 +209,9 @@ class _FeedbackPageState extends State<FeedbackScreen> {
   Widget _buildCustomButton(VoidCallback onPressed,String btnLabel){
     return ElevatedButton(
       style: ElevatedButton.styleFrom(
-        minimumSize: Size(140, 45), 
-        backgroundColor: Color(0xFFE50F2A),
-        side: BorderSide(color: Colors.transparent),
+        minimumSize: const Size(140, 45), 
+        backgroundColor: const Color(0xFFE50F2A),
+        side: const BorderSide(color: Colors.transparent),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(10),
         ),
@@ -206,7 +219,7 @@ class _FeedbackPageState extends State<FeedbackScreen> {
       onPressed: onPressed,
       child: Text(
         btnLabel,
-        style: TextStyle(
+        style: const TextStyle(
           color: Colors.white,
           fontSize: 16,
         ),

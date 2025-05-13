@@ -17,7 +17,7 @@ void main() async {
     anonKey: AppCredentials.supabaseAnonKey,
   );
 
-  runApp(MyApp());
+  runApp(const MyApp());
 }
 
 class MyApp extends StatelessWidget {
@@ -25,6 +25,6 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return LifeBlood(); // Running the app after setup
+    return const LifeBlood(); // Running the app after setup
   }
 }

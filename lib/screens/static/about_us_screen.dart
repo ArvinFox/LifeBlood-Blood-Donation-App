@@ -7,17 +7,16 @@ class AboutUsScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: CustomMainAppbar(title: 'About Us', showLeading: true),
+      appBar: const CustomMainAppbar(title: 'About Us', showLeading: true),
       body: Container(
         color: Colors.white,
         child: SingleChildScrollView(
           child: Padding(
-            padding: EdgeInsets.all(20.0),
+            padding: const EdgeInsets.all(20.0),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                SizedBox(height: 15),
-
+                const SizedBox(height: 15),
                 Text(
                   'Welcome to LifeBlood',
                   textAlign: TextAlign.center,
@@ -27,7 +26,7 @@ class AboutUsScreen extends StatelessWidget {
                     color: Color(0xFFE50F2A),
                   ),
                 ),
-                SizedBox(height: 20),
+                const SizedBox(height: 20),
 
                 // Image
                 Image.asset(
@@ -36,9 +35,9 @@ class AboutUsScreen extends StatelessWidget {
                   width: double.infinity,
                   fit: BoxFit.cover,
                 ),
-                SizedBox(height: 20),
+                const SizedBox(height: 20),
 
-                Text(
+                const Text(
                   'Your essential companion for finding blood donors with ease and efficiency. Our mission is to save lives by connecting those in need of blood with generous donors. '
                   'With LifeBlood, donors can easily register and become part of a life-saving community. Whether you’re looking to donate or need blood, our app is designed to provide quick, reliable connections to ensure timely assistance. Join us in making a difference, one drop at a time.',
                   textAlign: TextAlign.justify,
@@ -47,10 +46,10 @@ class AboutUsScreen extends StatelessWidget {
                     color: Colors.black,
                   ),
                 ),
-                SizedBox(height: 20),
+                const SizedBox(height: 20),
 
                 // Social Media Links
-                Text(
+                const Text(
                   'For More Information',
                   style: TextStyle(
                     fontSize: 18,
@@ -58,7 +57,7 @@ class AboutUsScreen extends StatelessWidget {
                     color: Colors.black,
                   ),
                 ),
-                SizedBox(height: 8),
+                const SizedBox(height: 8),
 
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
@@ -73,7 +72,7 @@ class AboutUsScreen extends StatelessWidget {
                         width: 50,
                       ),
                     ),
-                    SizedBox(width: 20),
+                    const SizedBox(width: 20),
                     GestureDetector(
                       onTap: () {
                         // Google functionality
@@ -86,10 +85,10 @@ class AboutUsScreen extends StatelessWidget {
                     ),
                   ],
                 ),
-                SizedBox(height: 32),
+                const SizedBox(height: 32),
 
                 // Footer Text
-                Text(
+                const Text(
                   '©2025 LifeBlood. All rights reserved. Developed by Group 10 (Batch 12 UOP - NSBM)',
                   textAlign: TextAlign.center,
                   style: TextStyle(fontSize: 12,color: Colors.black54),

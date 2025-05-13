@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:lifeblood_blood_donation_app/components/custom_main_app_bar.dart';
 import 'package:lifeblood_blood_donation_app/components/drawer/side_drawer.dart';
-import 'package:lifeblood_blood_donation_app/providers/user_provider.dart';
-import 'package:provider/provider.dart';
 
 class ChooseActionPage extends StatefulWidget {
   final ChooseActionPageNavigation navigation;
@@ -27,7 +25,7 @@ class _ChooseActionPageState extends State<ChooseActionPage> {
         automaticallyImplyLeading:
             widget.navigation == ChooseActionPageNavigation.sideDrawer,
       ),
-      endDrawer: NavDrawer(),
+      endDrawer: const NavDrawer(),
       body: Container(
         width: double.infinity,
         decoration: const BoxDecoration(
@@ -51,16 +49,12 @@ class _ChooseActionPageState extends State<ChooseActionPage> {
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Consumer<UserProvider>(
-                          builder: (context, userProvider, child) {
-                            return _actionButton(
-                              context: context,
-                              title: "Donate Blood",
-                              icon: Icons.volunteer_activism,
-                              onTap: () {
-                                Navigator.pushNamed(context, '/donation-request');
-                              },
-                            );
+                        _actionButton(
+                          context: context,
+                          title: "Donate Blood",
+                          icon: Icons.volunteer_activism,
+                          onTap: () {
+                            Navigator.pushNamed(context, '/donation-request');
                           },
                         ),
                         const SizedBox(height: 40),

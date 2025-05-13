@@ -42,9 +42,9 @@ class _NotificationScreenState extends State<NotificationScreen> {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
-        backgroundColor: Color(0xFFE50F2A),
-        iconTheme: IconThemeData(color: Colors.white),
-        title: Text(
+        backgroundColor: const Color(0xFFE50F2A),
+        iconTheme: const IconThemeData(color: Colors.white),
+        title: const Text(
           " Notifications",
           style: TextStyle(
             color: Colors.white,
@@ -69,7 +69,7 @@ class _NotificationScreenState extends State<NotificationScreen> {
           Consumer<UserProvider>(
             builder: (context, userProvider, child) {
               return IconButton(
-                icon: Icon(
+                icon: const Icon(
                   Icons.mark_email_read_outlined,
                   size: 30,
                 ),
@@ -80,15 +80,17 @@ class _NotificationScreenState extends State<NotificationScreen> {
               );
             },
           ),
-          SizedBox(width: 20),
+          const SizedBox(width: 20),
         ],
       ),
       body: Consumer<NotificationProvider>(
         builder: (context, notificationProvider, child) {
           if (notificationProvider.isLoading) {
-            return const Center(child: CircularProgressIndicator());
+            return const Center(child: CircularProgressIndicator(color: Colors.red));
+
           } else if (notificationProvider.notifications.isEmpty) {
             return const Center(child: Text("No new notifications."));
+
           } else {
             final List<Future<Widget>> fetchedNotifications = notificationProvider.notifications.map((notification) {
               return _buildNotificationCard(notification);
@@ -98,16 +100,19 @@ class _NotificationScreenState extends State<NotificationScreen> {
               future: Future.wait(fetchedNotifications),
               builder: (context, snapshot) {
                 if (snapshot.connectionState == ConnectionState.waiting) {
-                  return const Center(child: CircularProgressIndicator());
+                  return const Center(child: CircularProgressIndicator(color: Colors.red));
+
                 } else if (snapshot.hasError) {
                   Helpers.debugPrintWithBorder("Error loading notifications: ${snapshot.error}");
-                  return Center(child: Text('Error loading notifications. Please check back later.'));
+                  return const Center(child: Text('Error loading notifications. Please check back later.'));
+
                 } else if (snapshot.hasData) {
                   return SingleChildScrollView(
                     child: Column(
                       children: snapshot.data!,
                     ),
                   );
+
                 } else {
                   return const SizedBox.shrink();
                 }
@@ -167,7 +172,7 @@ class _NotificationScreenState extends State<NotificationScreen> {
                         : Colors.red,
                   ),
                 ),
-                SizedBox(height: 8),
+                const SizedBox(height: 8),
                 
                 Row(
                   children: [
@@ -182,7 +187,7 @@ class _NotificationScreenState extends State<NotificationScreen> {
                     ),
                   ],
                 ),
-                SizedBox(height: 12),
+                const SizedBox(height: 12),
                 
                 if (notification.type == 'new_request' && request != null) ...[
                   Row(
@@ -198,6 +203,7 @@ class _NotificationScreenState extends State<NotificationScreen> {
                         ),
                       ),
                       const SizedBox(width: 14),
+                      
                       Expanded(
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
@@ -238,6 +244,7 @@ class _NotificationScreenState extends State<NotificationScreen> {
                       ),
                     ),
                   ),
+                  
                 ] else if (notification.type == 'verification_status') ...[
                   Container(
                     padding: const EdgeInsets.all(12),
@@ -259,7 +266,7 @@ class _NotificationScreenState extends State<NotificationScreen> {
                             notification.status == 'approved'
                                 ? "Congratulations! Your donor profile is now verified."
                                 : "Your donor profile was not approved. Please review the details and try again.",
-                            style: TextStyle(
+                            style: const TextStyle(
                               fontSize: 14, 
                               fontWeight: FontWeight.w500,
                             ),
@@ -285,7 +292,7 @@ class _NotificationScreenState extends State<NotificationScreen> {
         maxLines: maxLines,
         overflow: TextOverflow.ellipsis,
         softWrap: true,
-        style: TextStyle(
+        style: const TextStyle(
           fontSize: 13,
           fontWeight: FontWeight.w500,
         ),
@@ -319,21 +326,17 @@ class _NotificationScreenState extends State<NotificationScreen> {
         backgroundColor: const Color.fromARGB(255, 255, 244, 244),
         title: Column(
           children: [
-            SizedBox(height: 10),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  "Lifesaving Alert: Donate Blood Now!",
-                  style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.red,
-                  ),
-                ),
-              ],
+            const SizedBox(height: 10),
+            const Text(
+              "Lifesaving Alert: Donate Blood Now!",
+              style: TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.bold,
+                color: Colors.red,
+              ),
             ),
-            SizedBox(height: 10),
+
+            const SizedBox(height: 10),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
@@ -342,28 +345,29 @@ class _NotificationScreenState extends State<NotificationScreen> {
                   width: 120,
                   height: 140,
                 ),
-                SizedBox(width: 5),
+                const SizedBox(width: 5),
+                
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
                         "Blood Type : $bloodType",
-                        style: TextStyle(
+                        style: const TextStyle(
                           fontSize: 12,
                           fontWeight: FontWeight.bold,
                         ),
                       ),
                       Text(
                         "Urgency Level : $urgencyLevel",
-                        style: TextStyle(
+                        style: const TextStyle(
                           fontSize: 12,
                           fontWeight: FontWeight.bold,
                         ),
                       ),
                       Text(
                         "Location : $hospital - $city",
-                        style: TextStyle(
+                        style: const TextStyle(
                           fontSize: 12,
                           fontWeight: FontWeight.bold,
                         ),
@@ -375,7 +379,7 @@ class _NotificationScreenState extends State<NotificationScreen> {
             ),
           ],
         ),
-        content: Text(
+        content: const Text(
           "Your timely blood donation can save lives and bring hope to those in critical need. Act now to be a hero!",
           style: TextStyle(fontWeight: FontWeight.bold),
           textAlign: TextAlign.center,
@@ -390,10 +394,16 @@ class _NotificationScreenState extends State<NotificationScreen> {
                 },
                 style:
                     OutlinedButton.styleFrom(side: BorderSide(color: Colors.red)),
-                child: Text("Cancel", style: TextStyle(color: Colors.red)),
+                child: const Text("Cancel", style: TextStyle(color: Colors.red)),
               ),
               ElevatedButton(
                 onPressed: () async {
+                  if (userProvider.user!.isDonating) {
+                    Navigator.pop(context);
+                    Helpers.showError(context, "Donation in progress. Please complete current request.");
+                    return;
+                  }
+
                   await userProvider.saveCurrentActivity(requestId);
 
                   final user = userProvider.user;
@@ -409,9 +419,10 @@ class _NotificationScreenState extends State<NotificationScreen> {
                   );
 
                   Navigator.pop(context);
+                  Navigator.pushNamed(context, '/home');
                 },
                 style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
-                child: Text("Confirm", style: TextStyle(color: Colors.white)),
+                child: const Text("Confirm", style: TextStyle(color: Colors.white)),
               ),
             ],
           ),

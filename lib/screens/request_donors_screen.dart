@@ -139,8 +139,8 @@ class _RequestDonorsState extends State<RequestDonors> {
                 width: 1,
               ),
               columnWidths: const {
-                0: FixedColumnWidth(140),
-                1: FlexColumnWidth(),
+                0: const FixedColumnWidth(140),
+                1: const FlexColumnWidth(),
               },
               children: [
                 Helpers.buildTableRow(
@@ -265,7 +265,7 @@ class _RequestDonorsState extends State<RequestDonors> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: CustomMainAppbar(
+      appBar: const CustomMainAppbar(
         title: 'Request a Donor',
         showLeading: true,
       ),
@@ -291,6 +291,7 @@ class _RequestDonorsState extends State<RequestDonors> {
                     FilteringTextInputFormatter.allow(RegExp(r'[a-zA-Z ]')),
                   ],
                 ),
+
                 CustomInputBox(
                   textName: 'Contact Number',
                   hintText: 'Enter Contact Number',
@@ -310,6 +311,7 @@ class _RequestDonorsState extends State<RequestDonors> {
                     LengthLimitingTextInputFormatter(10),
                   ],
                 ),
+
                 //province selection
                 _inputBox(
                   _buildDropdown(
@@ -325,6 +327,7 @@ class _RequestDonorsState extends State<RequestDonors> {
                   ),
                 ),
                 const SizedBox(height: 15),
+
                 if (selectedProvince != null)
                   //city selection
                   _inputBox(
@@ -340,6 +343,7 @@ class _RequestDonorsState extends State<RequestDonors> {
                     ),
                   ),
                 const SizedBox(height: 15),
+
                 if (selectedCity != null)
                   //hospital name selection
                   _inputBox(
@@ -352,6 +356,7 @@ class _RequestDonorsState extends State<RequestDonors> {
                     ),
                   ),
                 const SizedBox(height: 15),
+
                 //blood type selection
                 const Text(
                   "Blood Type",
@@ -361,6 +366,7 @@ class _RequestDonorsState extends State<RequestDonors> {
                       fontWeight: FontWeight.bold),
                 ),
                 const SizedBox(height: 16),
+                
                 Wrap(
                   spacing: 20,
                   runSpacing: 20,
@@ -405,6 +411,7 @@ class _RequestDonorsState extends State<RequestDonors> {
                   }).toList(),
                 ),
                 const SizedBox(height: 15),
+
                 //urgency level selection
                 _inputBox(
                   _buildDropdown(
@@ -415,6 +422,7 @@ class _RequestDonorsState extends State<RequestDonors> {
                   ),
                 ),
                 const SizedBox(height: 15),
+
                 //quantity selection
                 _inputBox(
                   _buildDropdown(
@@ -425,6 +433,7 @@ class _RequestDonorsState extends State<RequestDonors> {
                   ),
                 ),
                 const SizedBox(height: 40),
+
                 LoginButton(
                     text: 'Submit',
                     onPressed: () {
@@ -450,7 +459,7 @@ class _RequestDonorsState extends State<RequestDonors> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(label,
-            style: TextStyle(
+            style: const TextStyle(
                 fontSize: 16,
                 color: Colors.black,
                 fontWeight: FontWeight.bold)),
@@ -459,7 +468,7 @@ class _RequestDonorsState extends State<RequestDonors> {
           isExpanded: true,
           autovalidateMode: AutovalidateMode.onUserInteraction,
           value: value,
-          style: TextStyle(
+          style: const TextStyle(
               fontSize: 16, color: Colors.black, fontWeight: FontWeight.bold),
           decoration: InputDecoration(
             contentPadding:

@@ -154,20 +154,23 @@ class _EnterOtpPageState extends State<EnterOtpScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            SizedBox(height: 20),
-            Text(
+            const SizedBox(height: 20),
+            const Text(
               'Need to Change Password ?',
               style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold),
               textAlign: TextAlign.center,
             ),
-            SizedBox(height: 20),
+            const SizedBox(height: 20),
+
             Image.asset('assets/images/otp.png', height: 230),
-            SizedBox(height: 20),
-            Text(
+            const SizedBox(height: 20),
+
+            const Text(
               'Enter the OTP here...',
               style: TextStyle(fontSize: 16),
             ),
-            SizedBox(height: 30),
+            const SizedBox(height: 30),
+
             Form(
               key: _formKey,
               child: CustomInputBox(
@@ -178,7 +181,8 @@ class _EnterOtpPageState extends State<EnterOtpScreen> {
                 inputFormatters: [FilteringTextInputFormatter.digitsOnly],
               ),
             ),
-            SizedBox(height: 10),
+            const SizedBox(height: 10),
+            
             Align(
               alignment: Alignment.centerRight,
               child: GestureDetector(
@@ -193,14 +197,15 @@ class _EnterOtpPageState extends State<EnterOtpScreen> {
                 ),
               ),
             ),
-            SizedBox(height: 40),
+            const SizedBox(height: 40),
+
             CustomButton(
               onPressed: _isLoading
                 ? null
                 : () => _handleOtpVerification(),
               btnLabel: 'Continue',
               buttonChild: _isLoading
-                  ? SizedBox(
+                  ? const SizedBox(
                       width: 20,
                       height: 20,
                       child: CircularProgressIndicator(
@@ -210,11 +215,11 @@ class _EnterOtpPageState extends State<EnterOtpScreen> {
                     )
                   : null,
               cornerRadius: 15,
-              btnColor: _isLoading ? Color(0xFFE50F2A) : Colors.white,
-              btnBorderColor: Color(0xFFE50F2A),
-              labelColor: _isLoading ? Colors.white : Color(0xFFE50F2A),
+              btnColor: _isLoading ? const Color(0xFFE50F2A) : Colors.white,
+              btnBorderColor: const Color(0xFFE50F2A),
+              labelColor: _isLoading ? Colors.white : const Color(0xFFE50F2A),
             ),
-            SizedBox(height: 30),
+            const SizedBox(height: 30),
           ],
         ),
       ),

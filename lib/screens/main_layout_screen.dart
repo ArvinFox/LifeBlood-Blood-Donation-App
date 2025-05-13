@@ -28,10 +28,10 @@ class _MainLayoutScreenState extends State<MainLayoutScreen> {
   ];
 
   final List<Widget> pages = [
-    HomeScreen(),
-    ChooseActionPage(navigation: ChooseActionPageNavigation.bottomNavigation),
-    NotificationScreen(navigation: NotificationPageNavigation.bottomNavigation),
-    ProfileScreen(navigation: ProfilePageNavigation.bottomNavigation),
+    const HomeScreen(),
+    const ChooseActionPage(navigation: ChooseActionPageNavigation.bottomNavigation),
+    const NotificationScreen(navigation: NotificationPageNavigation.bottomNavigation),
+    const ProfileScreen(navigation: ProfilePageNavigation.bottomNavigation),
   ];
 
   @override
@@ -61,7 +61,7 @@ class _MainLayoutScreenState extends State<MainLayoutScreen> {
             ),
             child: CurvedNavigationBar(
               backgroundColor: Colors.transparent,
-              color: Color(0xFFe5142b),
+              color: const Color(0xFFe5142b),
               items: items,
               index: _currentIndex,
               onTap: _onItemTapped,

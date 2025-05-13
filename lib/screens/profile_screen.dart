@@ -40,12 +40,12 @@ class _ProfilePageState extends State<ProfileScreen> {
     showDialog(
         context: context,
         builder: (context) => AlertDialog(
-              title: Text('Access Restricted'),
+              title: const Text('Access Restricted'),
               content:
-                  Text('This feature is only accessible for verified users.'),
+                  const Text('This feature is only accessible for verified users.'),
               actions: [
                 TextButton(
-                    onPressed: () => Navigator.pop(context), child: Text('Ok'))
+                    onPressed: () => Navigator.pop(context), child: const Text('Ok'))
               ],
             ));
   }
@@ -68,7 +68,7 @@ class _ProfilePageState extends State<ProfileScreen> {
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text(
+          content: const Text(
             "Logout failed. Please try again.",
             style: TextStyle(
               color: Colors.white,
@@ -131,7 +131,7 @@ class _ProfilePageState extends State<ProfileScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
-      appBar: CustomMainAppbar(
+      appBar: const CustomMainAppbar(
         title: 'Profile',
         showLeading: false,
         automaticallyImplyLeading: false,
@@ -142,7 +142,7 @@ class _ProfilePageState extends State<ProfileScreen> {
           padding: EdgeInsets.all(20),
           child: Column(
             children: [
-              SizedBox(height: 16),
+              const SizedBox(height: 16),
 
               // Profile Image
               CircleAvatar(
@@ -150,8 +150,8 @@ class _ProfilePageState extends State<ProfileScreen> {
                 backgroundColor: Colors.grey.shade300,
                 backgroundImage: AssetImage("assets/images/profile.jpg"),
               ),
-
-              SizedBox(height: 16),
+              const SizedBox(height: 16),
+              
               Consumer<UserProvider>(
                 builder: (context, userProvider, child) {
                   final user = userProvider.user;
@@ -160,25 +160,25 @@ class _ProfilePageState extends State<ProfileScreen> {
                       children: [
                         Center(
                           child: Text(user?.email ?? 'No email available.',
-                              style: TextStyle(fontSize: 16)),
+                              style: const TextStyle(fontSize: 16)),
                         ),
-                        SizedBox(height: 30),
+                        const SizedBox(height: 30),
                       ],
                     );
                   } else if (user.isDonorVerified == true) {
                     return Column(
                       children: [
                         Text(user.fullName!,
-                            style: TextStyle(
+                            style: const TextStyle(
                                 fontSize: 18, fontWeight: FontWeight.bold)),
-                        SizedBox(height: 8),
+                        const SizedBox(height: 8),
                         Text(Formatters.formatPhoneNumber(user.contactNumber!),
-                            style: TextStyle(fontSize: 16)),
-                        SizedBox(height: 30),
+                            style: const TextStyle(fontSize: 16)),
+                        const SizedBox(height: 30),
                       ],
                     );
                   }
-                  return SizedBox.shrink();
+                  return const SizedBox.shrink();
                 },
               ),
 
@@ -187,10 +187,10 @@ class _ProfilePageState extends State<ProfileScreen> {
                 children: [
                   Expanded(
                     child: Container(
-                      padding: EdgeInsets.all(16),
-                      margin: EdgeInsets.only(right: 8),
+                      padding: const EdgeInsets.all(16),
+                      margin: const EdgeInsets.only(right: 8),
                       decoration: BoxDecoration(
-                        color: Color(0xFFE50F2A),
+                        color: const Color(0xFFE50F2A),
                         borderRadius: BorderRadius.circular(8),
                       ),
                       child: Consumer<UserProvider>(
@@ -199,13 +199,13 @@ class _ProfilePageState extends State<ProfileScreen> {
                         if (user!.isDonorVerified == true) {
                           return Text(
                             "Donation Count\n${user.donationCount.toString()}",
-                            style: TextStyle(
+                            style: const TextStyle(
                                 color: Colors.white,
                                 fontWeight: FontWeight.bold),
                             textAlign: TextAlign.center,
                           );
                         }
-                        return Text(
+                        return const Text(
                           "No Donations",
                           style: TextStyle(
                               color: Colors.white, fontWeight: FontWeight.bold),
@@ -214,15 +214,16 @@ class _ProfilePageState extends State<ProfileScreen> {
                       }),
                     ),
                   ),
+
                   Expanded(
                     child: Container(
-                      padding: EdgeInsets.all(16),
-                      margin: EdgeInsets.only(left: 8),
+                      padding: const EdgeInsets.all(16),
+                      margin: const EdgeInsets.only(left: 8),
                       decoration: BoxDecoration(
-                        color: Color(0xFFE50F2A),
+                        color: const Color(0xFFE50F2A),
                         borderRadius: BorderRadius.circular(8),
                       ),
-                      child: Text(
+                      child: const Text(
                         "Next Donation Date\nAfter 3 months",
                         style: TextStyle(
                             color: Colors.white, fontWeight: FontWeight.bold),
@@ -233,7 +234,7 @@ class _ProfilePageState extends State<ProfileScreen> {
                 ],
               ),
 
-              SizedBox(height: 40),
+              const SizedBox(height: 40),
 
               // Availability Status
               Row(
@@ -241,7 +242,7 @@ class _ProfilePageState extends State<ProfileScreen> {
                 children: [
                   Padding(
                     padding: const EdgeInsets.only(left: 15),
-                    child: Text(
+                    child: const Text(
                       "Availability Status",
                       style:
                           TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
@@ -252,7 +253,7 @@ class _ProfilePageState extends State<ProfileScreen> {
                       final user = userProvider.user;
 
                       return Switch(
-                        padding: EdgeInsets.only(right: 20),
+                        padding: const EdgeInsets.only(right: 20),
                         value: isAvailable,
                         onChanged:
                             (user != null && user.isDonorVerified == true)
@@ -271,16 +272,16 @@ class _ProfilePageState extends State<ProfileScreen> {
                                     }
                                   }
                                 : null,
-                        activeColor: Color(0xFFE50F2A),
+                        activeColor: const Color(0xFFE50F2A),
                       );
                     },
                   ),
                 ],
               ),
 
-              Divider(thickness: 1.2, color: Colors.grey),
+              const Divider(thickness: 1.2, color: Colors.grey),
 
-              SizedBox(height: 10),
+              const SizedBox(height: 10),
 
               // Profile Options
               Consumer<UserProvider>(builder: (context, userProvider, child) {
@@ -342,12 +343,12 @@ class _ProfilePageState extends State<ProfileScreen> {
 Widget _buildProfileOption(IconData icon, String text, VoidCallback onTap,
     {bool enable = true, bool redColor = false}) {
   return Container(
-    margin: EdgeInsets.symmetric(vertical: 6, horizontal: 12),
-    padding: EdgeInsets.all(6),
+    margin: const EdgeInsets.symmetric(vertical: 6, horizontal: 12),
+    padding: const EdgeInsets.all(6),
     decoration: BoxDecoration(
-      color: redColor ? Color(0xFFE50F2A) : Colors.white,
+      color: redColor ? const Color(0xFFE50F2A) : Colors.white,
       borderRadius: BorderRadius.circular(15),
-      boxShadow: [
+      boxShadow: const [
         BoxShadow(
           color: Colors.black26,
           blurRadius: 6,
@@ -356,7 +357,7 @@ Widget _buildProfileOption(IconData icon, String text, VoidCallback onTap,
       ],
     ),
     child: ListTile(
-      leading: Icon(icon, color: redColor ? Colors.white : Color(0xFFE50F2A)),
+      leading: Icon(icon, color: redColor ? Colors.white : const Color(0xFFE50F2A)),
       title: Text(text,
           style: TextStyle(
               fontSize: 16,

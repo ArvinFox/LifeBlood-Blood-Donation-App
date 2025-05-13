@@ -15,8 +15,7 @@ class UserFeedback {
     required this.createdAt,
   });
 
-  // Convert Firestore document to UserFeedback model
-  factory UserFeedback.fromMap(Map<String, dynamic> data, String documentId) {
+  factory UserFeedback.fromFirestore(Map<String, dynamic> data, String documentId) {
     return UserFeedback(
       userName: data['userName'] ?? '',
       feedbackContent: data['feedbackContent'] ?? '',
@@ -25,8 +24,7 @@ class UserFeedback {
     );
   }
 
-  // Convert UserFeedback model to Firestore format
-  Map<String, dynamic> toMap() {
+  Map<String, dynamic> toFirestore() {
     return {
       'userName': userName,
       'feedbackContent': feedbackContent,

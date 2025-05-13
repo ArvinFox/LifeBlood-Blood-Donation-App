@@ -27,8 +27,8 @@ class _EnterMobileNumberState extends State<EnterMobileNumber> {
 
   @override
   void dispose() {
-    super.dispose();
     _contactNumberController.dispose();
+    super.dispose();
   }
 
   void _checkAndSendOtp(String userId) async {
@@ -96,24 +96,27 @@ class _EnterMobileNumberState extends State<EnterMobileNumber> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            SizedBox(height: 20),
-            Text(
+            const SizedBox(height: 20),
+            const Text(
               'Need to Change Password ?',
               style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold),
               textAlign: TextAlign.center,
             ),
-            SizedBox(height: 10),
+            const SizedBox(height: 10),
+
             Image.asset(
               'assets/images/forgot_pswd.png',
               height: 240,
             ),
-            SizedBox(height: 10),
-            Text(
+            const SizedBox(height: 10),
+
+            const Text(
               'Please enter your registered contact number here. You will receive an OTP to create a new password via mobile number.',
               textAlign: TextAlign.center,
               style: TextStyle(fontSize: 16),
             ),
-            SizedBox(height: 30),
+            const SizedBox(height: 30),
+            
             Form(
               key: _formKey,
               child: CustomInputBox(
@@ -135,20 +138,21 @@ class _EnterMobileNumberState extends State<EnterMobileNumber> {
                 onTap: () {
                   Navigator.pop(context);
                 },
-                child: Text(
+                child: const Text(
                   'Back to Profile',
                   style: TextStyle(color: Colors.red),
                 ),
               ),
             ),
-            SizedBox(height: 20),
+            const SizedBox(height: 20),
+
             CustomButton(
               onPressed: isLoading
-                  ? null
-                  : () => _checkAndSendOtp(userProvider.user!.userId!),
+                ? null
+                : () => _checkAndSendOtp(userProvider.user!.userId!),
               btnLabel: 'Continue',
               buttonChild: isLoading
-                  ? SizedBox(
+                  ? const SizedBox(
                       width: 20,
                       height: 20,
                       child: CircularProgressIndicator(
@@ -158,11 +162,11 @@ class _EnterMobileNumberState extends State<EnterMobileNumber> {
                     )
                   : null,
               cornerRadius: 15,
-              btnColor: isLoading ? Color(0xFFE50F2A) : Colors.white,
-              btnBorderColor: Color(0xFFE50F2A),
-              labelColor: isLoading ? Colors.white : Color(0xFFE50F2A),
+              btnColor: isLoading ? const Color(0xFFE50F2A) : Colors.white,
+              btnBorderColor: const Color(0xFFE50F2A),
+              labelColor: isLoading ? Colors.white : const Color(0xFFE50F2A),
             ),
-            SizedBox(height: 20),
+            const SizedBox(height: 20),
           ],
         ),
       ),

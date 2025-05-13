@@ -3,6 +3,7 @@ import 'package:intl/intl.dart';
 import 'package:lifeblood_blood_donation_app/models/reward_model.dart';
 import 'package:lifeblood_blood_donation_app/services/reward_service.dart';
 import 'package:lifeblood_blood_donation_app/components/custom_main_app_bar.dart';
+import 'package:lifeblood_blood_donation_app/utils/helpers.dart';
 
 class RewardsScreen extends StatefulWidget {
   const RewardsScreen({super.key});
@@ -30,11 +31,15 @@ class _RewardsScreenState extends State<RewardsScreen> {
         future: _rewardFuture,
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Center(child: CircularProgressIndicator());
+            return const Center(child: CircularProgressIndicator(color: Colors.red));
+
           } else if (snapshot.hasError) {
-            return Center(child: Text('Error: ${snapshot.error}'));
+            Helpers.debugPrintWithBorder("Error loading rewards: ${snapshot.error}");
+            return Center(child: Text('An error occurred while loading rewards. Please try again.'));
+
           } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
             return const Center(child: Text('No rewards available.'));
+
           } else {
             final rewardsWithId = snapshot.data!;
             return ListView.builder(
@@ -64,9 +69,9 @@ class _RewardsScreenState extends State<RewardsScreen> {
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         gradient: LinearGradient(
-          colors: [
-            const Color.fromARGB(255, 240, 240, 240),
-            const Color.fromARGB(255, 240, 240, 240)
+          colors: const [
+            Color.fromARGB(255, 240, 240, 240),
+            Color.fromARGB(255, 240, 240, 240)
           ],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
@@ -94,6 +99,7 @@ class _RewardsScreenState extends State<RewardsScreen> {
             maxLines: 1,
           ),
           const SizedBox(height: 10),
+
           ClipRRect(
             borderRadius: BorderRadius.circular(12),
             child: Container(
@@ -115,6 +121,7 @@ class _RewardsScreenState extends State<RewardsScreen> {
             ),
           ),
           const SizedBox(height: 10),
+
           RichText(
             text: TextSpan(
               style: const TextStyle(
@@ -140,6 +147,7 @@ class _RewardsScreenState extends State<RewardsScreen> {
             ),
           ),
           const SizedBox(height: 5),
+
           RichText(
             text: TextSpan(
               style: const TextStyle(
@@ -165,10 +173,11 @@ class _RewardsScreenState extends State<RewardsScreen> {
             ),
           ),
           const SizedBox(height: 20),
+
           Center(
             child: ElevatedButton(
               style: ElevatedButton.styleFrom(
-                backgroundColor: Color(0xFFE50F2A),
+                backgroundColor: const Color(0xFFE50F2A),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(8),
                 ),
@@ -205,11 +214,13 @@ class _RewardsScreenState extends State<RewardsScreen> {
                             ),
                           ),
                           const SizedBox(height: 10),
+
                           Text(
                             reward.description,
                             style: const TextStyle(color: Colors.black87),
                           ),
                           const SizedBox(height: 20),
+                          
                           ElevatedButton(
                             onPressed: () => Navigator.pop(context),
                             child: const Text('Close',

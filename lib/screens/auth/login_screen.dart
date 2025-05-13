@@ -62,12 +62,14 @@ class _LoginScreenState extends State<LoginScreen> {
               ),
             ),
           ),
+
           Center(
             child: Image.asset(
               'assets/images/login.png',
               height: 250,
             ),
           ),
+          
           Form(
             key: _formKey,
             child: Column(
@@ -79,6 +81,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   validator: Helpers.validateEmail,
                   autovalidateMode: AutovalidateMode.onUserInteraction,
                 ),
+                
                 CustomInputBox(
                   textName: 'Password',
                   hintText: 'Enter your password',
@@ -100,7 +103,7 @@ class _LoginScreenState extends State<LoginScreen> {
               onTap: () {
                 Navigator.pushNamed(context, '/forgot-password');
               },
-              child: Text(
+              child: const Text(
                 'Forgot Password?',
                 style: TextStyle(color: Colors.red),
               ),
@@ -114,14 +117,16 @@ class _LoginScreenState extends State<LoginScreen> {
               loginUser();
             },
             btnLabel: 'Login',
-            buttonChild: isLoading ? SizedBox(
-              width: 20,
-              height: 20,
-              child: CircularProgressIndicator(
-                strokeWidth: 2.0,
-                color: Colors.red,
-              ),
-            ) : null,
+            buttonChild: isLoading 
+              ? const SizedBox(
+                  width: 20,
+                  height: 20,
+                  child: CircularProgressIndicator(
+                    strokeWidth: 2.0,
+                    color: Colors.red,
+                  ),
+                ) 
+              : null,
             cornerRadius: 15,
             btnColor: isLoading ? Colors.grey : Colors.white,
             btnBorderColor: Color(0xFFE50F2A),
@@ -154,7 +159,7 @@ class _LoginScreenState extends State<LoginScreen> {
               ),
             ],
           ),
-          SizedBox(height: 20),
+          const SizedBox(height: 20),
         ],
       ),
     );

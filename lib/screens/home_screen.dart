@@ -270,7 +270,7 @@ class _HomePageState extends State<HomeScreen> {
     return Consumer<UserProvider>(
       builder: (context, userProvider, child) {
         if (userProvider.isLoading) {
-          return const Center(child: CircularProgressIndicator());
+          return const Center(child: CircularProgressIndicator(color: Colors.red));
         }
 
         final user = userProvider.user;
@@ -280,7 +280,7 @@ class _HomePageState extends State<HomeScreen> {
         return Consumer<MedicalReportProvider>(
           builder: (context, medicalReportProvider, child) {
             if (medicalReportProvider.isLoading) {
-              return const Center(child: CircularProgressIndicator());
+              return const Center(child: CircularProgressIndicator(color: Colors.red));
             }
 
             bool isDonorRejected = false;

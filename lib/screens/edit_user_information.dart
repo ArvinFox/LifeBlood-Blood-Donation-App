@@ -160,6 +160,7 @@ class _EditUserInformationState extends State<EditUserInformation> {
     _addressController.dispose();
     _dobController.dispose();
     _healthConditionController.dispose();
+    
     super.dispose();
   }
 
@@ -297,7 +298,7 @@ class _EditUserInformationState extends State<EditUserInformation> {
     final userProvider = Provider.of<UserProvider>(context, listen: false);
 
     return Scaffold(
-      appBar: CustomMainAppbar(title: 'Edit Donor Info', showLeading: true),
+      appBar: const CustomMainAppbar(title: 'Edit Donor Info', showLeading: true),
       backgroundColor: Colors.white,
       body: _isLoading
           ? const Center(
@@ -319,9 +320,9 @@ class _EditUserInformationState extends State<EditUserInformation> {
                         decoration: BoxDecoration(
                           color: Colors.grey[100], // Light grey background
                           borderRadius:
-                              BorderRadius.circular(12), // Rounded corners
+                            BorderRadius.circular(12), // Rounded corners
                           border: Border.all(
-                              color: Colors.grey[300]!), // Border color
+                            color: Colors.grey[300]!), // Border color
                         ),
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
@@ -334,12 +335,14 @@ class _EditUserInformationState extends State<EditUserInformation> {
                                   color: Colors.black),
                             ),
                             const SizedBox(height: 15),
+
                             CustomInputBox(
                               textName: 'Full Name',
                               hintText: 'Enter full name here',
                               controller: _fullNameController,
                               NoneedToEdit: true,
                             ),
+
                             _buildDatePicker(
                                 'Date Of Birth', _dobController, _selectedDate,
                                 (picked) {
@@ -350,16 +353,20 @@ class _EditUserInformationState extends State<EditUserInformation> {
                               });
                             }, 'dd-mm-yyyy'),
                             const SizedBox(height: 15),
-                            Text(
+
+                            const Text(
                               "Gender",
                               style: TextStyle(
-                                  fontSize: 16,
-                                  color: Colors.black,
-                                  fontWeight: FontWeight.bold),
+                                fontSize: 16,
+                                color: Colors.black,
+                                fontWeight: FontWeight.bold,
+                              ),
                             ),
-                            SizedBox(height: 5),
+                            const SizedBox(height: 5),
+
                             _buildGenderSelector(),
                             const SizedBox(height: 15),
+                            
                             CustomInputBox(
                               textName: 'NIC',
                               hintText: 'Enter NIC here',
@@ -367,12 +374,14 @@ class _EditUserInformationState extends State<EditUserInformation> {
                               NoneedToEdit: true,
                             ),
                             const SizedBox(height: 16),
-                            Text(
+
+                            const Text(
                               "Your uploaded report:",
                               style: TextStyle(
-                                  fontSize: 16,
-                                  color: Colors.black,
-                                  fontWeight: FontWeight.bold),
+                                fontSize: 16,
+                                color: Colors.black,
+                                fontWeight: FontWeight.bold,
+                              ),
                             ),
                             if (medicalReport != null &&
                                 userProvider.user!.hasCompletedProfile!)
@@ -383,7 +392,7 @@ class _EditUserInformationState extends State<EditUserInformation> {
                                     onTap: () {
                                       launchUrl(Uri.parse(medicalReport!));
                                     },
-                                    child: Text(
+                                    child: const Text(
                                       "View Medical Report",
                                       style: TextStyle(
                                         color: Colors.blue,
@@ -391,16 +400,18 @@ class _EditUserInformationState extends State<EditUserInformation> {
                                       ),
                                     ),
                                   ),
-                                  SizedBox(height: 20),
+                                  const SizedBox(height: 20),
                                 ],
                               ),
-                            SizedBox(height: 15),
+
+                            const SizedBox(height: 15),
                             const Text(
                               "Blood Type",
                               style: TextStyle(
-                                  fontSize: 16,
-                                  color: Colors.black,
-                                  fontWeight: FontWeight.bold),
+                                fontSize: 16,
+                                color: Colors.black,
+                                fontWeight: FontWeight.bold,
+                              ),
                             ),
                             const SizedBox(height: 16),
                             Wrap(
@@ -413,16 +424,13 @@ class _EditUserInformationState extends State<EditUserInformation> {
                                       horizontal: 20, vertical: 12),
                                   decoration: BoxDecoration(
                                     color: selectedBloodType != null
-                                        ? Colors
-                                            .redAccent // Background color when selected
-                                        : Colors
-                                            .white, // Default background color if no selection
+                                      ? Colors.redAccent // Background color when selected
+                                      : Colors.white, // Default background color if no selection
                                     borderRadius: BorderRadius.circular(20),
                                     border: Border.all(
                                       color: selectedBloodType != null
-                                          ? Colors
-                                              .red // Border color when selected
-                                          : Colors.grey, // Default border color
+                                        ? Colors.red // Border color when selected
+                                        : Colors.grey, // Default border color
                                       width: 2,
                                     ),
                                     boxShadow: selectedBloodType != null
@@ -438,15 +446,12 @@ class _EditUserInformationState extends State<EditUserInformation> {
                                   ),
                                   child: Center(
                                     child: Text(
-                                      selectedBloodType ??
-                                          '', // Display selected blood type or empty
+                                      selectedBloodType ?? '', // Display selected blood type or empty
                                       style: TextStyle(
                                         fontSize: 18,
                                         color: selectedBloodType != null
-                                            ? Colors
-                                                .white // White text color when selected
-                                            : Colors
-                                                .black, // Default text color if no selection
+                                          ? Colors.white // White text color when selected
+                                          : Colors.black, // Default text color if no selection
                                         fontWeight: FontWeight.w600,
                                       ),
                                     ),
@@ -457,7 +462,6 @@ class _EditUserInformationState extends State<EditUserInformation> {
                           ],
                         ),
                       ),
-
                       const SizedBox(height: 22),
 
                       // Editable Information Section
@@ -479,6 +483,7 @@ class _EditUserInformationState extends State<EditUserInformation> {
                                   color: Colors.black),
                             ),
                             const SizedBox(height: 15),
+
                             CustomInputBox(
                               textName: 'Contact Number',
                               hintText: 'Enter contact number here',
@@ -497,10 +502,13 @@ class _EditUserInformationState extends State<EditUserInformation> {
                                 LengthLimitingTextInputFormatter(10),
                               ],
                             ),
+
                             CustomInputBox(
-                                textName: 'Address',
-                                hintText: 'Enter address here',
-                                controller: _addressController),
+                              textName: 'Address',
+                              hintText: 'Enter address here',
+                              controller: _addressController,
+                            ),
+
                             _inputBox(
                               _buildDropdown(
                                 label: "Province",
@@ -516,6 +524,7 @@ class _EditUserInformationState extends State<EditUserInformation> {
                               ),
                             ),
                             const SizedBox(height: 15),
+
                             if (selectedProvince != null)
                               _inputBox(
                                 _buildDropdown(
@@ -531,14 +540,15 @@ class _EditUserInformationState extends State<EditUserInformation> {
                                 ),
                               ),
                             const SizedBox(height: 15),
-                            Text(
+
+                            const Text(
                               "Health Conditions",
                               style: TextStyle(
                                   fontSize: 16,
                                   color: Colors.black,
                                   fontWeight: FontWeight.bold),
                             ),
-                            SizedBox(height: 15),
+                            const SizedBox(height: 15),
                             TextFormField(
                               controller: _healthConditionController,
                               maxLines: 20,
@@ -556,7 +566,8 @@ class _EditUserInformationState extends State<EditUserInformation> {
                                 fillColor: Colors.white,
                               ),
                             ),
-                            SizedBox(height: 15),
+                            const SizedBox(height: 15),
+                            
                             SizedBox(
                               width: double.infinity,
                               child: ElevatedButton(
@@ -576,19 +587,18 @@ class _EditUserInformationState extends State<EditUserInformation> {
                                   ),
                                   elevation:
                                       (!_isLoading && hasChanged) ? 2 : 0,
-                                  padding:
-                                      const EdgeInsets.symmetric(vertical: 14),
+                                  padding: const EdgeInsets.symmetric(vertical: 14),
                                 ),
                                 child: _isLoading
-                                    ? const SizedBox(
-                                        width: 24,
-                                        height: 24,
-                                        child: CircularProgressIndicator(
-                                          color: Colors.white,
-                                          strokeWidth: 2,
-                                        ),
-                                      )
-                                    : const Text("Update Information"),
+                                  ? const SizedBox(
+                                      width: 24,
+                                      height: 24,
+                                      child: CircularProgressIndicator(
+                                        color: Colors.white,
+                                        strokeWidth: 2,
+                                      ),
+                                    )
+                                  : const Text("Update Information"),
                               ),
                             ),
                           ],
@@ -613,13 +623,13 @@ class _EditUserInformationState extends State<EditUserInformation> {
       children: [
         Text(
           label,
-          style: TextStyle(
+          style: const TextStyle(
             fontSize: 16,
             color: Colors.black,
             fontWeight: FontWeight.bold,
           ),
         ),
-        SizedBox(height: 10),
+        const SizedBox(height: 10),
         TextFormField(
           controller: controller,
           decoration: InputDecoration(
@@ -655,16 +665,19 @@ class _EditUserInformationState extends State<EditUserInformation> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(label,
-            style: TextStyle(
-                fontSize: 16,
-                color: Colors.black,
-                fontWeight: FontWeight.bold)),
+        Text(
+          label,
+          style: const TextStyle(
+            fontSize: 16,
+            color: Colors.black,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
         const SizedBox(height: 8),
         DropdownButtonFormField<String>(
           isExpanded: true,
           value: value,
-          style: TextStyle(
+          style: const TextStyle(
               fontSize: 16, color: Colors.black, fontWeight: FontWeight.bold),
           decoration: InputDecoration(
             contentPadding:
@@ -673,14 +686,12 @@ class _EditUserInformationState extends State<EditUserInformation> {
             filled: true, // Enable the background color
             fillColor: Colors.white, // Set background color to white
           ),
-          items: items
-              .map(
-                (e) => DropdownMenuItem(
-                  value: e,
-                  child: Text(e, overflow: TextOverflow.ellipsis),
-                ),
-              )
-              .toList(),
+          items: items.map(
+            (e) => DropdownMenuItem(
+              value: e,
+              child: Text(e, overflow: TextOverflow.ellipsis),
+            ),
+          ).toList(),
           onChanged: onChanged,
           validator: (value) => value == null ? 'Required' : null,
         ),
@@ -728,7 +739,7 @@ class _MedicalReportPickerState extends State<MedicalReportPicker> {
             widget.onFileUploaded!(base64String);
           }
         } catch (e) {
-          print('Error while reading or encoding the file: $e');
+          Helpers.debugPrintWithBorder('Error while reading or encoding the file: $e');
         }
       }
     }
@@ -742,16 +753,17 @@ class _MedicalReportPickerState extends State<MedicalReportPicker> {
       child: ElevatedButton(
         onPressed: uploadFile,
         style: ElevatedButton.styleFrom(
-            backgroundColor: btnColor,
-            shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(10),
-                side: BorderSide(color: Colors.black38))),
+          backgroundColor: btnColor,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(10),
+            side: BorderSide(color: Colors.black38))),
         child: Text(
           text,
           style: TextStyle(
-              color: btnColor == Colors.red ? Colors.white : Colors.black,
-              fontWeight: FontWeight.bold,
-              fontSize: 16),
+            color: btnColor == Colors.red ? Colors.white : Colors.black,
+            fontWeight: FontWeight.bold,
+            fontSize: 16,
+          ),
         ),
       ),
     );

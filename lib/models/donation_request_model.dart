@@ -31,25 +31,6 @@ class BloodRequest {
     this.confirmedDonors,
   });
 
-  // Convert a BloodRequest to a Map for Firestore
-  Map<String, dynamic> toFirestore() {
-    return {
-      'patientName': patientName,
-      'requestedBy': requestedBy,
-      'requestBloodType': requestBloodType,
-      'urgencyLevel': urgencyLevel,
-      'requestQuantity': requestQuantity,
-      'province': province,
-      'city': city,
-      'hospitalName': hospitalName,
-      'contactNumber': contactNumber,
-      'createdAt': createdAt,
-      'status': status,
-      'confirmedDonors': confirmedDonors!.map((item) => item).toList(),
-    };
-  }
-
-  // Create a BloodRequest from a Firestore document snapshot
   factory BloodRequest.fromFirestore(DocumentSnapshot doc) {
     final data = doc.data() as Map<String, dynamic>;
 
@@ -68,5 +49,22 @@ class BloodRequest {
       status: data['status'] ?? 'pending',
       confirmedDonors: List<Map<String, dynamic>>.from(data['confirmedDonors']?.map((item) => item as Map<String, dynamic>) ?? []),
     );
+  }
+
+  Map<String, dynamic> toFirestore() {
+    return {
+      'patientName': patientName,
+      'requestedBy': requestedBy,
+      'requestBloodType': requestBloodType,
+      'urgencyLevel': urgencyLevel,
+      'requestQuantity': requestQuantity,
+      'province': province,
+      'city': city,
+      'hospitalName': hospitalName,
+      'contactNumber': contactNumber,
+      'createdAt': createdAt,
+      'status': status,
+      'confirmedDonors': confirmedDonors!.map((item) => item).toList(),
+    };
   }
 }

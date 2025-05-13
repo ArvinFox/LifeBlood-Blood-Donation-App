@@ -157,152 +157,157 @@ class _BloodRequestScreenState extends State<BloodRequestScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
-        appBar: CustomMainAppbar(
+        appBar: const CustomMainAppbar(
         title: 'Donate Blood',
         showLeading: true,
       ),
-      body: _isLoading ? const Center(child: CircularProgressIndicator()) : SingleChildScrollView(
-        child: Padding(
-          padding: const EdgeInsets.all(20),
-          child: Column(
-            children: [
-              const SizedBox(height: 8),
-              const Text(
-                "Urgent help needed! Browse the list of blood donation requests and be a hero. Your donation can save lives and bring hope. Every drop counts!",
-                textAlign: TextAlign.center,
-              ),
-              Container(
-                margin: const EdgeInsets.symmetric(vertical: 18),
-                padding: const EdgeInsets.all(13),
-                decoration: BoxDecoration(
-                    border: Border.all(color: Colors.black, width: 1.5),
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(15)),
-                child: Column(
-                  children: [
-                    _buildDropdown(
-                      label: "Province",
-                      items: provinceCities.keys.toList(),
-                      value: _selectedProvince,
-                      onChanged: (val) {
-                        setState(() {
-                          if (_selectedProvince != val) {
-                            _selectedCity = null;
-                          }
-                          _selectedProvince = val;
-                        });
-                        _checkResetAndFilterState();
-                      },
-                    ),
-                    const SizedBox(height: 15),
-                    if (_selectedProvince != null)
-                      _buildDropdown(
-                        label: "City",
-                        items: provinceCities[_selectedProvince]!,
-                        value: _selectedCity,
-                        onChanged: (val) {
-                          setState(() {
-                            _selectedCity = val;
-                          });
-                          _checkResetAndFilterState();
-                        },
-                      ),
-                    const SizedBox(height: 13),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+      body: _isLoading 
+        ? const Center(child: CircularProgressIndicator(color: Colors.red)) 
+        : SingleChildScrollView(
+            child: Padding(
+              padding: const EdgeInsets.all(20),
+              child: Column(
+                children: [
+                  const SizedBox(height: 8),
+                  const Text(
+                    "Urgent help needed! Browse the list of blood donation requests and be a hero. Your donation can save lives and bring hope. Every drop counts!",
+                    textAlign: TextAlign.center,
+                  ),
+
+                  Container(
+                    margin: const EdgeInsets.symmetric(vertical: 18),
+                    padding: const EdgeInsets.all(13),
+                    decoration: BoxDecoration(
+                      border: Border.all(color: Colors.black, width: 1.5),
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(15)),
+                    child: Column(
                       children: [
-                        OutlinedButton(
-                          onPressed: _canReset ? _resetFilters : null,
-                          style: OutlinedButton.styleFrom(
-                            padding: const EdgeInsets.symmetric(horizontal: 20),
-                            foregroundColor: _canReset ? const Color(0xFFE50F2A) : Colors.grey,
-                            backgroundColor: Colors.white,
-                            side: BorderSide(
-                              color: _canReset ? const Color(0xFFE50F2A) : Colors.grey,
-                              width: 1,
-                            ),
-                            shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(20)),
-                          ),
-                          child: Text("Reset Filter",
-                            style: TextStyle(
-                              fontSize: 13,
-                              fontWeight: FontWeight.w500,
-                              color: _canReset ? const Color(0xFFE50F2A) : Colors.grey,
-                            ),
-                          ),
+                        _buildDropdown(
+                          label: "Province",
+                          items: provinceCities.keys.toList(),
+                          value: _selectedProvince,
+                          onChanged: (val) {
+                            setState(() {
+                              if (_selectedProvince != val) {
+                                _selectedCity = null;
+                              }
+                              _selectedProvince = val;
+                            });
+                            _checkResetAndFilterState();
+                          },
                         ),
-                        OutlinedButton(
-                          onPressed: _canFilter ? _filterRequests : null,
-                          style: OutlinedButton.styleFrom(
-                            padding: const EdgeInsets.symmetric(horizontal: 35),
-                            foregroundColor: _canFilter ? const Color(0xFFE50F2A) : Colors.grey,
-                            backgroundColor: Colors.white,
-                            side: BorderSide(
-                              color: _canFilter ? const Color(0xFFE50F2A) : Colors.grey,
-                              width: 1,
-                            ),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(20),
-                            ),
+                        const SizedBox(height: 15),
+
+                        if (_selectedProvince != null)
+                          _buildDropdown(
+                            label: "City",
+                            items: provinceCities[_selectedProvince]!,
+                            value: _selectedCity,
+                            onChanged: (val) {
+                              setState(() {
+                                _selectedCity = val;
+                              });
+                              _checkResetAndFilterState();
+                            },
                           ),
-                          child: Text(
-                            "Filter",
-                            style: TextStyle(
-                              fontSize: 13,
-                              fontWeight: FontWeight.w500,
-                              color: _canFilter ? const Color(0xFFE50F2A) : Colors.grey,
+                        const SizedBox(height: 13),
+
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                          children: [
+                            OutlinedButton(
+                              onPressed: _canReset ? _resetFilters : null,
+                              style: OutlinedButton.styleFrom(
+                                padding: const EdgeInsets.symmetric(horizontal: 20),
+                                foregroundColor: _canReset ? const Color(0xFFE50F2A) : Colors.grey,
+                                backgroundColor: Colors.white,
+                                side: BorderSide(
+                                  color: _canReset ? const Color(0xFFE50F2A) : Colors.grey,
+                                  width: 1,
+                                ),
+                                shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(20)),
+                              ),
+                              child: Text("Reset Filter",
+                                style: TextStyle(
+                                  fontSize: 13,
+                                  fontWeight: FontWeight.w500,
+                                  color: _canReset ? const Color(0xFFE50F2A) : Colors.grey,
+                                ),
+                              ),
                             ),
-                          ),
+                            
+                            OutlinedButton(
+                              onPressed: _canFilter ? _filterRequests : null,
+                              style: OutlinedButton.styleFrom(
+                                padding: const EdgeInsets.symmetric(horizontal: 35),
+                                foregroundColor: _canFilter ? const Color(0xFFE50F2A) : Colors.grey,
+                                backgroundColor: Colors.white,
+                                side: BorderSide(
+                                  color: _canFilter ? const Color(0xFFE50F2A) : Colors.grey,
+                                  width: 1,
+                                ),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(20),
+                                ),
+                              ),
+                              child: Text(
+                                "Filter",
+                                style: TextStyle(
+                                  fontSize: 13,
+                                  fontWeight: FontWeight.w500,
+                                  color: _canFilter ? const Color(0xFFE50F2A) : Colors.grey,
+                                ),
+                              ),
+                            ),
+                          ],
                         ),
                       ],
                     ),
+                  ),
+
+                  // Show no request found text if no results after filter
+                  if (displayedRequests.isEmpty) ...[
+                    const SizedBox(height: 20),
+                    const Center(
+                      child: Text(
+                        'No blood donation requests found',
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.red),
+                      ),
+                    ),
                   ],
-                ),
+
+                  // Show blood requests when available
+                  if (displayedRequests.isNotEmpty) ...[
+                    ListView.builder(
+                      shrinkWrap: true,
+                      physics: const NeverScrollableScrollPhysics(),
+                      itemCount: displayedRequests.length,
+                      itemBuilder: (context, index) {
+                        return BloodRequestCard(request: displayedRequests[index]);
+                      },
+                    ),
+
+                    if (filteredRequests.length != displayedRequests.length)
+                    ElevatedButton(
+                      onPressed: loadMoreRequests,
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: const Color(0xFFE50F2A),
+                        padding: const EdgeInsets.symmetric(horizontal: 100, vertical: 10)),
+                      child: const Text(
+                        "Load More",
+                        style: TextStyle(color: Colors.white),
+                      ),
+                    ),
+                  ],
+                ],
               ),
-
-              // Show no request found text if no results after filter
-              if (displayedRequests.isEmpty) ...[
-                const SizedBox(height: 20),
-                const Center(
-                  child: Text(
-                    'No blood donation requests found',
-                    style: TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.red),
-                  ),
-                ),
-              ],
-
-              // Show blood requests when available
-              if (displayedRequests.isNotEmpty) ...[
-                ListView.builder(
-                  shrinkWrap: true,
-                  physics: const NeverScrollableScrollPhysics(),
-                  itemCount: displayedRequests.length,
-                  itemBuilder: (context, index) {
-                    return BloodRequestCard(request: displayedRequests[index]);
-                  },
-                ),
-
-                if (filteredRequests.length != displayedRequests.length)
-                ElevatedButton(
-                  onPressed: loadMoreRequests,
-                  style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color(0xFFE50F2A),
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 100, vertical: 10)),
-                  child: const Text(
-                    "Load More",
-                    style: TextStyle(color: Colors.white),
-                  ),
-                ),
-              ],
-            ],
+            ),
           ),
-        ),
-      ),
     );
   }
 
@@ -317,27 +322,26 @@ class _BloodRequestScreenState extends State<BloodRequestScreen> {
       children: [
         Text(
           label, 
-          style: TextStyle(fontSize: 16,color: Colors.black,fontWeight: FontWeight.bold)
+          style: const TextStyle(fontSize: 16,color: Colors.black,fontWeight: FontWeight.bold)
         ),
         const SizedBox(height: 8),
+        
         DropdownButtonFormField<String>(
           isExpanded: true,
           value: value,
-          style: TextStyle(fontSize: 16,color: Colors.black,fontWeight: FontWeight.bold),
+          style: const TextStyle(fontSize: 16,color: Colors.black,fontWeight: FontWeight.bold),
           decoration: InputDecoration(
             contentPadding: const EdgeInsets.symmetric(horizontal: 16,vertical: 14),
             border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
           ),
           autovalidateMode: AutovalidateMode.onUserInteraction,
           items:
-            items
-              .map(
-                (e) => DropdownMenuItem(
-                  value: e,
-                  child: Text(e, overflow: TextOverflow.ellipsis),
-                ),
-              )
-              .toList(),
+            items.map(
+              (e) => DropdownMenuItem(
+                value: e,
+                child: Text(e, overflow: TextOverflow.ellipsis),
+              ),
+            ).toList(),
           onChanged: onChanged,
         ),
       ],
